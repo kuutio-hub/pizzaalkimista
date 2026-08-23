@@ -1,0 +1,673 @@
+/* ==========================================================================
+   PizzaAlkimista — design tokens
+   Alkimista / Szabadkőműves stílusú sötét, elegáns és modern dizájn
+   ========================================================================== */
+:root {
+  --bg:            #0c0c0e;
+  --surface:       #131316;
+  --surface-2:     #1a1a1f;
+  --ink:           #f4f4f5;
+  --ink-soft:      #9ca3af;
+  --line:          rgba(212, 175, 55, 0.12);
+  --line-strong:   rgba(212, 175, 55, 0.25);
+  --primary:       #C5A059;
+  --primary-dark:  #a88444;
+  --primary-light: #1c1915;
+  --accent:        #C5A059;
+  --accent-light:  #211e18;
+  --gold:          #d4af37;
+  --gold-dark:     #c5a059;
+  --gold-light:    #2e2719;
+  --danger:        #A1301C;
+  --shadow-sm:     0 2px 8px rgba(0,0,0,.4);
+  --shadow-md:     0 12px 40px rgba(0,0,0,.7);
+  --radius-s:      10px;
+  --radius-m:      18px;
+  --radius-l:      26px;
+  --font-display:  'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body:     'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:     'Space Mono', 'SFMono-Regular', Menlo, monospace;
+  --nav-h:         68px;
+  --header-h:      64px;
+  --safe-b:        env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(var(--nav-h) + var(--safe-b));
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ---------- Szabadkőműves & Alkimista Háttér ---------- */
+.masonic-background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--bg);
+}
+/* Finom alkimista rácsháló */
+.geometric-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: 
+    linear-gradient(to right, var(--gold) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--gold) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+/* Szent geometria motívum (finom körök és háromszögek a háttérben) */
+.sacred-geometry {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 500px;
+  opacity: 0.05;
+  background: radial-gradient(circle, transparent 30%, var(--gold) 31%, transparent 32%),
+              radial-gradient(circle, transparent 50%, var(--gold) 51%, transparent 52%);
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0 0 .4em;
+  letter-spacing: -.01em;
+  color: var(--gold);
+}
+h1 { font-size: 1.9rem; border-bottom: 2px solid var(--line); padding-bottom: 0.6rem; }
+h2 { font-size: 1.45rem; }
+h3 { font-size: 1.2rem; }
+p { margin: 0 0 .8em; line-height: 1.62; color: var(--ink-soft); }
+button, select, input { font-family: inherit; }
+a { color: var(--gold); text-decoration: none; }
+
+/* ---------- App header ---------- */
+.app-header {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: .6rem;
+  height: var(--header-h);
+  padding: 0 1.2rem;
+  background: rgba(12, 12, 14, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.app-header .logo { flex: none; filter: drop-shadow(0 0 4px rgba(212,175,55,0.4)); }
+.app-header .brand {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem;
+  letter-spacing: -.01em;
+  color: var(--gold);
+}
+.app-header .brand small {
+  display: block; font-family: var(--font-body); font-weight: 800;
+  font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft);
+}
+.app-header .spacer { flex: 1; }
+
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--line-strong); background: var(--surface-2);
+  color: var(--gold); cursor: pointer; transition: 0.15s;
+}
+.icon-btn svg { width: 20px; height: 20px; }
+.icon-btn:active { transform: scale(.92); background: var(--primary-light); }
+.icon-btn[disabled] { opacity: 0.3; cursor: not-allowed; }
+
+/* ---------- Views / layout ---------- */
+main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
+.view { display: none; animation: fade .2s ease-out; }
+.view.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.section-eyebrow {
+  font-size: .75rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+  color: var(--primary); margin-bottom: .4rem;
+}
+.lead { color: var(--ink-soft); font-size: 0.95rem; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---------- Form fields ---------- */
+.field { margin-bottom: 1.25rem; }
+.field-label {
+  display: flex; align-items: center; gap: .35rem;
+  font-weight: 700; font-size: .85rem; margin-bottom: .5rem;
+  color: var(--ink);
+}
+.info-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 1px solid var(--line-strong); background: var(--surface-2);
+  color: var(--gold); font: 700 11px/16px var(--font-body);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; flex: none;
+}
+.field input[type=number], .field select, .field input[type=text] {
+  width: 100%; padding: .8rem 1rem; font-size: 1.05rem;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-s);
+  background: var(--surface-2); color: var(--ink); font-family: var(--font-mono);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  text-align: center;
+}
+.field input[readonly] {
+  cursor: pointer;
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+.field input[readonly].numpad-active {
+  border-color: var(--gold);
+  box-shadow: 0 0 8px var(--line-strong);
+}
+.field select { font-family: var(--font-body); text-align: center; text-align-last: center; }
+.field .hint { font-size: .78rem; color: var(--ink-soft); margin-top: .4rem; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+
+.conditional-section {
+  border-top: 1px solid var(--line);
+  padding-top: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+/* ---------- Precíziós Stepper gombok range-hez ---------- */
+.mobile-stepper {
+  display: flex; align-items: center; gap: 0.5rem; width: 100%;
+}
+.mobile-stepper input[type=range] {
+  flex: 1; accent-color: var(--primary); height: 8px; border-radius: 4px;
+}
+.step-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--surface-2); border: 1px solid var(--line-strong);
+  color: var(--gold); font-size: 1.2rem; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; flex: none; transition: 0.1s;
+}
+.step-btn:active {
+  transform: scale(0.9);
+  background: var(--primary-light);
+}
+.range-value {
+  font-family: var(--font-mono); font-weight: 700; min-width: 5.5em; text-align: right;
+  color: var(--gold); font-size: 0.95rem;
+}
+
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .75rem 0; border-top: 1px solid var(--line);
+}
+.toggle-row:first-child { border-top: 0; }
+.switch { position: relative; width: 46px; height: 26px; flex: none; }
+.switch input { opacity: 0; width: 100%; height: 100%; margin: 0; position: absolute; cursor: pointer; z-index: 2; }
+.switch .track {
+  position: absolute; inset: 0; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 999px; transition: .15s;
+}
+.switch .thumb {
+  position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--ink-soft); transition: .15s;
+}
+.switch input:checked + .track { background: var(--primary-light); border-color: var(--primary); }
+.switch input:checked ~ .thumb { transform: translateX(20px); background: var(--gold); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  border: 1px solid var(--line-strong); border-radius: 999px; padding: .9rem 1.5rem;
+  font-weight: 700; font-size: .95rem; cursor: pointer; transition: 0.15s;
+}
+.btn-primary { background: var(--primary); color: var(--bg); border-color: var(--gold); }
+.btn-primary:active { background: var(--primary-dark); transform: scale(0.98); }
+.btn-ghost { background: var(--surface-2); color: var(--ink); }
+.btn-ghost:active { background: var(--primary-light); }
+.btn-block { width: 100%; }
+.btn-sm { padding: .55rem 1rem; font-size: .8rem; }
+.btn-icon svg { width: 18px; height: 18px; }
+
+/* ---------- Results ---------- */
+.result-hero {
+  background: linear-gradient(135deg, #181613 0%, #0c0c0e 100%);
+  color: var(--gold); border-radius: var(--radius-l); padding: 1.5rem;
+  margin-bottom: 1.25rem; border: 1px solid var(--primary);
+  text-align: center;
+}
+.result-hero .total { font-family: var(--font-mono); font-size: 2.4rem; font-weight: 700; color: var(--gold); }
+.result-hero .total span { font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+.result-hero .meta { font-size: .85rem; color: var(--ink-soft); margin-top: .4rem; }
+
+/* Élesztő váltó nyilak */
+.yeast-switcher-inline {
+  display: flex;
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 2px;
+}
+.yeast-arrow-btn {
+  background: none;
+  border: 0;
+  color: var(--gold);
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: 0.15s;
+}
+.yeast-arrow-btn:active {
+  transform: scale(0.85);
+}
+
+/* Fix oszlopos, ugrásmentes hozzávalók táblázat */
+.ing-table { width: 100%; border-collapse: collapse; }
+.ing-table-fixed {
+  table-layout: fixed;
+  width: 100%;
+}
+.ing-table-fixed th, .ing-table-fixed td {
+  padding: .65rem .3rem; 
+  border-bottom: 1px solid var(--line); 
+  font-size: .95rem; 
+  color: var(--ink);
+}
+.ing-table-fixed td:nth-child(1) {
+  width: 55%;
+  text-align: left;
+}
+.ing-table-fixed td:nth-child(2) {
+  width: 20%;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+.ing-table-fixed td:nth-child(3) {
+  width: 25%;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--gold);
+}
+.ing-table tr:last-child td { border-bottom: 0; }
+
+.accent-row { background: var(--gold-light); }
+.accent-row td { color: var(--gold) !important; }
+
+.timeline { list-style: none; margin: 0; padding: 0; }
+.timeline li {
+  display: flex; gap: .7rem; padding: .7rem 0; border-top: 1px solid var(--line); font-size: 0.92rem;
+}
+.timeline li:first-child { border-top: 0; }
+.timeline .dot {
+  width: 9px; height: 9px; border-radius: 50%; background: var(--gold); margin-top: .5rem; flex: none;
+}
+.timeline .t { font-family: var(--font-mono); font-size: .8rem; color: var(--ink-soft); min-width: 6em; }
+
+/* ---------- Recipe list ---------- */
+.recipe-item {
+  display: flex; align-items: center; gap: .7rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-m);
+  padding: .9rem; margin-bottom: .6rem;
+}
+.recipe-item .thumb {
+  width: 44px; height: 44px; border-radius: 50%; flex: none;
+  background: conic-gradient(var(--gold), var(--primary-dark), var(--gold-light), var(--gold));
+  border: 1px solid var(--line-strong);
+}
+.recipe-item .info { flex: 1; min-width: 0; }
+.recipe-item .info h4 { margin: 0 0 .2rem; font-size: 1rem; font-family: var(--font-body); font-weight: 700; color: var(--gold); }
+.recipe-item .info .sub { font-size: .78rem; color: var(--ink-soft); }
+.recipe-item .actions { display: flex; gap: .35rem; }
+
+.empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--ink-soft); }
+.empty-state svg { width: 56px; height: 56px; margin-bottom: .6rem; opacity: .4; color: var(--gold); }
+
+/* ---------- Wiki (Tudástár) ---------- */
+.wiki-grid { display: grid; grid-template-columns: 1fr; gap: .8rem; }
+@media (min-width: 480px) {
+  .wiki-grid { grid-template-columns: 1fr 1fr; }
+}
+.wiki-cat-btn {
+  display: flex; align-items: center; gap: .75rem; text-align: left;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-m);
+  padding: .95rem; cursor: pointer; color: var(--ink);
+  transition: transform 0.15s, border-color 0.15s;
+}
+.wiki-cat-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+.wiki-cat-btn .ic {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--gold-light);
+  color: var(--gold); display: flex; align-items: center; justify-content: center; flex: none;
+  border: 1px solid var(--line-strong);
+}
+.wiki-cat-btn .ic svg { width: 20px; height: 20px; }
+.wiki-cat-btn h4 { margin: 0; font-size: .95rem; color: var(--gold); }
+.wiki-cat-btn .sub { font-size: .75rem; color: var(--ink-soft); }
+.wiki-article h3 { margin-top: 1.2rem; }
+.wiki-article table { width: 100%; border-collapse: collapse; margin: .8rem 0; font-size: .85rem; }
+.wiki-article th, .wiki-article td { border: 1px solid var(--line); padding: .5rem .6rem; text-align: left; }
+.wiki-article th { background: var(--surface-2); color: var(--gold); }
+
+/* ---------- Bottom nav ---------- */
+.bottom-nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: flex; height: var(--nav-h); padding-bottom: var(--safe-b);
+  background: var(--surface); border-top: 1px solid var(--line);
+}
+.bottom-nav button {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .25rem; border: 0; background: none; color: var(--ink-soft); font-size: .72rem; font-weight: 700;
+  cursor: pointer; transition: 0.15s;
+}
+.bottom-nav button svg { width: 22px; height: 22px; color: var(--ink-soft); }
+.bottom-nav button.active { color: var(--gold); }
+.bottom-nav button.active svg { color: var(--gold); }
+
+/* ---------- Popup sheets & Settings ---------- */
+.sheet-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 40;
+  display: none; align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.sheet-backdrop.open { display: flex; }
+.sheet {
+  width: 100%; max-width: 640px; max-height: 85vh;
+  background: var(--surface); border-radius: 24px 24px 0 0; padding: 1.2rem 1.2rem calc(1.8rem + var(--safe-b));
+  box-shadow: var(--shadow-md); border-top: 2px solid var(--primary);
+  display: flex; flex-direction: column;
+}
+.sheet-body-scroll {
+  overflow-y: auto;
+  max-height: 70vh;
+  padding-right: 4px;
+}
+.sheet-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--line-strong); margin: 0 auto 1rem; }
+.sheet h3 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; color: var(--gold); }
+
+/* ---------- Virtuális Számbillentyűzet ---------- */
+.numpad {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+  background: #121215; border-top: 3px solid var(--primary);
+  border-radius: 24px 24px 0 0;
+  padding: 1rem 1.2rem calc(1.2rem + var(--safe-b));
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-width: 640px;
+  margin: 0 auto;
+  transform: translateY(100%);
+  transition: transform 0.2s ease-out;
+}
+.numpad.open {
+  transform: translateY(0);
+}
+.numpad-header {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.numpad-header span {
+  font-weight: 700; font-size: 0.9rem; color: var(--ink-soft);
+}
+.numpad-input-row {
+  background: #0c0c0e; border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s); padding: 0.8rem; text-align: center;
+}
+#numpad-display-val {
+  font-family: var(--font-mono); font-size: 2rem; font-weight: 700; color: var(--gold);
+}
+.numpad-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;
+}
+.numpad-grid button {
+  background: var(--surface-2); border: 1px solid var(--line);
+  color: var(--ink); border-radius: 12px; height: 50px;
+  font-size: 1.4rem; font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: 0.05s;
+}
+.numpad-grid button:active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  transform: scale(0.95);
+}
+.numpad-grid button.numpad-back {
+  color: var(--danger);
+}
+.numpad-actions {
+  margin-top: 0.2rem;
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: calc(var(--nav-h) + 14px + var(--safe-b));
+  transform: translateX(-50%) translateY(8px); opacity: 0;
+  background: var(--gold); color: var(--bg); padding: .7rem 1.2rem; border-radius: 999px;
+  font-size: .85rem; font-weight: 700; z-index: 50; transition: .2s; pointer-events: none;
+  box-shadow: var(--shadow-md);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- Utility ---------- */
+.flex { display: flex; gap: .5rem; }
+.mt { margin-top: 1.2rem; }
+.center { text-align: center; }
+.small { font-size: .78rem; color: var(--ink-soft); }
+
+@media (min-width: 641px) {
+  .sheet-backdrop {
+    align-items: center;
+  }
+  .sheet {
+    border-radius: 24px;
+    max-height: 80vh;
+    border: 2px solid var(--primary);
+  }
+  .sheet-body-scroll {
+    max-height: 55vh;
+  }
+}
+
+/* ---------- Nehézségi szintjelző (Színkód rendszer) ---------- */
+.diff-easy input[type="number"],
+.diff-easy input[type="range"] {
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.35);
+  border-color: rgba(74, 222, 128, 0.6) !important;
+}
+.diff-medium input[type="number"],
+.diff-medium input[type="range"] {
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.35);
+  border-color: rgba(251, 191, 36, 0.6) !important;
+}
+.diff-hard input[type="number"],
+.diff-hard input[type="range"] {
+  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.35);
+  border-color: rgba(248, 113, 113, 0.6) !important;
+}
+.diff-easy .field-label::after { content: ' 🟢'; font-size: 0.75em; }
+.diff-medium .field-label::after { content: ' 🟡'; font-size: 0.75em; }
+.diff-hard .field-label::after { content: ' 🔴'; font-size: 0.75em; }
+
+/* ---------- Nyomtatási stílusok ---------- */
+#print-root {
+  display: none;
+}
+
+@media print {
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  }
+
+  /* Elrejtünk minden képernyős elemet */
+  header, main, nav, .sheet-backdrop, .toast, .numpad, .bottom-nav, .app-header {
+    display: none !important;
+  }
+
+  /* Megjelenítjük a nyomtatási sablont */
+  #print-root {
+    display: block !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 20px !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  .p-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .p-header .brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000000;
+  }
+
+  .p-header .brand small {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #555555;
+  }
+
+  .p-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 0.2rem;
+  }
+
+  .p-subtitle {
+    font-size: 1.1rem;
+    color: #555555;
+    margin-bottom: 1rem;
+  }
+
+  .p-badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .p-badge {
+    background: #f0f0f0;
+    color: #000000;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: 1px solid #cccccc;
+  }
+
+  .p-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .p-section h3 {
+    border-bottom: 1px solid #dddddd;
+    padding-bottom: 0.3rem;
+    margin-bottom: 0.6rem;
+    font-size: 1.2rem;
+    color: #000000;
+  }
+
+  .p-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .p-table td {
+    padding: 0.4rem 0;
+    border-bottom: 1px dashed #dddddd;
+    color: #000000;
+  }
+
+  .p-table td.amt {
+    text-align: right;
+    font-weight: bold;
+  }
+
+  .p-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .p-timeline li {
+    margin-bottom: 0.5rem;
+    padding-left: 1.2rem;
+    position: relative;
+    color: #000000;
+  }
+
+  .p-timeline li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #000000;
+  }
+
+  .p-timeline li .t {
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+
+  .p-method {
+    padding-left: 1.2rem;
+    color: #000000;
+  }
+
+  .p-method li {
+    margin-bottom: 0.4rem;
+  }
+
+  .p-comments {
+    border: 1px solid #cccccc;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1.5rem;
+    color: #000000;
+  }
+
+  .p-comments .label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .p-footer {
+    margin-top: 2rem;
+    border-top: 1px solid #dddddd;
+    padding-top: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #555555;
+  }
+}

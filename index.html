@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title data-str="appTitle">PizzaAlkimista — a tökéletes tészta tudománya</title>
+<meta name="description" content="Privát, magyar nyelvű pizzatészta-kalkulátor: Biga előtészta, öregtészta, élesztő- és liszttudomány, mentett receptek, nyomtatható receptlap.">
+<meta name="theme-color" content="#101012">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-32.png" sizes="32x32">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PizzaAlkimista">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+
+<!-- MASZONIKUS / ALKIMISTA HÁTTÉR RÁCS -->
+<div class="masonic-background">
+  <div class="geometric-grid"></div>
+  <div class="sacred-geometry"></div>
+</div>
+
+<header class="app-header">
+  <!-- ELEGÁNS ALKIMISTA PIZZA LOGÓ (SVG) -->
+  <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:36px; height:36px;">
+    <!-- Háromszög (Alkimista Tűz szimbólum és szabadkőműves piramis) -->
+    <polygon points="50,15 15,80 85,80" fill="none" stroke="#D4AF37" stroke-width="4"/>
+    <!-- Körök és Pizzaszelet sugarak -->
+    <circle cx="50" cy="55" r="20" fill="none" stroke="#D4AF37" stroke-width="2" stroke-dasharray="3 3"/>
+    <line x1="50" y1="55" x2="50" y2="35" stroke="#D4AF37" stroke-width="2"/>
+    <line x1="50" y1="55" x2="33" y2="65" stroke="#D4AF37" stroke-width="2"/>
+    <line x1="50" y1="55" x2="67" y2="65" stroke="#D4AF37" stroke-width="2"/>
+    <!-- Mindent látó Alkimista Szem a piramis tetején -->
+    <path d="M40,30 Q50,20 60,30 Q50,40 40,30 Z" fill="none" stroke="#D4AF37" stroke-width="2"/>
+    <circle cx="50" cy="30" r="3" fill="#D4AF37"/>
+  </svg>
+
+  <div class="brand" data-str="brandName">PizzaAlkimista<small data-str="brandSubtitle">A tökéletes tészta tudománya</small></div>
+  <div class="spacer"></div>
+  <button class="icon-btn" id="btn-settings" title="Beállítások">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+  <button class="icon-btn" id="btn-install" title="Telepítés" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 19h14"/></svg>
+  </button>
+</header>
+
+<main>
+
+  <!-- ===================== KALKULÁTOR ===================== -->
+  <section class="view active" id="view-calc">
+    <div class="section-eyebrow" data-str="settingsBtn">Kalkulátor</div>
+    <h1 data-str="mainHeading">Milyen tésztát készítünk?</h1>
+    <p class="lead" data-str="leadText">Add meg a paramétereket az alkímiai számításokhoz.</p>
+
+    <form id="calc-form" class="card">
+      <div id="form-fields"><!-- app.js tölti fel a tészta formátumnak megfelelően --></div>
+
+      <!-- Kelesztési szekció -->
+      <h3 class="mt" data-str="timelineDagasztas">Kelesztés</h3>
+      
+      <div class="field">
+        <label class="field-label"><span data-str="labelRoomHours">Szobahőmérsékletű kelesztés</span>
+          <button type="button" class="info-dot" data-info="roomHours">i</button>
+        </label>
+        <div class="range-row mobile-stepper">
+          <button type="button" class="step-btn" data-step-dir="-1" data-input-id="roomHours">-</button>
+          <input type="range" id="roomHours" min="0.5" max="24" step="0.5" value="4">
+          <button type="button" class="step-btn" data-step-dir="1" data-input-id="roomHours">+</button>
+          <span class="range-value" id="roomHours-val">4 óra</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label"><span data-str="labelRoomTemp">Szoba hőmérséklete (°C)</span>
+          <button type="button" class="info-dot" data-info="roomTemp">i</button>
+        </label>
+        <div class="range-row mobile-stepper">
+          <button type="button" class="step-btn" data-step-dir="-1" data-input-id="roomTempC">-</button>
+          <input type="range" id="roomTempC" min="16" max="32" step="0.5" value="22">
+          <button type="button" class="step-btn" data-step-dir="1" data-input-id="roomTempC">+</button>
+          <span class="range-value" id="roomTempC-val">22°C</span>
+        </div>
+      </div>
+
+      <!-- Hűtős kelesztés paraméterek -->
+      <div id="cold-fields" hidden>
+        <div class="field">
+          <label class="field-label" data-str="labelColdHours">Hűtőszekrényben töltött idő</label>
+          <div class="range-row mobile-stepper">
+            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="coldHours">-</button>
+            <input type="range" id="coldHours" min="1" max="72" step="1" value="24">
+            <button type="button" class="step-btn" data-step-dir="1" data-input-id="coldHours">+</button>
+            <span class="range-value" id="coldHours-val">24 óra</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" data-str="labelColdTemp">Hűtőszekrény hőmérséklete (°C)</label>
+          <div class="range-row mobile-stepper">
+            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="coldTempC">-</button>
+            <input type="range" id="coldTempC" min="1" max="12" step="0.5" value="4">
+            <button type="button" class="step-btn" data-step-dir="1" data-input-id="coldTempC">+</button>
+            <span class="range-value" id="coldTempC-val">4°C</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Biga paraméterek -->
+      <div id="biga-fields" hidden class="conditional-section">
+        <h3 class="mt" data-str="resHeadingBiga">Biga beállítások</h3>
+        <div class="row2">
+          <div class="field">
+            <label class="field-label" data-str="labelBigaFlourPct">Biga liszt (%)</label>
+            <input type="number" id="bigaFlourPct" min="10" max="100" value="50" readonly>
+          </div>
+          <div class="field">
+            <label class="field-label" data-str="labelBigaHydration">Biga hidratáció (%)</label>
+            <input type="number" id="bigaHydration" min="40" max="100" value="45" readonly>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="field-label" data-str="labelBigaRoomHours">Biga szobahős kelesztés (óra)</label>
+            <input type="number" id="bigaRoomHours" min="0.5" max="48" step="0.5" value="16" readonly>
+          </div>
+          <div class="field">
+            <label class="field-label" data-str="labelBigaRoomTemp">Biga szobahőmérséklet (°C)</label>
+            <input type="number" id="bigaRoomTempC" min="12" max="30" step="0.5" value="18" readonly>
+          </div>
+        </div>
+        <div class="toggle-row" style="border-top:0; padding-top:0;">
+          <label class="field-label" style="margin:0" data-str="labelBigaUseCold">Biga hidegen is érik</label>
+          <label class="switch"><input type="checkbox" id="useBigaCold"><span class="track"></span><span class="thumb"></span></label>
+        </div>
+        <div id="biga-cold-fields" hidden>
+          <div class="row2">
+            <div class="field">
+              <label class="field-label" data-str="labelBigaColdHours">Biga hűtős kelesztés (óra)</label>
+              <input type="number" id="bigaColdHours" min="1" max="72" value="24" readonly>
+            </div>
+            <div class="field">
+              <label class="field-label" data-str="labelBigaColdTemp">Biga hűtő hőmérséklet (°C)</label>
+              <input type="number" id="bigaColdTempC" min="1" max="12" step="0.5" value="4" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Öregtészta hozzáadása (BE) -->
+      <div id="olddough-in-fields" hidden class="conditional-section">
+        <h3 class="mt">Öregtészta hozzáadása (BE)</h3>
+        <div class="row2">
+          <div class="field">
+            <label class="field-label" data-str="labelOldDoughG">Öregtészta mennyisége (g)</label>
+            <input type="number" id="oldDoughG" min="10" max="500" value="100" readonly>
+          </div>
+          <div class="field">
+            <label class="field-label" data-str="labelOldDoughHydration">Öregtészta hidratációja (%)</label>
+            <input type="number" id="oldDoughHydration" min="40" max="100" value="60" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Öregtészta kivétele (KI) -->
+      <div id="olddough-out-fields" hidden class="conditional-section">
+        <h3 class="mt">Öregtészta kivétele (KI)</h3>
+        <div class="field">
+          <label class="field-label" data-str="labelTakeOutOldDoughG">Kiveendő mennyiség (g)</label>
+          <input type="number" id="takeOutOldDoughG" min="10" max="500" value="150" readonly>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block mt" data-str="btnCalculate">Kiszámítás</button>
+    </form>
+
+    <!-- Eredmények megjelenítése -->
+    <div id="result-wrap" hidden>
+      <div class="result-hero">
+        <div class="small" style="opacity:.85" id="res-style"></div>
+        <div class="total" id="res-total">0 <span>g tészta</span></div>
+        <div class="meta" id="res-meta"></div>
+      </div>
+
+      <div class="card">
+        <div class="flex" style="justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h3 data-str="resHeadingIngredients">Hozzávalók</h3>
+          
+          <!-- Új, asztali/mobil-kompatibilis élesztőválasztó nyilakkal -->
+          <div class="yeast-switcher-inline">
+            <button type="button" class="yeast-arrow-btn" id="yeast-prev">◀</button>
+            <span id="yeast-active-display" style="font-weight:700; color:var(--gold); font-size:0.85rem; min-width:140px; text-align:center;">Friss élesztő</span>
+            <button type="button" class="yeast-arrow-btn" id="yeast-next">▶</button>
+          </div>
+        </div>
+        
+        <!-- Fix oszlopszélességű, ugrásmentes hozzávalók táblázat -->
+        <table class="ing-table ing-table-fixed" id="ing-table"></table>
+      </div>
+
+      <div class="card" id="biga-card" hidden>
+        <h3 data-str="resHeadingBiga">Biga (előtészta)</h3>
+        <table class="ing-table ing-table-fixed" id="biga-table"></table>
+      </div>
+
+      <div class="card">
+        <h3 data-str="resHeadingTimeline">Idővonal</h3>
+        <ul class="timeline" id="res-timeline"></ul>
+      </div>
+
+      <!-- Autolízis eredmény (ha be van kapcsolva) -->
+      <div id="autolyse-result" hidden></div>
+
+      <!-- Vízhőmérséklet kalkulátor -->
+      <details class="card" style="cursor:pointer;">
+        <summary style="font-weight:700; font-size:0.95rem; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+          🌡️ Vízhőmérséklet kalkulátor <small style="opacity:.6; font-weight:400;">(DDT-alapú)</small>
+          <span style="opacity:.5; font-size:.8rem;">▼</span>
+        </summary>
+        <div style="margin-top:0.8rem;">
+          <div class="row2">
+            <div class="field">
+              <label class="field-label">Cél tészta-hőm. (DDT °C)</label>
+              <input type="number" id="wt-ddt" min="18" max="30" step="0.5" value="23" readonly>
+            </div>
+            <div class="field">
+              <label class="field-label">Liszthőmérséklet (°C)</label>
+              <input type="number" id="wt-flour" min="10" max="40" step="0.5" value="22" readonly>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Dagasztás módja</label>
+            <select id="wt-friction" style="width:100%; padding:0.6rem; background:var(--card); border:1px solid var(--accent-dim); border-radius:8px; color:var(--text);">
+              <option value="kezi">Kézi (nincs súrlódás)</option>
+              <option value="gep">Gépi (kb. +5°C súrlódás)</option>
+            </select>
+          </div>
+          <div id="wt-result" style="margin-top:0.6rem; font-size:0.95rem; padding:0.6rem; background:var(--card); border-radius:8px; border:1px solid var(--accent-dim);"></div>
+        </div>
+      </details>
+
+      <!-- Recept elnevezése beviteli mező közvetlenül a kártyán a PDF indítás/Mentés előtt -->
+      <div class="card">
+        <div class="toggle-row" style="border:0; padding:0; margin-bottom: 0;">
+          <label class="field-label" style="margin:0;">Recept elnevezése</label>
+          <label class="switch"><input type="checkbox" id="toggle-recipe-name"><span class="track"></span><span class="thumb"></span></label>
+        </div>
+        <div class="field" id="recipe-name-field-wrapper" hidden style="margin-bottom:0; margin-top:0.6rem;">
+          <label class="field-label">Recept elnevezése</label>
+          <input type="text" id="recipe-title-input" value="Gregory's Special">
+        </div>
+      </div>
+
+      <div class="flex mt" style="margin-bottom:2rem">
+        <button class="btn btn-ghost btn-block btn-icon" id="btn-save">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 4.5 3 1-1.5 2.5-3 4.5-3C19 5 21.5 8.5 19.5 12.5 17 16.65 12 21 12 21z"/></svg>
+          <span data-str="btnSave">Mentés kedvencekbe</span>
+        </button>
+        <button class="btn btn-ghost btn-block btn-icon" id="btn-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+          <span data-str="btnPrint">Nyomtatás / PDF</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RECEPTJEIM ===================== -->
+  <section class="view" id="view-recipes">
+    <div class="section-eyebrow" data-str="btnSave">Kedvencek</div>
+    <h1 data-str="btnSave">Receptjeim</h1>
+    <p class="lead">Helyben, az eszközödön tárolva — semmi nem kerül fel internetre.</p>
+    <div id="recipe-list"></div>
+  </section>
+
+  <!-- ===================== TUDÁSTÁR ===================== -->
+  <section class="view" id="view-wiki">
+    <div id="wiki-index">
+      <div class="section-eyebrow">Tudástár</div>
+      <h1>Pizzatudomány</h1>
+      <p class="lead">Liszt, élesztő, hidratáció és a fermentáció fogalmai — közérthetően.</p>
+      <div class="wiki-grid" id="wiki-cats"></div>
+    </div>
+    <div id="wiki-article" class="wiki-article" hidden>
+      <button class="btn btn-ghost btn-sm" id="wiki-back">← Vissza a Tudástárhoz</button>
+      <div id="wiki-article-body"></div>
+    </div>
+  </section>
+
+  <!-- ===================== INFÓ ===================== -->
+  <section class="view" id="view-info">
+    <div class="section-eyebrow">Rólunk</div>
+    <h1>Infó</h1>
+    <div class="card">
+      <h3>Mit tud ez az app?</h3>
+      <p>PizzaAlkimista receptek pontos liszt, víz, só, élesztő és olaj mennyiségének meghatározásával, az alacsony hőmérsékletű fermentáció (hűtős érlelés) és a Biga előtészta integrációjával.</p>
+    </div>
+    <div class="card">
+      <h3>Adatkezelés</h3>
+      <p>Nincs szerver, nincs nyomkövetés. Minden mentett recept a böngésző IndexedDB tárolójában marad offline módon.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- BOTTOM NAVIGATION -->
+<nav class="bottom-nav">
+  <button data-view="view-calc" class="active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="16" y1="11" x2="16.01" y2="11"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="16" y1="15" x2="16.01" y2="15"/></svg>
+    Kalkulátor
+  </button>
+  <button data-view="view-recipes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 4.5 3 1-1.5 2.5-3 4.5-3C19 5 21.5 8.5 19.5 12.5 17 16.65 12 21 12 21z"/></svg>
+    Kedvencek
+  </button>
+  <button data-view="view-wiki">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Tudástár
+  </button>
+  <button data-view="view-info">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    Infó
+  </button>
+</nav>
+
+<!-- ===================== POPUP SHEETS ===================== -->
+<div class="sheet-backdrop" id="sheet-backdrop">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h3><span id="sheet-title"></span><button class="icon-btn btn-sm" id="sheet-close" style="width:30px;height:30px">✕</button></h3>
+    <div id="sheet-body"></div>
+  </div>
+</div>
+
+<!-- BEÁLLÍTÁSOK LAP (⚙️ Settings Modal) -->
+<div class="sheet-backdrop" id="settings-backdrop">
+  <div class="sheet settings-sheet">
+    <div class="sheet-handle"></div>
+    <h3><span data-str="settingsTitle">Beállítások</span><button class="icon-btn btn-sm" id="settings-close" style="width:30px;height:30px">✕</button></h3>
+    
+    <div class="sheet-body-scroll">
+      <p data-str="settingsIntro" class="hint">Testreszabhatod az aktív technológiai modulokat.</p>
+      
+      <div class="field">
+        <label class="field-label" data-str="settingDoughType">Tészta formátuma</label>
+        <select id="setting-style-select">
+          <option value="egyeni" data-str="settingDoughBuns">Normál (kerek pizza)</option>
+          <option value="teglia" data-str="settingDoughTray">Tepsis pizza</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Élesztő-aktivitási görbe</label>
+        <select id="setting-yeast-model">
+          <option value="craig">Craig-féle (Alapértelmezett)</option>
+          <option value="alchemist">Alkimista modell</option>
+        </select>
+      </div>
+
+      <div class="toggle-row">
+        <label class="field-label" style="margin:0" data-str="settingLockNapolyi">Nápolyi rögzítés</label>
+        <label class="switch"><input type="checkbox" id="setting-lock-napolyi"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <div class="toggle-row">
+        <label class="field-label" style="margin:0" data-str="settingUseOil">Olaj használata</label>
+        <label class="switch"><input type="checkbox" id="setting-use-oil"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <div class="toggle-row">
+        <label class="field-label" style="margin:0" data-str="settingUseBiga">Biga előtészta alkalmazása</label>
+        <label class="switch"><input type="checkbox" id="setting-use-biga"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <div class="toggle-row">
+        <label class="field-label" style="margin:0" data-str="settingUseOldDoughIn">Öregtészta hozzáadása (BE)</label>
+        <label class="switch"><input type="checkbox" id="setting-use-olddough-in"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <div class="toggle-row">
+        <label class="field-label" style="margin:0" data-str="settingUseOldDoughOut">Öregtészta kivétele (KI)</label>
+        <label class="switch"><input type="checkbox" id="setting-use-olddough-out"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <div class="toggle-row">
+        <label class="field-label" style="margin:0" data-str="settingUseCold">Hűtőszekrényben történő fermentáció</label>
+        <label class="switch"><input type="checkbox" id="setting-use-cold"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <div class="toggle-row" id="setting-secondball-toggle-row">
+        <label class="field-label" style="margin:0" data-str="settingUseSecondBall">Többféle gombócméret</label>
+        <label class="switch"><input type="checkbox" id="setting-use-secondball"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <div class="toggle-row">
+        <label class="field-label" style="margin:0;" data-str="settingSaveHistory">Legutóbbi értékek megjegyzése</label>
+        <label class="switch"><input type="checkbox" id="setting-save-history"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <hr style="border-color: var(--accent-dim); margin: 1rem 0;">
+
+      <div class="toggle-row">
+        <label class="field-label" style="margin:0;">Hulladék kompenzáció <small style="opacity:.6">(Scarto)</small></label>
+        <label class="switch"><input type="checkbox" id="setting-use-waste"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+      <div id="setting-waste-pct-row" hidden style="margin-top:0.5rem;">
+        <label class="field-label">Kompenzáció mértéke: <span id="setting-waste-pct-label">5%</span></label>
+        <div class="range-row mobile-stepper">
+          <button type="button" class="step-btn" data-step-dir="-1" data-input-id="setting-waste-pct">-</button>
+          <input type="range" id="setting-waste-pct" min="1" max="10" step="1" value="5">
+          <button type="button" class="step-btn" data-step-dir="1" data-input-id="setting-waste-pct">+</button>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top:0.8rem;">
+        <label class="field-label" style="margin:0;">Autolízis <small style="opacity:.6">(Autolisi)</small></label>
+        <label class="switch"><input type="checkbox" id="setting-use-autolyse"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+      <div id="setting-autolyse-fields" style="display:none;">
+        <div class="row2" style="margin-top:0.5rem;">
+          <div class="field">
+            <label class="field-label">Autolízisos liszt (%)</label>
+            <input type="number" id="setting-autolyse-flour" min="30" max="100" step="5" value="70" readonly>
+          </div>
+          <div class="field">
+            <label class="field-label">Autolízisos víz (%)</label>
+            <input type="number" id="setting-autolyse-water" min="30" max="100" step="5" value="70" readonly>
+          </div>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top:0.8rem;">
+        <label class="field-label" style="margin:0;">Fahrenheit mód (°F)</label>
+        <label class="switch"><input type="checkbox" id="setting-use-fahrenheit"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <div class="field" style="margin-top:1.5rem;" id="yeast-correction-field-wrapper">
+        <label class="field-label" data-str="settingYeastFactor">Élesztő korrekció (%) <span id="yeast-factor-warn" style="color: var(--gold); font-size: 0.85rem; margin-left: 0.5rem; font-weight: bold; text-shadow: 0 0 5px rgba(212,175,55,0.3);"></span></label>
+        <div class="range-row mobile-stepper">
+          <button type="button" class="step-btn" data-step-dir="-1" data-input-id="yeastFactor">-</button>
+          <input type="range" id="yeastFactor" min="20" max="250" step="5" value="100">
+          <button type="button" class="step-btn" data-step-dir="1" data-input-id="yeastFactor">+</button>
+          <span class="range-value" id="yeastFactor-val">100%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIRTUÁLIS SZÁMBILLENTYŰZET -->
+<div class="numpad" id="numpad" hidden>
+  <div class="numpad-header">
+    <span id="numpad-label">Szám megadása</span>
+    <button type="button" id="numpad-close" class="icon-btn btn-sm">✕</button>
+  </div>
+  <div class="numpad-input-row">
+    <div id="numpad-display-val">0</div>
+  </div>
+  <div class="numpad-grid">
+    <button type="button" data-key="1">1</button>
+    <button type="button" data-key="2">2</button>
+    <button type="button" data-key="3">3</button>
+    <button type="button" data-key="4">4</button>
+    <button type="button" data-key="5">5</button>
+    <button type="button" data-key="6">6</button>
+    <button type="button" data-key="7">7</button>
+    <button type="button" data-key="8">8</button>
+    <button type="button" data-key="9">9</button>
+    <button type="button" data-key=".">,</button>
+    <button type="button" data-key="0">0</button>
+    <button type="button" data-key="back" class="numpad-back">⌫</button>
+  </div>
+  <div class="numpad-actions">
+    <button type="button" class="btn btn-primary btn-block" id="numpad-ok">OK</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===================== NYOMTATÁSI / PDF SABLON ===================== -->
+<div id="print-root">
+  <div class="p-header">
+    <img src="icons/icon.svg" alt="">
+    <div class="brand">PizzaAlkimista<small>A tökéletes tészta tudománya</small></div>
+    <div class="meta" id="p-date"></div>
+  </div>
+  <div class="p-title" id="p-title">Gregory's Special</div>
+  <div class="p-subtitle" id="p-subtitle"></div>
+  <div class="p-badges" id="p-badges"></div>
+  <div class="p-grid">
+    <div>
+      <div class="p-section">
+        <h3 data-str="resHeadingIngredients">Hozzávalók</h3>
+        <table class="p-table" id="p-ingredients"></table>
+      </div>
+      <div class="p-section" id="p-biga-section" hidden>
+        <h3 data-str="resHeadingBiga">Biga (előtészta)</h3>
+        <table class="p-table" id="p-biga"></table>
+      </div>
+    </div>
+    <div>
+      <div class="p-section">
+        <h3 data-str="resHeadingTimeline">Idővonal</h3>
+        <ul class="p-timeline" id="p-timeline"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-section" style="margin-top:1.5rem;">
+    <h3 data-str="printMethodTitle">Elkészítési Útmutató</h3>
+    <ol class="p-method" id="p-method-list"></ol>
+  </div>
+
+  <div class="p-section">
+    <div class="p-comments">
+      <span class="label" data-str="printNotesLabel">Jegyzeteim</span>
+      <div id="p-notes"></div>
+    </div>
+  </div>
+  <div class="p-footer">
+    <span data-str="printFooter">PizzaAlkimista — saját receptúra</span>
+    <span id="p-footer-date"></span>
+  </div>
+</div>
+
+<script src="js/strings.js"></script>
+<script src="js/calc.js"></script>
+<script src="js/db.js"></script>
+<script src="js/wiki-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
