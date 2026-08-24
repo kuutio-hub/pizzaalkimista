@@ -522,7 +522,7 @@
       roomHours: parseFloat(v('roomHours')),
       roomTempC: appSettings.useFahrenheit ? fToC(parseFloat(v('roomTempC'))) : parseFloat(v('roomTempC')),
       yeastModel: appSettings.yeastModel || 'alchemist',
-      yeastFactor: parseFloat(v('yeastFactor') || 100) / 100,
+      yeastFactor: parseFloat(v('yeastFactor') || appSettings.yeastFactor || 100),
       coldHours: appSettings.useCold ? parseFloat(v('coldHours') || 0) : 0,
       coldTempC: appSettings.useFahrenheit ? fToC(parseFloat(v('coldTempC') || 39)) : parseFloat(v('coldTempC') || 4),
       useBiga: appSettings.useBiga,
