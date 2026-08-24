@@ -55,8 +55,7 @@
     saveHistory: true,
     yeastModel: 'alchemist',
     yeastFactor: 100, // 100% = 0% korrekció
-    wastePct: 0 // 0% korrekció (alapból +5% beépítve)
-  };
+    wastePct: 0, // 0% korrekció (alapból +5% beépítve)
     useAutolyse: false,
     autolyseFlourPct: 70,
     autolyseWaterPct: 70,
