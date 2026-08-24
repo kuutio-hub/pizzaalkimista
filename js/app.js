@@ -267,24 +267,45 @@
     if (!btn || !numpadTargetInput) return;
     e.preventDefault();
 
-    const key = btn.dataset.key;
+    const isDecimalField = numpadTargetInput && parseFloat(numpadTargetInput.step) === 0.1;
+
     if (key === 'back') {
       numpadOverwriteMode = false;
       numpadValue = numpadValue.slice(0, -1);
     } else if (key === '.') {
-      if (numpadOverwriteMode) {
-        numpadValue = '0.';
-        numpadOverwriteMode = false;
-      } else if (!numpadValue.includes('.')) {
-        numpadValue += numpadValue === '' ? '0.' : '.';
+      if (!isDecimalField) {
+        if (numpadOverwriteMode) {
+          numpadValue = '0.';
+          numpadOverwriteMode = false;
+        } else if (!numpadValue.includes('.')) {
+          numpadValue += numpadValue === '' ? '0.' : '.';
+        }
       }
     } else {
-      if (numpadOverwriteMode) {
-        numpadValue = key;
-        numpadOverwriteMode = false;
+      if (isDecimalField) {
+        if (numpadOverwriteMode) {
+          numpadValue = key + '.0';
+          numpadOverwriteMode = false;
+        } else {
+          // Ha már egy számjegy + .0 áll bent (pl 3.0), és beír egy 5-öst -> 3.5 lesz
+          // Ha sorban nyomja pl 2, majd 5: 2.0 -> 2.5
+          const digitsOnly = (numpadValue + key).replace(/\D/g, '');
+          if (digitsOnly.length === 1) {
+            numpadValue = digitsOnly + '.0';
+          } else if (digitsOnly.length >= 2) {
+            const integerPart = digitsOnly.slice(0, -1);
+            const decimalPart = digitsOnly.slice(-1);
+            numpadValue = `${integerPart}.${decimalPart}`;
+          }
+        }
       } else {
-        if (numpadValue.length < 6) {
-          numpadValue += key;
+        if (numpadOverwriteMode) {
+          numpadValue = key;
+          numpadOverwriteMode = false;
+        } else {
+          if (numpadValue.length < 6) {
+            numpadValue += key;
+          }
         }
       }
     }
