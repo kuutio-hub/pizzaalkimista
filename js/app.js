@@ -286,16 +286,10 @@
           numpadValue = key + '.0';
           numpadOverwriteMode = false;
         } else {
-          // Ha már egy számjegy + .0 áll bent (pl 3.0), és beír egy 5-öst -> 3.5 lesz
-          // Ha sorban nyomja pl 2, majd 5: 2.0 -> 2.5
-          const digitsOnly = (numpadValue + key).replace(/\D/g, '');
-          if (digitsOnly.length === 1) {
-            numpadValue = digitsOnly + '.0';
-          } else if (digitsOnly.length >= 2) {
-            const integerPart = digitsOnly.slice(0, -1);
-            const decimalPart = digitsOnly.slice(-1);
-            numpadValue = `${integerPart}.${decimalPart}`;
-          }
+          // Ha már egy egész része be van írva (pl. "2.0"), és megnyomjuk a 8-ast: "2.8" lesz!
+          const parts = numpadValue.split('.');
+          const currentInt = parts[0] || '0';
+          numpadValue = `${currentInt}.${key}`;
         }
       } else {
         if (numpadOverwriteMode) {
