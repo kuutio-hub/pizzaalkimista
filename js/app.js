@@ -265,8 +265,7 @@
   numpad.querySelector('.numpad-grid').addEventListener('click', e => {
     const btn = e.target.closest('button[data-key]');
     if (!btn || !numpadTargetInput) return;
-    e.preventDefault();
-
+    const key = btn.dataset.key;
     const isDecimalField = numpadTargetInput && parseFloat(numpadTargetInput.step) === 0.1;
 
     if (key === 'back') {
@@ -636,9 +635,6 @@
     
     if (r.takeOutOldDoughG > 0) {
       rows += `<tr class="accent-row"><td>Kiveendő öregtészta (végén)</td><td></td><td class="amt">${fmtG(r.takeOutOldDoughG)}</td></tr>`;
-    }
-    if (r.wasteG > 0) {
-      rows += `<tr style="opacity:0.6; font-size:0.8em;"><td>↳ ebből veszteség-pótlás</td><td class="pct">${fmt(r.wastePct,0)}%</td><td class="amt">+${fmtG(r.wasteG)}</td></tr>`;
     }
     return rows;
   }
@@ -1051,9 +1047,9 @@
     }
     ingHtml += `
       <tr style="border-top:1px solid #ccc;"><td style="font-weight:bold;">Élesztő fajták:</td><td></td></tr>
-      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastFresh}</td><td class="amt">${fmtG(r.yeast.fresh)}</td></tr>
-      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastInstant}</td><td class="amt">${fmtG(r.yeast.instantDry)}</td></tr>
-      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastActive}</td><td class="amt">${fmtG(r.yeast.activeDry)}</td></tr>`;
+      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastFresh}</td><td class="amt">${fmtG2(r.yeast.fresh)}</td></tr>
+      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastInstant}</td><td class="amt">${fmtG2(r.yeast.instantDry)}</td></tr>
+      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastActive}</td><td class="amt">${fmtG2(r.yeast.activeDry)}</td></tr>`;
     
     if (r.takeOutOldDoughG > 0) {
       ingHtml += `<tr style="border-top:1px dashed #ccc; font-weight:bold;"><td>Kiveendő öregtészta a végén</td><td class="amt">${fmtG(r.takeOutOldDoughG)}</td></tr>`;
