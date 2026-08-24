@@ -1,6 +1,6 @@
 {
-  "name": "PizzaTárcsa — otthoni pizzatészta kalkulátor",
-  "short_name": "PizzaTárcsa",
+  "name": "PizzaAlkimista — otthoni pizzatészta kalkulátor",
+  "short_name": "PizzaAlkimista",
   "description": "Privát, magyar nyelvű pizzatészta-kalkulátor és tudástár: Nápolyi, egyéni és tepsis receptek, mentett kedvencek, nyomtatható receptlap.",
   "start_url": "./index.html",
   "scope": "./",

@@ -1,5 +1,5 @@
 /*!
- * PizzaTárcsa — calc.js
+ * PizzaAlkimista — calc.js
  * ---------------------------------------------------------------------------
  * Determinisztikus tésztaszámító motor.
  *

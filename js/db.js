@@ -1,10 +1,11 @@
 /*!
- * PizzaTárcsa — db.js
- * IndexedDB alapú helyi tárolás a mentett receptekhez. Semmilyen adat nem
- * hagyja el az eszközt, nincs szerver, nincs hálózati hívás.
+ * PizzaAlkimista — db.js
+ * IndexedDB wrapper a mentett receptek tárolásához.
  */
-const PizzaDB = (() => {
-  const DB_NAME = 'pizzatarcsa';
+const PizzaAlkimistaDB = (() => {
+  'use strict';
+
+  const DB_NAME = 'pizzaalkimista';
   const DB_VERSION = 1;
   const STORE = 'recipes';
   let dbPromise = null;

@@ -1,5 +1,5 @@
 /*!
- * PizzaTárcsa — wiki-data.js
+ * PizzaAlkimista — wiki-data.js
  * A Tudástár tartalma. Minden szöveg saját megfogalmazás, nyilvános
  * pékségi/pizzaiolo szakirodalom (AVPN, Pizzaalkímia, Stadler Made stb.)
  * alapján összefoglalva — nem szó szerinti átvétel.

@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================
-REM  start.bat — PizzaTarcsa helyi teszt-inditasa (Windows)
+REM  start.bat — PizzaAlkimista helyi teszt-inditasa (Windows)
 REM  Ezt a fajlt tedd ugyanabba a mappaba, ahol az index.html es
 REM  a serve.py van, majd dupla-kattintassal indithato.
 REM ============================================================

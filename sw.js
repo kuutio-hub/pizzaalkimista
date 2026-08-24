@@ -1,10 +1,10 @@
 /*!
- * PizzaTárcsa — sw.js
+ * PizzaAlkimista — sw.js
  * Egyszerű "app shell" cache-first stratégia: az app maga offline is
  * elinduljon. A GitHub Pages relatív útvonalakat használ, ezért a CACHE
  * kulcsokat is relatívan soroljuk fel.
  */
-const CACHE_NAME = 'pizzatarcsa-v1';
+const CACHE_NAME = 'pizzaalkimista-v1';
 const APP_SHELL = [
   './',
   './index.html',

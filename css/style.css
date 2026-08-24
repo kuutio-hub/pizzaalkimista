@@ -651,25 +651,7 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
   }
 }
 
-/* ---------- Nehézségi szintjelző (Színkód rendszer) ---------- */
-.diff-easy input[type="number"],
-.diff-easy input[type="range"] {
-  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.35);
-  border-color: rgba(74, 222, 128, 0.6) !important;
-}
-.diff-medium input[type="number"],
-.diff-medium input[type="range"] {
-  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.35);
-  border-color: rgba(251, 191, 36, 0.6) !important;
-}
-.diff-hard input[type="number"],
-.diff-hard input[type="range"] {
-  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.35);
-  border-color: rgba(248, 113, 113, 0.6) !important;
-}
-.diff-easy .field-label::after { content: ' 🟢'; font-size: 0.75em; }
-.diff-medium .field-label::after { content: ' 🟡'; font-size: 0.75em; }
-.diff-hard .field-label::after { content: ' 🔴'; font-size: 0.75em; }
+
 
 /* ---------- Nyomtatási stílusok ---------- */
 #print-root {

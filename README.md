@@ -1,21 +1,20 @@
-# PizzaTárcsa 🍕
+# PizzaAlkimista 🍕
 
 Privát, magyar nyelvű, offline-képes pizzatészta-kalkulátor PWA. Tiszta vanilla JS/HTML/CSS — semmilyen build-lépés vagy csomagkezelő nem kell hozzá, egyből GitHub Pages-re tölthető.
 
 ## Gyors indítás — GitHub Pages
 
-1. Hozz létre egy **privát** (vagy publikus, ha nem baj) GitHub repót, pl. `pizzatarcsa`.
+1. Hozz létre egy **privát** (vagy publikus, ha nem baj) GitHub repót, pl. `pizzaalkimista`.
 2. Töltsd fel ennek a mappának a teljes tartalmát a repó gyökerébe.
 3. Repó → **Settings → Pages** → Source: `Deploy from a branch` → Branch: `main` / `(root)` → Save.
-4. Pár perc múlva elérhető lesz: `https://<felhasznalonev>.github.io/pizzatarcsa/`
+4. Pár perc múlva elérhető lesz: `https://<felhasznalonev>.github.io/pizzaalkimista/`
 5. Nyisd meg telefonon, majd:
    - **iOS Safari:** Megosztás → „Kezdőképernyőhöz adás”
    - **Android Chrome:** ⋮ menü → „Telepítés”
 
 Helyi teszteléshez bármilyen statikus szerver jó, pl.:
 ```bash
-python3 -m http.server 8000
-# majd http://localhost:8000
+python3 serve.py
 ```
 (A `file://` megnyitás NEM működik jól, mert a Service Worker és az IndexedDB is HTTP(S) kontextust igényel.)
 
@@ -52,7 +51,7 @@ Fontossági sorrendben, a jelenlegi alapokra épülve:
 4. **Magasság feletti (tengerszint feletti) korrekció** — a légnyomás hatása a kelesztési időre, opcionális GPS-alapú vagy manuális bevitellel.
 5. **Többféle liszt keverése** — ha 2 lisztet keversz (pl. 70% „00” + 30% BL80), a kalkulátor számolja ki az arányos mennyiségeket és a becsült effektív W-értéket.
 6. **Sütési időzítő widget** — kemence-hőmérséklet + stílus alapján ajánlott sütési idő, konyhai időzítő integrációval (Web Notifications API).
-7. **Megosztás QR-kóddal** — egy recept exportálása tömörített URL-paraméterként, hogy egy másik telepített PizzaTárcsa-példányba be lehessen tölteni anélkül, hogy fiók vagy szerver kellene.
+7. **Megosztás QR-kóddal** — egy recept exportálása tömörített URL-paraméterként, hogy egy másik telepített PizzaAlkimista-példányba be lehessen tölteni anélkül, hogy fiók vagy szerver kellene.
 8. **Sötét/világos téma kapcsoló kézzel** — jelenleg csak a rendszerbeállítást követi (`prefers-color-scheme`), egy kézi kapcsoló kényelmesebb lehet.
 9. **Egységváltás** — opcionális uncia/font mértékegység, ha nemzetközi recepteket is be szeretnél másolni.
 10. **Widget / gyorsparancs** — iOS Shortcuts vagy Android widget, ami egy tárolt recepthez egyetlen érintéssel visszaviszi a hozzávalókat.

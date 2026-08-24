@@ -255,10 +255,12 @@
   const numpadLabel = document.getElementById('numpad-label');
   let numpadTargetInput = null;
   let numpadValue = '';
+  let numpadOverwriteMode = false;
 
   function openNumpad(inputEl) {
     numpadTargetInput = inputEl;
     numpadValue = inputEl.value === '0' ? '' : inputEl.value;
+    numpadOverwriteMode = true; // Új megnyitásnál az első gombnyomás felülírja az értéket
     numpadDisplay.textContent = numpadValue || '0';
     
     const fieldParent = inputEl.closest('.field');
@@ -289,14 +291,23 @@
 
     const key = btn.dataset.key;
     if (key === 'back') {
+      numpadOverwriteMode = false;
       numpadValue = numpadValue.slice(0, -1);
     } else if (key === '.') {
-      if (!numpadValue.includes('.')) {
+      if (numpadOverwriteMode) {
+        numpadValue = '0.';
+        numpadOverwriteMode = false;
+      } else if (!numpadValue.includes('.')) {
         numpadValue += numpadValue === '' ? '0.' : '.';
       }
     } else {
-      if (numpadValue.length < 6) {
-        numpadValue += key;
+      if (numpadOverwriteMode) {
+        numpadValue = key;
+        numpadOverwriteMode = false;
+      } else {
+        if (numpadValue.length < 6) {
+          numpadValue += key;
+        }
       }
     }
 
@@ -633,30 +644,7 @@
     return rows;
   }
 
-  // ---------------------------------------------------------------------
-  // Színkód rendszer (hidratáció + só nehézségi szint)
-  // ---------------------------------------------------------------------
-  function updateColorCodes() {
-    const hydrInput = document.getElementById('hydration');
-    const saltInput = document.getElementById('salt');
 
-    if (hydrInput) {
-      const h = parseFloat(hydrInput.value) || 65;
-      const hydrWrap = hydrInput.closest('.field-group') || hydrInput.parentElement;
-      hydrWrap.classList.remove('diff-easy','diff-medium','diff-hard');
-      if (h <= 65) hydrWrap.classList.add('diff-easy');
-      else if (h <= 72) hydrWrap.classList.add('diff-medium');
-      else hydrWrap.classList.add('diff-hard');
-    }
-    if (saltInput) {
-      const s = parseFloat(saltInput.value) || 3.0;
-      const saltWrap = saltInput.closest('.field-group') || saltInput.parentElement;
-      saltWrap.classList.remove('diff-easy','diff-medium','diff-hard');
-      if (s >= 2.5 && s <= 3.0) saltWrap.classList.add('diff-easy');
-      else if (s > 3.0 && s <= 3.5) saltWrap.classList.add('diff-medium');
-      else saltWrap.classList.add('diff-hard');
-    }
-  }
 
   // Autolízis eredmény megjelenítése
   function renderAutolyseSection(r) {
@@ -1234,41 +1222,6 @@
   }
 
   // ---------------------------------------------------------------------
-  // Vízhőmérséklet kalkulátor (DDT-alapú)
-  // ---------------------------------------------------------------------
-  function updateWaterTemp() {
-    const ddtInput = document.getElementById('wt-ddt');
-    const flourInput = document.getElementById('wt-flour');
-    const roomInput = document.getElementById('roomTempC'); // főform értéke
-    const frictionInput = document.getElementById('wt-friction');
-    const resultEl = document.getElementById('wt-result');
-    if (!ddtInput || !resultEl) return;
-
-    const ddt = parseFloat(ddtInput.value) || 23;
-    const flourTemp = parseFloat(flourInput?.value) || parseFloat(roomInput?.value) || 22;
-    const roomTemp = parseFloat(roomInput?.value) || 22;
-    const friction = frictionInput?.value === 'gep' ? 5 : 0;
-    const waterTemp = ddt * 3 - (flourTemp + roomTemp + friction);
-    const rounded = Math.round(waterTemp * 2) / 2;
-
-    let label = '';
-    if (rounded < 5) label = ' ❄️ Nagyon hideg! Adj hozzá jég-kockát.';
-    else if (rounded < 15) label = ' 🧊 Hűtőből!';
-    else if (rounded <= 25) label = ' ✅ Szobahőmérséklet, megfelelő.';
-    else label = ' 🔥 Langyos — vigyázz az élesztőre!';
-
-    resultEl.innerHTML = `Javasolt vízh.: <strong>${rounded} °C</strong>${label}`;
-  }
-
-  function setupWaterTempCalc() {
-    ['wt-ddt','wt-flour','wt-friction'].forEach(id => {
-      document.getElementById(id)?.addEventListener('input', updateWaterTemp);
-    });
-    document.getElementById('roomTempC')?.addEventListener('input', updateWaterTemp);
-    updateWaterTemp();
-  }
-
-  // ---------------------------------------------------------------------
   // Fahrenheit segédfüggvények
   // ---------------------------------------------------------------------
   function cToF(c) { return Math.round((c * 9/5 + 32) * 10) / 10; }
@@ -1311,12 +1264,6 @@
     renderWikiCats();
     renderRecipeList();
     setupYeastSwitcher();
-    setupWaterTempCalc();
-
-    // Színkód élő frissítés
-    document.getElementById('hydration')?.addEventListener('input', updateColorCodes);
-    document.getElementById('salt')?.addEventListener('input', updateColorCodes);
-    updateColorCodes();
 
     // Hulladék % slider élő label
     document.getElementById('setting-waste-pct')?.addEventListener('input', function() {
