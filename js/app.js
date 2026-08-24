@@ -718,19 +718,32 @@
       const translationKey = 'timeline' + item.label;
       const desc = PizzaAlkimistaStrings[translationKey] || item.label;
       
+      let stepName = '';
       let timeLabel = '';
-      if (item.h === 0) {
-        timeLabel = 'Kezdet (0p)';
+
+      if (item.label.includes('Start') || item.label === 'Dagasztas') {
+        stepName = 'Dagasztás';
+        timeLabel = 'Kezdet (most)';
+      } else if (item.label === 'Gombocolas') {
+        stepName = 'Gombócolás';
+        const bulkHours = item.h - (prevItem ? prevItem.h : 0);
+        timeLabel = `Tömbös előérlelés: ${formatDuration(bulkHours)}`;
+      } else if (item.label === 'HutoBe') {
+        stepName = 'Hűtős érlelés';
+        timeLabel = `Hűtőbe tétel (${formatDuration(item.h)} után)`;
+      } else if (item.label === 'HutoKi') {
+        stepName = 'Bemelegedés';
+        timeLabel = `Hűtőből kivétel (Sütés előtt 2ó)`;
+      } else if (item.label === 'Sutes') {
+        stepName = 'Nyújtás & Sütés';
+        const finalPhaseHours = item.h - (prevItem ? prevItem.h : 0);
+        timeLabel = `Készre kelesztés: ${formatDuration(finalPhaseHours)} (Összesen: ${formatDuration(item.h)})`;
       } else {
-        const diffHours = item.h - (prevItem ? prevItem.h : 0);
-        const durationStr = formatDuration(diffHours);
-        if (i === r.timeline.length - 1) {
-          timeLabel = `További ${durationStr} után (Összesen: ${formatDuration(item.h)})`;
-        } else {
-          timeLabel = `${durationStr} kelesztés után`;
-        }
+        stepName = item.label;
+        timeLabel = `${formatDuration(item.h)} után`;
       }
-      timelineHtml += `<li><span class="t">${timeLabel}</span><span class="dot"></span> ${desc}</li>`;
+
+      timelineHtml += `<li><span class="t" style="min-width:130px; display:inline-block; font-weight:bold; color:var(--gold);">${stepName}</span><span style="opacity:0.85; font-size:0.9rem; margin-right:8px;">[${timeLabel}]</span><span class="dot"></span> ${desc}</li>`;
     }
     document.getElementById('res-timeline').innerHTML = timelineHtml;
     renderAutolyseSection(r);
@@ -1058,19 +1071,31 @@
       const translationKey = 'timeline' + item.label;
       const desc = PizzaAlkimistaStrings[translationKey] || item.label;
       
+      let stepName = '';
       let timeLabel = '';
-      if (item.h === 0) {
-        timeLabel = 'Kezdet (0p)';
+
+      if (item.label.includes('Start') || item.label === 'Dagasztas') {
+        stepName = 'Dagasztás';
+        timeLabel = 'Kezdet (most)';
+      } else if (item.label === 'Gombocolas') {
+        stepName = 'Gombócolás';
+        const bulkHours = item.h - (prevItem ? prevItem.h : 0);
+        timeLabel = `Tömbös előérlelés: ${formatDuration(bulkHours)}`;
+      } else if (item.label === 'HutoBe') {
+        stepName = 'Hűtős érlelés';
+        timeLabel = `Hűtőbe tétel (${formatDuration(item.h)} után)`;
+      } else if (item.label === 'HutoKi') {
+        stepName = 'Bemelegedés';
+        timeLabel = `Hűtőből kivétel (Sütés előtt 2ó)`;
+      } else if (item.label === 'Sutes') {
+        stepName = 'Nyújtás & Sütés';
+        const finalPhaseHours = item.h - (prevItem ? prevItem.h : 0);
+        timeLabel = `Készre kelesztés: ${formatDuration(finalPhaseHours)} (Összesen: ${formatDuration(item.h)})`;
       } else {
-        const diffHours = item.h - (prevItem ? prevItem.h : 0);
-        const durationStr = formatDuration(diffHours);
-        if (i === r.timeline.length - 1) {
-          timeLabel = `További ${durationStr} után (Összesen: ${formatDuration(item.h)})`;
-        } else {
-          timeLabel = `${durationStr} kelesztés után`;
-        }
+        stepName = item.label;
+        timeLabel = `${formatDuration(item.h)} után`;
       }
-      printTimelineHtml += `<li><span class="t">${timeLabel}</span> ${desc}</li>`;
+      printTimelineHtml += `<li><span class="t">${stepName}</span> <span>[${timeLabel}] — ${desc}</span></li>`;
     }
     document.getElementById('p-timeline').innerHTML = printTimelineHtml;
 

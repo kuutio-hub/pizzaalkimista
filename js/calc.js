@@ -86,15 +86,15 @@ const PizzaCalc = (() => {
   function freshYeastPercentFromStages(stages, model = 'craig') {
     const eff = effectiveHours21(stages, model);
     if (eff <= 0) return YEAST_MAX_PERCENT;
+    let pct = 0;
     if (model === 'alchemist') {
-      // PizzApp regressziós egyenlet (46 adatpontos optimalizálás)
-      const pct = 6.62 / Math.pow(eff, 1.46);
-      return clamp(pct, YEAST_MIN_PERCENT, YEAST_MAX_PERCENT);
+      // Normált Alkimista élesztőgörbe (21°C / 24h = ~0.08-0.10% friss élesztő)
+      pct = 2.25 / Math.pow(eff, 1.08);
     } else {
-      // Craig-féle képlet
-      const pct = YEAST_REF_PERCENT * YEAST_REF_HOURS / eff;
-      return clamp(pct, YEAST_MIN_PERCENT, YEAST_MAX_PERCENT);
+      // Craig-féle klasszikus képlet (21°C / 24h = 0.10% friss élesztő)
+      pct = (YEAST_REF_PERCENT * YEAST_REF_HOURS) / eff;
     }
+    return clamp(pct, YEAST_MIN_PERCENT, YEAST_MAX_PERCENT);
   }
 
   function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
