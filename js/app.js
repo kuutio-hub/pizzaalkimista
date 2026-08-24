@@ -1089,7 +1089,7 @@
     // Dinamikus, a beállítások alapján testreszabott instrukciók (hülyebiztos, konkrét grammokkal és időkkel)
     let steps = [];
     if (r.biga) {
-      steps.push(`<b>Biga előkészítése</b>: Mérj ki ${fmtG(r.biga.biga.flour)} lisztet, ${fmtG(r.biga.biga.water)} vizet és ${fmtG(r.biga.biga.yeastFresh)} friss élesztőt. Keverd össze lazán, darabosra. Takard le és keleszd szobahőmérsékleten (${r.input.bigaRoomTempC || 18}°C) ${formatDuration(r.input.bigaRoomHours || 16)} ideig${r.input.bigaColdHours > 0 ? ` + hűtőszekrényben (${r.input.bigaColdTempC || 4}°C) ${formatDuration(r.input.bigaColdHours)} ideig` : ''}.`);
+      steps.push(`<b>Biga előkészítése</b>: Mérj ki ${fmtG(r.biga.biga.flour)} lisztet, ${fmtG(r.biga.biga.water)} vizet és ${fmtG(r.biga.biga.yeastFresh)} friss élesztőt. Keverd össze lazán, darabosra. Takard le és keleszd szobahőmérsékleten (${inp.bigaRoomTempC || 18}°C) ${formatDuration(inp.bigaRoomHours || 16)} ideig${inp.bigaColdHours > 0 ? ` + hűtőszekrényben (${inp.bigaColdTempC || 4}°C) ${formatDuration(inp.bigaColdHours)} ideig` : ''}.`);
       steps.push(`<b>Fő dagasztás</b>: Tépkedd apró darabokra a megérett bigát. Add hozzá a fő lisztet (${fmtG(r.biga.final.flour)}), vizet (${fmtG(r.biga.final.water)}), sót (${fmtG(r.saltG)})${r.oilG > 0 ? `, zsiradékot (${fmtG(r.oilG)})` : ''}${r.useOldDough ? ` és a bevinni kívánt öregtésztát (${fmtG(r.oldDoughG)})` : ''}. Dagassz sima, rugalmas tésztát.`);
     } else {
       steps.push(`<b>Dagasztás</b>: Keverd össze és dolgozd össze alaposan a lisztet (${fmtG(r.flour)}), vizet (${fmtG(r.water)}), sót (${fmtG(r.saltG)})${r.oilG > 0 ? `, zsiradékot (${fmtG(r.oilG)})` : ''}${r.useOldDough ? ` és az öregtésztát (${fmtG(r.oldDoughG)})` : ''}. Az élesztő mennyisége Friss: ${fmtG(r.yeast.fresh)} (vagy Instant: ${fmtG(r.yeast.instantDry)}, vagy Aktív száraz: ${fmtG(r.yeast.activeDry)}). Dagassz addig, amíg szép sima és feszes tésztát kapsz.`);
@@ -1099,17 +1099,17 @@
       steps.push(`<b>Öregtészta elmentése (KI)</b>: A dagasztás végeztével azonnal mérj ki belőle ${fmtG(r.takeOutOldDoughG)} tésztát, tedd jól záródó edénybe és tedd a hűtőbe a következő sütéshez.`);
     }
 
-    const bulkHours = Math.min(1.0, Math.max(0.5, r.totalHours * 0.08));
-    steps.push(`<b>Tömbös előkelesztés</b>: Takard le a tésztát és hagyd szobahőmérsékleten (${r.input.roomTempC}°C) pihenni ${formatDuration(bulkHours)} ideig, hogy a gluténszerkezet ellazuljon.`);
+    const bulkHours = Math.min(1.5, Math.max(0.5, r.totalHours * 0.15));
+    steps.push(`<b>Tömbös előkelesztés (Massa)</b>: Takard le a tésztát és hagyd szobahőmérsékleten (${roomT}°C) pihenni ${formatDuration(bulkHours)} ideig, hogy a gluténszerkezet ellazuljon.`);
     
     steps.push(`<b>Gombócolás</b>: Vágd a tésztát a kívánt darabokra (${r.style === 'teglia' ? 'tepsi méretre' : r.ballGroups.map(g => `${g.count} db × ${g.weight}g`).join(' + ')}), formázz belőlük feszes felületű tésztagolyókat.`);
 
-    if (r.input.coldHours > 0) {
-      steps.push(`<b>Hideg kelesztés (hűtő)</b>: Helyezd a golyókat kelesztőedénybe, és keleszd a hűtőben (${r.input.coldTempC}°C) ${formatDuration(r.input.coldHours)} ideig.`);
-      steps.push(`<b>Sütés előtti bemelegítés</b>: A hűtőből kivéve hagyd a gombócokat szobahőmérsékleten (${r.input.roomTempC}°C) kelni további 2 órán át, hogy elérjék a megfelelő sütési hőmérsékletet és nyújthatóságot.`);
+    if (coldH > 0) {
+      steps.push(`<b>Hideg kelesztés (hűtő)</b>: Helyezd a golyókat kelesztőedénybe, és keleszd a hűtőben (${coldT}°C) ${formatDuration(coldH)} ideig.`);
+      steps.push(`<b>Sütés előtti bemelegítés</b>: A hűtőből kivéve hagyd a gombócokat szobahőmérsékleten (${roomT}°C) kelni további 2 órán át, hogy elérjék a megfelelő sütési hőmérsékletet és nyújthatóságot.`);
     } else {
-      const remainingRoom = r.input.roomHours - bulkHours;
-      steps.push(`<b>Készre kelesztés szobahőn</b>: Hagyd a gombócokat kelesztőedényben szobahőmérsékleten (${r.input.roomTempC}°C) kelni további ${formatDuration(remainingRoom)} ideig.`);
+      const remainingRoom = Math.max(0, roomH - bulkHours);
+      steps.push(`<b>Készre kelesztés szobahőn</b>: Hagyd a gombócokat kelesztőedényben szobahőmérsékleten (${roomT}°C) kelni további ${formatDuration(remainingRoom)} ideig.`);
     }
 
     steps.push(`<b>Sütés</b>: Formázd a tésztát nápolyi vagy tepsis stílusnak megfelelően, tetszőlegesen feltétezd és a lehető legmagasabb hőfokon süsd készre.`);

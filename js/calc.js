@@ -42,13 +42,16 @@ const PizzaCalc = (() => {
       hydration: 75,
       salt: 2.5,
       oil: 3,
-      // Forrás: Gabriele Bonci (Pizzarium) közismert szabálya — a tepsi
-      // területét (cm²) egy 0,5-0,6 közötti szorzóval kell beszorozni, hogy
-      // megkapjuk a szükséges tésztát grammban. Ez m²-re vetítve kb.
-      // 5000-6000 g/m². Vékonyabb, ropogósabb tésztához kevesebb (~4000),
-      // magasabb, focaccia-szerűhöz több (~7000-8000) is lehet.
       gramPerM2: 5500,
       minHydration: 65, maxHydration: 90
+    },
+    poolish: {
+      label: 'Poolish (100% hidratált előtészta)',
+      hydration: 70,
+      salt: 2.5,
+      oil: 1,
+      ballWeightG: 280,
+      minHydration: 60, maxHydration: 85
     }
   };
 
@@ -289,22 +292,45 @@ const PizzaCalc = (() => {
   }
 
   function buildTimeline(input, totalHours) {
-    const items = [{ label: 'Dagasztas', h: 0 }];
-    if (input.useBiga) {
-      items.push({ label: 'BigaStart', h: 0 });
-      const bigaTotalHours = (input.bigaRoomHours || 0) + (input.bigaColdHours || 0);
-      items.push({ label: 'BigaMix', h: bigaTotalHours });
+    const items = [];
+    
+    if (input.useBiga || input.usePoolish) {
+      const isPoolish = !!input.usePoolish;
+      const prefType = isPoolish ? 'Poolish' : 'Biga';
+      const prefTotalHours = isPoolish 
+        ? ((input.poolishRoomHours || 0) + (input.poolishColdHours || 0))
+        : ((input.bigaRoomHours || 0) + (input.bigaColdHours || 0));
+
+      items.push({ label: `${prefType}Start`, h: 0 });
+      items.push({ label: `${prefType}Mix`, h: prefTotalHours });
+      
+      const bulkHours = Math.min(1.5, Math.max(0.5, totalHours * 0.15));
+      items.push({ label: 'Gombocolas', h: prefTotalHours + bulkHours });
+      
+      if (input.coldHours > 0) {
+        items.push({ label: 'HutoBe', h: prefTotalHours + input.roomHours });
+        items.push({ label: 'HutoKi', h: prefTotalHours + input.roomHours + input.coldHours - 2.0 });
+      }
+      if (input.takeOutOldDough && input.takeOutOldDoughG > 0) {
+        items.push({ label: 'TakeOutOld', h: prefTotalHours + 0.1 });
+      }
+      items.push({ label: 'Sutes', h: prefTotalHours + totalHours });
+    } else {
+      items.push({ label: 'Dagasztas', h: 0 });
+      if (input.takeOutOldDough && input.takeOutOldDoughG > 0) {
+        items.push({ label: 'TakeOutOld', h: 0.1 });
+      }
+      const bulkHours = Math.min(1.5, Math.max(0.5, totalHours * 0.15));
+      items.push({ label: 'Gombocolas', h: bulkHours });
+
+      if (input.coldHours > 0) {
+        items.push({ label: 'HutoBe', h: input.roomHours });
+        // Sütés előtt 2 órával kötelezően kivenni a hűtőből, hogy szobahőmérsékletre melegedjen!
+        items.push({ label: 'HutoKi', h: input.roomHours + input.coldHours - 2.0 });
+      }
+      items.push({ label: 'Sutes', h: totalHours });
     }
-    const bulkHours = Math.min(1.0, Math.max(0.5, totalHours * 0.08));
-    items.push({ label: 'Gombocolas', h: bulkHours });
-    if (input.coldHours > 0) {
-      items.push({ label: 'HutoBe', h: input.roomHours });
-      items.push({ label: 'HutoKi', h: input.roomHours + input.coldHours - 1.5 });
-    }
-    if (input.takeOutOldDough && input.takeOutOldDoughG > 0) {
-      items.push({ label: 'TakeOutOld', h: totalHours - 0.1 });
-    }
-    items.push({ label: 'Sutes', h: totalHours });
+
     return items.sort((a, b) => a.h - b.h);
   }
 
