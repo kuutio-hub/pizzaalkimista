@@ -4,7 +4,7 @@
  * elinduljon. A GitHub Pages relatív útvonalakat használ, ezért a CACHE
  * kulcsokat is relatívan soroljuk fel.
  */
-const CACHE_NAME = 'pizzaalkimista-v14';
+const CACHE_NAME = 'pizzaalkimista-v17';
 const APP_SHELL = [
   './',
   './index.html',
@@ -55,6 +55,10 @@ self.addEventListener('fetch', event => {
         return res;
       }).catch(err => {
         if (cached) return cached;
+        if (event.request.url.includes('fonts.gstatic.com') || event.request.url.includes('fonts.googleapis.com')) {
+          // Ha a Google Fonts betűtípus letöltése időtúllépés miatt meghiúsul, csendben kihagyjuk
+          return new Response('', { status: 200, headers: { 'Content-Type': 'text/css' } });
+        }
         return new Response('Network error', { status: 408, headers: { 'Content-Type': 'text/plain' } });
       });
     })

@@ -233,17 +233,6 @@
         <table class="ing-table ing-table-fixed" id="biga-table"></table>
       </div>
 
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
-          <h3 data-str="resHeadingTimeline" style="margin:0;">Idővonal</h3>
-          <button type="button" class="btn btn-ghost btn-sm btn-icon" id="btn-schedule-notifications" style="font-size:0.8rem; padding:0.4rem 0.8rem;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span>⏰ Kelesztési emlékeztető</span>
-          </button>
-        </div>
-        <ul class="timeline" id="res-timeline"></ul>
-      </div>
-
       <!-- Autolízis eredmény (ha be van kapcsolva) -->
       <div id="autolyse-result" hidden></div>
 
@@ -439,14 +428,14 @@
       <hr style="border-color: var(--accent-dim); margin: 1rem 0;">
 
       <div class="field" style="margin-top:1.2rem;">
-        <label class="field-label">Hulladék kompenzáció (0% - 5%)</label>
+        <label class="field-label">Hulladék kompenzáció</label>
         <select id="setting-waste-pct">
-          <option value="0">0% (Alap +5% beépítve)</option>
-          <option value="1">1% (+6% összesen)</option>
-          <option value="2">2% (+7% összesen)</option>
-          <option value="3">3% (+8% összesen)</option>
-          <option value="4">4% (+9% összesen)</option>
-          <option value="5">5% (+10% összesen)</option>
+          <option value="0" selected>0% (Nincs kompenzáció — alapértelmezett)</option>
+          <option value="1">1%</option>
+          <option value="2">2%</option>
+          <option value="3">3%</option>
+          <option value="4">4%</option>
+          <option value="5">5%</option>
         </select>
       </div>
 
@@ -458,19 +447,19 @@
       <div class="field" style="margin-top:1.5rem;" id="yeast-correction-field-wrapper">
         <label class="field-label" data-str="settingYeastFactor">Élesztő mennyiség korrekciója (%) <span id="yeast-factor-warn" style="color: var(--gold); font-size: 0.85rem; margin-left: 0.5rem; font-weight: bold;"></span></label>
         <select id="yeastFactor">
-          <option value="70">-30% (Kisebb élesztőteljesítmény)</option>
+          <option value="70">-30% (Gyengébb élesztő)</option>
           <option value="75">-25%</option>
           <option value="80">-20%</option>
           <option value="85">-15%</option>
           <option value="90">-10%</option>
           <option value="95">-5%</option>
-          <option value="100" selected>0% (Alapértelmezett, +5% beépítve)</option>
+          <option value="100" selected>0% (Alapértelmezett / Normál)</option>
           <option value="105">+5%</option>
           <option value="110">+10%</option>
           <option value="115">+15%</option>
           <option value="120">+20%</option>
           <option value="125">+25%</option>
-          <option value="130">+30% (Erősebb élesztőteljesítmény)</option>
+          <option value="130">+30% (Erősebb élesztő)</option>
         </select>
       </div>
     </div>
@@ -517,23 +506,18 @@
   <div class="p-title" id="p-title">Gregory's Special</div>
   <div class="p-subtitle" id="p-subtitle"></div>
   <div class="p-badges" id="p-badges"></div>
-  <div class="p-grid">
-    <div>
-      <div class="p-section">
-        <h3 data-str="resHeadingIngredients">Hozzávalók</h3>
-        <table class="p-table" id="p-ingredients"></table>
-      </div>
-      <div class="p-section" id="p-biga-section" hidden>
-        <h3 data-str="resHeadingBiga">Biga (előtészta)</h3>
-        <table class="p-table" id="p-biga"></table>
-      </div>
-    </div>
-    <div>
-      <div class="p-section">
-        <h3 data-str="resHeadingTimeline">Idővonal</h3>
-        <ul class="p-timeline" id="p-timeline"></ul>
-      </div>
-    </div>
+  <div class="p-section">
+    <h3 data-str="resHeadingIngredients">Hozzávalók</h3>
+    <table class="p-table" id="p-ingredients"></table>
+  </div>
+  <div class="p-section" id="p-biga-section" hidden>
+    <h3 data-str="resHeadingBiga">Biga (előtészta)</h3>
+    <table class="p-table" id="p-biga"></table>
+  </div>
+
+  <div class="p-section" style="margin-top:1.2rem;">
+    <h3 data-str="resHeadingTimeline">Technológiai Idővonal</h3>
+    <ul class="p-timeline" id="p-timeline"></ul>
   </div>
 
   <div class="p-section" style="margin-top:1.5rem;">

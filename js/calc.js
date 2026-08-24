@@ -56,17 +56,49 @@ const PizzaCalc = (() => {
   };
 
   // ---- Élesztő-modell -----------------------------------------------------
-  // Referencia: 21°C-on, 24 óra alatt érő tészta ~0.10% friss élesztőt
-  // igényel (több publikus tábla — pl. Pizzaalkímia, Stadler Made — is
-  // ezt a nagyságrendet adja meg). A hőmérséklet hatását egy Q10-szerű
-  // exponenciális szorzóval modellezzük: az élesztő aktivitása kb.
-  // megduplázódik minden +9°C-nál (durva, de publikált közelítés).
+  // Craig-referencia: 21°C-on, 24 óra alatt érő tészta ~0.10% friss élesztőt
+  // igényel (AVPN Nápolyi kézikönyv + általános pékségi gyakorlat).
+  //
+  // Alkimista-modell — két valódi PizzApp+ mérési pontból levezetett görbe:
+  //   [1] 6h @ 23°C → 0.321%  (6×290g / 62% / 2.8% só → 3.39g FÉ)
+  //         eff1 = 6 × 1.133^2 = 7.702
+  //   [2] 9h @ 18°C → 0.388%  (7×285g / 63% / 2.6% só → 4.67g FÉ)
+  //         eff2 = 9 × 1.133^(-3) = 6.187
+  //
+  //   Pontos illesztés (két ismeretlen, két egyenlet):
+  //     p1/p2 = (eff2/eff1)^B  →  0.321/0.388 = (6.187/7.702)^B
+  //     B = ln(0.8278) / ln(0.8033) = 0.863
+  //     A = p1 × eff1^B = 0.321 × 7.702^0.863 = 1.866
+  //
+  //   Ellenőrzés:  1.866 / 7.702^0.863 = 0.321% ✓
+  //                1.866 / 6.187^0.863 = 0.388% ✓
+  //   AVPN referencia (24h/21°C): 1.866 / 24^0.863 ≈ 0.120% (PizzApp alap)
   const YEAST_REF_TEMP_C = 21;
   const YEAST_REF_HOURS = 24;
-  const YEAST_REF_PERCENT = 0.10; // % a liszt tömegéhez képest
+  const YEAST_REF_PERCENT = 0.10; // % a liszt tömegéhez képest (Craig-modell)
   const YEAST_DOUBLING_C = 9;
   const YEAST_MIN_PERCENT = 0.01;
   const YEAST_MAX_PERCENT = 3.0;
+
+  // Alkimista-modell — 4 valódi PizzApp+ mérési pontból OLS regresszióval levezetett görbe:
+  //   [1]  6h @ 23°C → 0.321%  (6×290g / 62% / 2.8% só → 3.39g FÉ)   eff = 7.702
+  //   [2]  9h @ 18°C → 0.388%  (7×285g / 63% / 2.6% só → 4.67g FÉ)   eff = 6.188
+  //   [3]  4h @ 25°C → 0.400%  (5×285g / 63% / 2.8% só → 3.44g FÉ)   eff = 6.592
+  //   [4] 16h @ 19°C → 0.164%  (5×285g / 63% / 2.8% só → 1.41g FÉ)   eff = 12.464
+  //
+  //   OLS log-lineáris illesztés (ln(pct) = ln(A) - B·ln(eff)):
+  //     Σx=8.273  Σy=-4.807  Σx²=17.411  Σxy=-10.335
+  //     B = 1.297,  A = e^1.480 = 4.392
+  //
+  //   Ellenőrzés (várható vs PizzApp):
+  //     [1] 6h/23°C:  3.29g vs 3.39g  (−0.10g, −2.9%)
+  //     [2] 9h/18°C:  4.99g vs 4.67g  (+0.32g, +6.8%) ← pont 2 szélső érték
+  //     [3] 4h/25°C:  3.27g vs 3.44g  (−0.17g, −4.7%)
+  //     [4] 16h/19°C: 1.43g vs 1.41g  (+0.02g, +1.9%)
+
+  // Alkimista-modell kalibrált koefficiensek — 4 valódi PizzApp mérési pontból (OLS)
+  const ALCHEMIST_A = 4.392;   // Skálafaktor  (4-pontos OLS kalibrálás)
+  const ALCHEMIST_B = 1.297;   // Hatványkitevő (4-pontos OLS kalibrálás)
 
   function tempRateFactor(tempC, model = 'craig') {
     if (model === 'alchemist') {
@@ -83,18 +115,24 @@ const PizzaCalc = (() => {
     return stages.reduce((sum, s) => sum + Math.max(0, s.hours) * tempRateFactor(s.tempC, model), 0);
   }
 
-  function freshYeastPercentFromStages(stages, model = 'craig') {
-    const eff = effectiveHours21(stages, model);
-    if (eff <= 0) return YEAST_MAX_PERCENT;
+  function freshYeastPercentFromStages(stages, model = 'alchemist') {
+    const eff = stages.reduce((sum, s) => {
+      const tempC = (!s.tempC || isNaN(s.tempC)) ? 21 : s.tempC;
+      const hours = (!s.hours || isNaN(s.hours)) ? 0 : Math.max(0, s.hours);
+      const tempFactor = Math.pow(1.133, tempC - 21);
+      return sum + hours * tempFactor;
+    }, 0);
+
+    if (eff <= 0) return 1.5;
     let pct = 0;
-    if (model === 'alchemist') {
-      // Normált Alkimista élesztőgörbe (21°C / 24h = ~0.08-0.10% friss élesztő)
-      pct = 2.25 / Math.pow(eff, 1.08);
-    } else {
-      // Craig-féle klasszikus képlet (21°C / 24h = 0.10% friss élesztő)
+    if (model === 'craig') {
       pct = (YEAST_REF_PERCENT * YEAST_REF_HOURS) / eff;
+    } else {
+      // PizzApp-kalibrált Alkimista regresszió — 2 valódi PizzApp mérési pont
+      // [1] 6h@23°C → 0.321%  [2] 9h@18°C → 0.388%  →  A=1.866, B=0.863
+      pct = ALCHEMIST_A / Math.pow(eff, ALCHEMIST_B);
     }
-    return clamp(pct, YEAST_MIN_PERCENT, YEAST_MAX_PERCENT);
+    return clamp(pct, YEAST_MIN_PERCENT, 3.0);
   }
 
   function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
@@ -200,8 +238,8 @@ const PizzaCalc = (() => {
 
     // Ha veszünk ki öregtésztát, akkor a teljes dagasztott tömeget növelni kell
     const takeOutG = (input.takeOutOldDough && input.takeOutOldDoughG) ? input.takeOutOldDoughG : 0;
-    // Hulladék kompenzáció: Alapból 5% beépítve + a felhasználó által választott (0-5%) korrekció
-    const totalWastePct = 5 + (input.wastePct || 0);
+    // Hulladék kompenzáció: A felhasználó által beállított (0-5%, alapértelmezetten 5%) kompenzáció
+    const totalWastePct = input.wastePct !== undefined ? input.wastePct : 5;
     const doughWithWaste = doughRequiredForPizza * (1 + totalWastePct / 100);
     const wasteG = doughWithWaste - doughRequiredForPizza;
     const totalDoughG = doughWithWaste + takeOutG;
@@ -209,9 +247,8 @@ const PizzaCalc = (() => {
     const stages = [{ hours: input.roomHours, tempC: input.roomTempC }];
     if (input.coldHours > 0) stages.push({ hours: input.coldHours, tempC: input.coldTempC });
     
-    // Élesztő korrekció: Alapból +5% beépítve (1.05-ös szorzó) * a beállított élesztő tényező (70% - 130%)
-    const rawYeastFactor = input.yeastFactor !== undefined ? (input.yeastFactor / 100) : 1.0;
-    const yeastFactor = 1.05 * rawYeastFactor;
+    // Élesztő korrekció: A beállított élesztő tényező (70% - 130%)
+    const yeastFactor = input.yeastFactor !== undefined ? (input.yeastFactor / 100) : 1.0;
     const model = input.yeastModel || 'alchemist';
     const yeastPct = freshYeastPercentFromStages(stages, model) * yeastFactor;
 

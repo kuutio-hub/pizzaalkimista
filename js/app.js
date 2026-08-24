@@ -58,8 +58,8 @@
     useSecondBall: false,
     saveHistory: true,
     yeastModel: 'alchemist',
-    yeastFactor: 100, // 100% = 0% korrekció
-    wastePct: 0, // 0% korrekció (alapból +5% beépítve)
+    yeastFactor: 100, // 100% = 0% korrekció (alapértelmezett: nincs korrekció)
+    wastePct: 0, // 0% = nincs hulladék-kompenzáció (PizzApp-kompatibilis alapértelmezés)
     useAutolyse: false,
     autolyseFlourPct: 70,
     autolyseWaterPct: 70,
@@ -73,7 +73,16 @@
     const saved = localStorage.getItem('pizza_alkimista_settings');
     if (saved) {
       try {
-        appSettings = { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        appSettings = { ...DEFAULT_SETTINGS, ...parsed };
+        // v2 migráció: régi mentett beállításokban a wastePct=5 volt default,
+        // most 0 az alapértelmezés. Ha még nincs settingsVersion, reseteljük.
+        if (!parsed.settingsVersion || parsed.settingsVersion < 2) {
+          appSettings.wastePct = 0;
+          appSettings.yeastFactor = Math.min(130, Math.max(70, appSettings.yeastFactor || 100));
+          appSettings.settingsVersion = 2;
+          localStorage.setItem('pizza_alkimista_settings', JSON.stringify(appSettings));
+        }
       } catch (e) {
         appSettings = { ...DEFAULT_SETTINGS };
       }
@@ -519,17 +528,17 @@
     
     const input = {
       style: currentStyle,
-      roomHours: parseFloat(v('roomHours')),
-      roomTempC: appSettings.useFahrenheit ? fToC(parseFloat(v('roomTempC'))) : parseFloat(v('roomTempC')),
+      roomHours: (parseFloat(v('roomHours')) && !isNaN(parseFloat(v('roomHours')))) ? parseFloat(v('roomHours')) : 8,
+      roomTempC: appSettings.useFahrenheit ? fToC(parseFloat(v('roomTempC'))) : ((parseFloat(v('roomTempC')) && !isNaN(parseFloat(v('roomTempC')))) ? parseFloat(v('roomTempC')) : 22),
       yeastModel: appSettings.yeastModel || 'alchemist',
-      yeastFactor: parseFloat(v('yeastFactor') || appSettings.yeastFactor || 100),
+      yeastFactor: Math.min(130, Math.max(70, parseFloat(v('yeastFactor') || appSettings.yeastFactor || 100))),
       coldHours: appSettings.useCold ? parseFloat(v('coldHours') || 0) : 0,
       coldTempC: appSettings.useFahrenheit ? fToC(parseFloat(v('coldTempC') || 39)) : parseFloat(v('coldTempC') || 4),
       useBiga: appSettings.useBiga,
       useOldDough: appSettings.useOldDoughIn || appSettings.useOldDoughOut,
       takeOutOldDough: appSettings.useOldDoughOut,
       // Hulladék kompenzáció
-      wastePct: appSettings.useWaste ? (appSettings.wastePct || 5) : 0,
+      wastePct: parseFloat(v('setting-waste-pct') || appSettings.wastePct || 5),
       // Autolízis
       useAutolyse: appSettings.useAutolyse,
       autolyseFlourPct: appSettings.useAutolyse ? (appSettings.autolyseFlourPct || 70) : 0,
@@ -570,10 +579,13 @@
       } else {
         const count = parseInt(v('ballCount'), 10) || 4;
         const weight = parseFloat(v('ballWeightG')) || 280;
+        input.ballCount = count;
+        input.ballWeightG = weight;
         input.ballGroups = [{ count, weight }];
       }
       input.hydration = parseFloat(v('hydration'));
-      input.salt = parseFloat(v('salt'));
+      const rawSalt = parseFloat(v('salt'));
+      input.salt = (!isNaN(rawSalt) && rawSalt >= 0.5 && rawSalt <= 5.0) ? rawSalt : 2.8;
       input.oil = appSettings.useOil ? parseFloat(v('oil') || 0) : 0;
     }
     return input;
@@ -608,8 +620,14 @@
     }
     
     let yeastVal = r.yeast.fresh;
-    if (activeYeastType === 'instantDry') yeastVal = r.yeast.instantDry;
-    else if (activeYeastType === 'activeDry') yeastVal = r.yeast.activeDry;
+    let activeYeastPct = r.yeastPct;
+    if (activeYeastType === 'instantDry') {
+      yeastVal = r.yeast.instantDry;
+      activeYeastPct = r.yeastPct * 0.415;
+    } else if (activeYeastType === 'activeDry') {
+      yeastVal = r.yeast.activeDry;
+      activeYeastPct = r.yeastPct * 0.52;
+    }
 
     rows += `
       <tr><td style="width: 55%;">Friss Liszt</td><td class="pct" style="width: 20%;">100%</td><td class="amt" style="width: 25%;">${fmtG(r.flour)}</td></tr>
@@ -623,7 +641,7 @@
     rows += `
       <tr style="font-weight:700; color:var(--gold-dark);">
         <td>${getActiveYeastLabel(activeYeastType)}</td>
-        <td class="pct">${fmt(r.yeastPct, 2)}%</td>
+        <td class="pct">${fmt(activeYeastPct, 2)}%</td>
         <td class="amt">${fmtG2(yeastVal)}</td>
       </tr>`;
     
@@ -711,41 +729,7 @@
       bigaCard.hidden = true;
     }
 
-    let timelineHtml = '';
-    for (let i = 0; i < r.timeline.length; i++) {
-      const item = r.timeline[i];
-      const prevItem = i > 0 ? r.timeline[i - 1] : null;
-      const translationKey = 'timeline' + item.label;
-      const desc = PizzaAlkimistaStrings[translationKey] || item.label;
-      
-      let stepName = '';
-      let timeLabel = '';
-
-      if (item.label.includes('Start') || item.label === 'Dagasztas') {
-        stepName = 'Dagasztás';
-        timeLabel = 'Kezdet (most)';
-      } else if (item.label === 'Gombocolas') {
-        stepName = 'Gombócolás';
-        const bulkHours = item.h - (prevItem ? prevItem.h : 0);
-        timeLabel = `Tömbös előérlelés: ${formatDuration(bulkHours)}`;
-      } else if (item.label === 'HutoBe') {
-        stepName = 'Hűtős érlelés';
-        timeLabel = `Hűtőbe tétel (${formatDuration(item.h)} után)`;
-      } else if (item.label === 'HutoKi') {
-        stepName = 'Bemelegedés';
-        timeLabel = `Hűtőből kivétel (Sütés előtt 2ó)`;
-      } else if (item.label === 'Sutes') {
-        stepName = 'Nyújtás & Sütés';
-        const finalPhaseHours = item.h - (prevItem ? prevItem.h : 0);
-        timeLabel = `Készre kelesztés: ${formatDuration(finalPhaseHours)} (Összesen: ${formatDuration(item.h)})`;
-      } else {
-        stepName = item.label;
-        timeLabel = `${formatDuration(item.h)} után`;
-      }
-
-      timelineHtml += `<li><span class="t" style="min-width:130px; display:inline-block; font-weight:bold; color:var(--gold);">${stepName}</span><span style="opacity:0.85; font-size:0.9rem; margin-right:8px;">[${timeLabel}]</span><span class="dot"></span> ${desc}</li>`;
-    }
-    document.getElementById('res-timeline').innerHTML = timelineHtml;
+    // Az idővonal csak a nyomtatott recepten jelenik meg (printRecipe függvény kezeli)
     renderAutolyseSection(r);
   }
 
@@ -1063,7 +1047,7 @@
     }
 
     document.getElementById('p-ingredients').innerHTML = ingHtml;
-    
+
     let printTimelineHtml = '';
     for (let i = 0; i < r.timeline.length; i++) {
       const item = r.timeline[i];
@@ -1097,7 +1081,8 @@
       }
       printTimelineHtml += `<li><span class="t">${stepName}</span> <span>[${timeLabel}] — ${desc}</span></li>`;
     }
-    document.getElementById('p-timeline').innerHTML = printTimelineHtml;
+    const pTimelineEl = document.getElementById('p-timeline');
+    if (pTimelineEl) pTimelineEl.innerHTML = printTimelineHtml;
 
     const bigaSection = document.getElementById('p-biga-section');
     if (r.biga) {
@@ -1268,6 +1253,16 @@
     try {
       const last = JSON.parse(saved);
       if (!last) return;
+
+      // Sanitáció: ha a tárolt yeastFactor értéke elszabadult (nem 70-130), töröljük az egész lastInput-ot
+      if (last.yeastFactor !== undefined) {
+        const yf = parseFloat(last.yeastFactor);
+        if (isNaN(yf) || yf < 70 || yf > 130) {
+          console.warn('PizzaAlkimista: Érvénytelen yeastFactor a localStorage-ban, törlés:', yf);
+          localStorage.removeItem('pizza_alkimista_last_input');
+          return;
+        }
+      }
       
       const setVal = (id, val) => {
         const el = document.getElementById(id);
@@ -1285,7 +1280,9 @@
       if (last.roomHours !== undefined) setVal('roomHours', last.roomHours);
       if (last.roomTempC !== undefined) setVal('roomTempC', last.roomTempC);
       if (last.yeastFactor !== undefined) {
-        appSettings.yeastFactor = last.yeastFactor * 100;
+        // Szigorú val idáció: csak 70-130 közötti érték fogadható el (a select megengedett tartománya)
+        const safeYF = parseFloat(last.yeastFactor);
+        appSettings.yeastFactor = (isNaN(safeYF) || safeYF < 70 || safeYF > 130) ? 100 : safeYF;
         setVal('yeastFactor', appSettings.yeastFactor);
       }
       if (last.coldHours !== undefined) setVal('coldHours', last.coldHours);
