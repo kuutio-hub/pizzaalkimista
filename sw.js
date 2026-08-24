@@ -4,7 +4,7 @@
  * elinduljon. A GitHub Pages relatív útvonalakat használ, ezért a CACHE
  * kulcsokat is relatívan soroljuk fel.
  */
-const CACHE_NAME = 'pizzaalkimista-v4';
+const CACHE_NAME = 'pizzaalkimista-v6';
 const APP_SHELL = [
   './',
   './index.html',
@@ -26,7 +26,11 @@ const APP_SHELL = [
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache => {
+      return Promise.allSettled(
+        APP_SHELL.map(url => cache.add(url).catch(err => console.warn('PWA Cache kihagyva:', url, err)))
+      );
+    }).then(() => self.skipWaiting())
   );
 });
 

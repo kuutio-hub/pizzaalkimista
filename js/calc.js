@@ -274,7 +274,7 @@ const PizzaCalc = (() => {
       panAreaM2,
       doughRequiredForPizza,
       takeOutOldDoughG: takeOutG,
-      wastePct, wasteG,
+      wastePct: totalWastePct, wasteG,
       totalDoughG,
       flour: freshFlour, 
       water: freshWater, 
