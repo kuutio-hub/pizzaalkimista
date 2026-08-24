@@ -1,0 +1,5 @@
+dev_tools/
+*.py
+*.json
+.DS_Store
+Thumbs.db

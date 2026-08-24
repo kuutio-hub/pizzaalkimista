@@ -76,19 +76,19 @@ const PizzaAlkimistaStrings = {
 
   // Info szövegek (Magyarázatok)
   infoTexts: {
-    roomHours: '[TA - Temperatura Ambiente] A tészta szobahőmérsékleten történő kelesztési szakasza a dagasztástól a formázásig vagy a sütésig. Hatással van a gluténszerkezet és az ízek fejlődésére.',
-    roomTemp: '[TA] A kelesztőhelyiség valós, mért hőmérséklete. A magasabb hőmérséklet gyorsítja az élesztőgombák aktivitását, így kevesebb élesztő (Lievito) szükséges.',
-    cold: '[TC - Temperatura Controllata] Alacsony hőmérsékleten (hűtőszekrényben) történő lassított fermentáció. Hosszabb idő alatt komplexebb ízek és jobb tésztaszerkezet alakul ki.',
-    biga: '[Biga] Hagyományos olasz előtészta, amely növeli a tészta szilárdságát, aromagazdagságát és javítja a bélzet szerkezetét. Saját kelesztési idővel rendelkezik.',
-    hydration: '[Idratazione] A folyadék (víz) tömegaránya a liszt teljes tömegéhez képest, százalékban. A magasabb hidratáció nyitottabb bélzetet eredményez, de nehezebben kezelhető.',
-    salt: '[Sale] A só mennyisége a liszt tömegéhez viszonyítva. Ízesíti a tésztát, szabályozza az élesztő működését és erősíti a gluténhálót.',
-    oil: '[Olio / Strutto] Zsiradék (olívaolaj vagy sertészsír) hozzáadása a tésztához. Lágyítja a tésztaszerkezetet, javítja a nyújthatóságot és ropogósabbá teszi a héjat.',
+    roomHours: 'A tészta szobahőmérsékleten történő kelesztési szakasza a dagasztástól a formázásig vagy a sütésig. Hatással van a gluténszerkezet és az ízek fejlődésére.',
+    roomTemp: 'A kelesztőhelyiség valós, mért hőmérséklete. A magasabb hőmérséklet gyorsítja az élesztőgombák aktivitását, így kevesebb élesztő szükséges.',
+    cold: 'Alacsony hőmérsékleten (hűtőszekrényben) történő lassított fermentáció. Hosszabb idő alatt komplexebb ízek és jobb tésztaszerkezet alakul ki.',
+    biga: '[Biga] Előtészta, amely növeli a tészta szilárdságát, aromagazdagságát és javítja a bélzet szerkezetét. Saját kelesztési idővel rendelkezik.',
+    hydration: 'A folyadék (víz) tömegaránya a liszt teljes tömegéhez képest, százalékban. A magasabb hidratáció nyitottabb bélzetet eredményez, de nehezebben kezelhető.',
+    salt: 'A só mennyisége a liszt tömegéhez viszonyítva. Ízesíti a tésztát, szabályozza az élesztő működését és erősíti a gluténhálót.',
+    oil: 'Zsiradék (olívaolaj vagy sertészsír) hozzáadása a tésztához. Lágyítja a tésztaszerkezetet, javítja a nyújthatóságot és ropogósabbá teszi a héjat.',
     ballCount: 'A készíteni kívánt pizzatészták (golyók) száma.',
-    ballWeight: 'Egy darab tésztagolyó tömege grammban. Egy normál nápolyi pizzához 250–280 gramm ajánlott.',
+    ballWeight: 'Egy darab tésztagolyó tömege grammban. Egy normál pizzához 250–280 gramm ajánlott.',
     panArea: 'A sütőtepsi belső felülete (hosszúság szorozva szélességgel).',
     gramPerM2: 'Négyzetméterenkénti tésztatömeg, ami meghatározza a tepsis pizza vastagságát és jellegét.',
     yeastFactor: 'Az élesztő arányának százalékos korrekciója. Ha egyéni preferenciád alapján csökkenteni vagy növelni szeretnéd az alapértelmezett élesztőmennyiséget.',
-    oldDough: '[Pasta Riporto] Egy korábbi dagasztásból félretett, már beérett tészta. Természetes savakat, mély ízeket biztosít és javítja a tészta eltarthatóságát.'
+    oldDough: 'Egy korábbi dagasztásból félretett, már beérett tészta. Természetes savakat, mély ízeket biztosít és javítja a tészta eltarthatóságát.'
   },
 
   // Eredmények feliratai

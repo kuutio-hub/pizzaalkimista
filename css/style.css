@@ -366,7 +366,72 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
 .wiki-article th, .wiki-article td { border: 1px solid var(--line); padding: .5rem .6rem; text-align: left; }
 .wiki-article th { background: var(--surface-2); color: var(--gold); }
 
-/* ---------- Bottom nav ---------- */
+/* ---------- Navigáció & Burger Menü ---------- */
+.mobile-only-btn {
+  display: none;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.desktop-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-s);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.desktop-nav-btn svg {
+  width: 18px;
+  height: 18px;
+  color: var(--ink-soft);
+  transition: color 0.15s ease;
+}
+
+.desktop-nav-btn:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+.desktop-nav-btn.active {
+  color: var(--gold);
+  background: var(--gold-light);
+  border-color: var(--line-strong);
+  font-weight: 700;
+}
+
+.desktop-nav-btn.active svg {
+  color: var(--gold);
+}
+
+@media (max-width: 640px) {
+  .mobile-only-btn {
+    display: inline-flex;
+  }
+  .desktop-nav {
+    display: none !important;
+  }
+  .bottom-nav {
+    display: none !important;
+  }
+  body {
+    padding-bottom: 0 !important;
+  }
+}
+
 .bottom-nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
   display: flex; height: var(--nav-h); padding-bottom: var(--safe-b);
@@ -380,6 +445,40 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
 .bottom-nav button svg { width: 22px; height: 22px; color: var(--ink-soft); }
 .bottom-nav button.active { color: var(--gold); }
 .bottom-nav button.active svg { color: var(--gold); }
+
+/* Burger Sheet Links */
+.burger-menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.5rem 0 1rem;
+}
+.burger-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.2rem;
+  border-radius: var(--radius-m);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  text-align: left;
+}
+.burger-nav-item svg {
+  width: 22px;
+  height: 22px;
+  color: var(--gold);
+  flex: none;
+}
+.burger-nav-item.active {
+  border-color: var(--gold);
+  background: var(--gold-light);
+  color: var(--gold);
+}
 
 /* ---------- Popup sheets & Settings ---------- */
 .sheet-backdrop {
@@ -472,6 +571,12 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
 .small { font-size: .78rem; color: var(--ink-soft); }
 
 @media (min-width: 641px) {
+  .bottom-nav {
+    display: none !important;
+  }
+  body {
+    padding-bottom: 0 !important;
+  }
   .sheet-backdrop {
     align-items: center;
   }
@@ -482,6 +587,67 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
   }
   .sheet-body-scroll {
     max-height: 55vh;
+  }
+}
+
+/* Tablet és Kisebb Monitorok (>= 768px) */
+@media (min-width: 768px) {
+  main {
+    max-width: 720px;
+    padding: 2rem 1.5rem 3rem;
+  }
+  .app-header {
+    height: 72px;
+    padding: 0 2rem;
+  }
+  .app-header .brand {
+    font-size: 1.3rem;
+  }
+  .app-header .logo {
+    width: 42px !important;
+    height: 42px !important;
+  }
+  .desktop-nav-btn {
+    padding: 0.6rem 1.1rem;
+    font-size: 0.95rem;
+  }
+  .desktop-nav-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Asztali Monitorok & Widescreen (>= 1024px) */
+@media (min-width: 1024px) {
+  main {
+    max-width: 900px;
+    padding: 2.5rem 2rem 4rem;
+  }
+  h1 {
+    font-size: 2.3rem;
+  }
+  .card {
+    padding: 1.6rem;
+  }
+  /* Kalkulátor kelesztési sorok jobb helykihasználása 2 oszlopban */
+  #calc-form .row2-desktop {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+}
+
+/* Nagy felbontású 4K / UltraWide Kijelzők (>= 1440px) */
+@media (min-width: 1440px) {
+  main {
+    max-width: 1080px;
+  }
+  .desktop-nav {
+    gap: 0.8rem;
+  }
+  .desktop-nav-btn {
+    padding: 0.7rem 1.3rem;
+    font-size: 1rem;
   }
 }
 

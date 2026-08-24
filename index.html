@@ -44,6 +44,30 @@
 
   <div class="brand" data-str="brandName">PizzaAlkimista<small data-str="brandSubtitle">A tökéletes tészta tudománya</small></div>
   <div class="spacer"></div>
+
+  <!-- ASZTALI NAVIGÁCIÓ (Desktop Header Navigation) -->
+  <nav class="desktop-nav">
+    <button data-view="view-calc" class="desktop-nav-btn active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="16" y1="11" x2="16.01" y2="11"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="16" y1="15" x2="16.01" y2="15"/></svg>
+      <span>Kalkulátor</span>
+    </button>
+    <button data-view="view-recipes" class="desktop-nav-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 4.5 3 1-1.5 2.5-3 4.5-3C19 5 21.5 8.5 19.5 12.5 17 16.65 12 21 12 21z"/></svg>
+      <span>Kedvencek</span>
+    </button>
+    <button data-view="view-wiki" class="desktop-nav-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Tudástár</span>
+    </button>
+    <button data-view="view-info" class="desktop-nav-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span>Infó</span>
+    </button>
+  </nav>
+
+  <button class="icon-btn mobile-only-btn" id="btn-burger" title="Menü" aria-label="Menü megnyitása">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
   <button class="icon-btn" id="btn-settings" title="Beállítások">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
   </button>
@@ -328,6 +352,32 @@
   </button>
 </nav>
 
+<!-- MOBIL NAVIGÁCIÓS BURGER MENÜ LAP -->
+<div class="sheet-backdrop" id="burger-menu-backdrop">
+  <div class="sheet burger-sheet">
+    <div class="sheet-handle"></div>
+    <h3><span>Navigáció</span><button class="icon-btn btn-sm" id="burger-close" style="width:30px;height:30px">✕</button></h3>
+    <div class="burger-menu-links">
+      <button class="burger-nav-item active" data-view="view-calc">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="16" y1="11" x2="16.01" y2="11"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="16" y1="15" x2="16.01" y2="15"/></svg>
+        <span>Kalkulátor</span>
+      </button>
+      <button class="burger-nav-item" data-view="view-recipes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 4.5 3 1-1.5 2.5-3 4.5-3C19 5 21.5 8.5 19.5 12.5 17 16.65 12 21 12 21z"/></svg>
+        <span>Kedvencek</span>
+      </button>
+      <button class="burger-nav-item" data-view="view-wiki">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Tudástár</span>
+      </button>
+      <button class="burger-nav-item" data-view="view-info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>Infó</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ===================== POPUP SHEETS ===================== -->
 <div class="sheet-backdrop" id="sheet-backdrop">
   <div class="sheet">
@@ -405,7 +455,7 @@
       <hr style="border-color: var(--accent-dim); margin: 1rem 0;">
 
       <div class="toggle-row">
-        <label class="field-label" style="margin:0;">Hulladék kompenzáció <small style="opacity:.6">(Scarto)</small></label>
+        <label class="field-label" style="margin:0;">Hulladék kompenzáció</label>
         <label class="switch"><input type="checkbox" id="setting-use-waste"><span class="track"></span><span class="thumb"></span></label>
       </div>
       <div id="setting-waste-pct-row" hidden style="margin-top:0.5rem;">
@@ -418,7 +468,7 @@
       </div>
 
       <div class="toggle-row" style="margin-top:0.8rem;">
-        <label class="field-label" style="margin:0;">Autolízis <small style="opacity:.6">(Autolisi)</small></label>
+        <label class="field-label" style="margin:0;">Autolízis</label>
         <label class="switch"><input type="checkbox" id="setting-use-autolyse"><span class="track"></span><span class="thumb"></span></label>
       </div>
       <div id="setting-autolyse-fields" style="display:none;">

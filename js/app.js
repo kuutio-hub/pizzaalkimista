@@ -667,7 +667,7 @@
       el.hidden = false;
       el.innerHTML = `
         <div class="result-card" style="border-color: var(--accent-dim);">
-          <div class="result-title">🌿 Autolízis (Autolisi)</div>
+          <div class="result-title">🌿 Autolízis</div>
           <table class="ing-table">
             <tr><td>Autolízisos liszt</td><td class="pct">${fmt(a.flourPct,0)}%</td><td class="amt">${fmtG(a.flour)}</td></tr>
             <tr><td>Autolízisos víz</td><td class="pct">${fmt(a.waterPct,0)}%</td><td class="amt">${fmtG(a.water)}</td></tr>
@@ -1037,7 +1037,11 @@
 
     document.getElementById('p-method-list').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
     document.getElementById('p-notes').textContent = notes || '';
-    window.print();
+    
+    // Mobil böngészőknél a DOM frissülés megvárása a nyomtatási párbeszédablak megnyitása előtt
+    setTimeout(() => {
+      window.print();
+    }, 100);
   }
 
   // ---------------------------------------------------------------------
@@ -1083,17 +1087,58 @@
   }
 
   // ---------------------------------------------------------------------
-  // Navigáció
+  // Navigáció & Burger Menü
   // ---------------------------------------------------------------------
+  const burgerBackdrop = document.getElementById('burger-menu-backdrop');
+  
+  function openBurgerMenu() {
+    if (burgerBackdrop) burgerBackdrop.classList.add('open');
+  }
+  function closeBurgerMenu() {
+    if (burgerBackdrop) burgerBackdrop.classList.remove('open');
+  }
+
+  const btnBurger = document.getElementById('btn-burger');
+  if (btnBurger) btnBurger.addEventListener('click', openBurgerMenu);
+  
+  const btnBurgerClose = document.getElementById('burger-close');
+  if (btnBurgerClose) btnBurgerClose.addEventListener('click', closeBurgerMenu);
+  if (burgerBackdrop) burgerBackdrop.addEventListener('click', e => { if (e.target === burgerBackdrop) closeBurgerMenu(); });
+
   function switchView(id) {
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
     document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.toggle('active', b.dataset.view === id));
+    document.querySelectorAll('.burger-nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === id));
+    document.querySelectorAll('.desktop-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === id));
     window.scrollTo(0, 0);
   }
-  document.querySelector('.bottom-nav').addEventListener('click', e => {
-    const btn = e.target.closest('button[data-view]');
-    if (btn) switchView(btn.dataset.view);
-  });
+
+  const desktopNav = document.querySelector('.desktop-nav');
+  if (desktopNav) {
+    desktopNav.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-view]');
+      if (btn) switchView(btn.dataset.view);
+    });
+  }
+
+  const bottomNav = document.querySelector('.bottom-nav');
+  if (bottomNav) {
+    bottomNav.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-view]');
+      if (btn) switchView(btn.dataset.view);
+    });
+  }
+
+  const burgerContainer = document.querySelector('.burger-menu-links');
+  if (burgerContainer) {
+    burgerContainer.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-view]');
+      if (btn) {
+        switchView(btn.dataset.view);
+        closeBurgerMenu();
+      }
+    });
+  }
 
   // ---------------------------------------------------------------------
   // Toast
