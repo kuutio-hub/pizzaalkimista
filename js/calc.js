@@ -200,17 +200,19 @@ const PizzaCalc = (() => {
 
     // Ha veszünk ki öregtésztát, akkor a teljes dagasztott tömeget növelni kell
     const takeOutG = (input.takeOutOldDough && input.takeOutOldDoughG) ? input.takeOutOldDoughG : 0;
-    // Hulladék kompenzáció: az elveszett tészta (tál, kéz, pult) pótlása
-    const wastePct = input.wastePct || 0;
-    const doughWithWaste = doughRequiredForPizza * (1 + wastePct / 100);
+    // Hulladék kompenzáció: Alapból 5% beépítve + a felhasználó által választott (0-5%) korrekció
+    const totalWastePct = 5 + (input.wastePct || 0);
+    const doughWithWaste = doughRequiredForPizza * (1 + totalWastePct / 100);
     const wasteG = doughWithWaste - doughRequiredForPizza;
     const totalDoughG = doughWithWaste + takeOutG;
 
     const stages = [{ hours: input.roomHours, tempC: input.roomTempC }];
     if (input.coldHours > 0) stages.push({ hours: input.coldHours, tempC: input.coldTempC });
     
-    const yeastFactor = input.yeastFactor !== undefined ? input.yeastFactor : 1.0;
-    const model = input.yeastModel || 'craig';
+    // Élesztő korrekció: Alapból +5% beépítve (1.05-ös szorzó) * a beállított élesztő tényező (70% - 130%)
+    const rawYeastFactor = input.yeastFactor !== undefined ? (input.yeastFactor / 100) : 1.0;
+    const yeastFactor = 1.05 * rawYeastFactor;
+    const model = input.yeastModel || 'alchemist';
     const yeastPct = freshYeastPercentFromStages(stages, model) * yeastFactor;
 
     const base = doughFromTotal(totalDoughG, hydration, salt, oil, yeastPct);

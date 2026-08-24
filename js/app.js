@@ -54,10 +54,9 @@
     useSecondBall: false,
     saveHistory: true,
     yeastModel: 'alchemist',
-    yeastFactor: 100,
-    // Új funkciók
-    useWaste: false,
-    wastePct: 5,
+    yeastFactor: 100, // 100% = 0% korrekció
+    wastePct: 0 // 0% korrekció (alapból +5% beépítve)
+  };
     useAutolyse: false,
     autolyseFlourPct: 70,
     autolyseWaterPct: 70,
@@ -104,39 +103,19 @@
     check('setting-use-fahrenheit', appSettings.useFahrenheit);
 
     if (val('setting-waste-pct')) {
-      val('setting-waste-pct').value = appSettings.wastePct;
-      const wl = document.getElementById('setting-waste-pct-label');
-      if (wl) wl.textContent = appSettings.wastePct + '%';
+      val('setting-waste-pct').value = appSettings.wastePct !== undefined ? appSettings.wastePct : 0;
     }
-    if (val('setting-autolyse-flour')) val('setting-autolyse-flour').value = appSettings.autolyseFlourPct;
-    if (val('setting-autolyse-water')) val('setting-autolyse-water').value = appSettings.autolyseWaterPct;
     
-    const wasteRow = document.getElementById('setting-waste-pct-row');
-    if (wasteRow) wasteRow.hidden = !appSettings.useWaste;
-
     if (val('yeastFactor')) {
-      val('yeastFactor').value = appSettings.yeastFactor;
-      updateLabel(val('yeastFactor'));
+      val('yeastFactor').value = appSettings.yeastFactor !== undefined ? appSettings.yeastFactor : 100;
     }
 
     const warnEl = document.getElementById('yeast-factor-warn');
-    const wrapEl = document.getElementById('yeast-correction-field-wrapper');
     if (warnEl) {
       if (appSettings.yeastFactor !== 100) {
-        warnEl.textContent = `(Módosítva: ${appSettings.yeastFactor > 100 ? '+' : ''}${appSettings.yeastFactor - 100}%)`;
-        if (wrapEl) {
-          wrapEl.style.boxShadow = '0 0 10px rgba(212, 175, 55, 0.25)';
-          wrapEl.style.border = '1px solid var(--gold)';
-          wrapEl.style.borderRadius = '8px';
-          wrapEl.style.padding = '0.5rem';
-        }
+        warnEl.textContent = `(${appSettings.yeastFactor > 100 ? '+' : ''}${appSettings.yeastFactor - 100}%)`;
       } else {
-        warnEl.textContent = '';
-        if (wrapEl) {
-          wrapEl.style.boxShadow = 'none';
-          wrapEl.style.border = 'none';
-          wrapEl.style.padding = '0';
-        }
+        warnEl.textContent = '(0%)';
       }
     }
 
@@ -178,14 +157,10 @@
     appSettings.useCold = document.getElementById('setting-use-cold').checked;
     appSettings.useSecondBall = document.getElementById('setting-use-secondball').checked;
     appSettings.saveHistory = document.getElementById('setting-save-history').checked;
-    appSettings.useWaste = document.getElementById('setting-use-waste')?.checked || false;
-    appSettings.wastePct = parseFloat(document.getElementById('setting-waste-pct')?.value || 5);
-    appSettings.useAutolyse = document.getElementById('setting-use-autolyse')?.checked || false;
-    appSettings.autolyseFlourPct = parseFloat(document.getElementById('setting-autolyse-flour')?.value || 70);
-    appSettings.autolyseWaterPct = parseFloat(document.getElementById('setting-autolyse-water')?.value || 70);
+    appSettings.wastePct = parseFloat(document.getElementById('setting-waste-pct')?.value || 0);
     appSettings.useFahrenheit = document.getElementById('setting-use-fahrenheit')?.checked || false;
-    appSettings.yeastModel = document.getElementById('setting-yeast-model').value || 'alchemist';
-    appSettings.yeastFactor = parseFloat(document.getElementById('yeastFactor').value || 100);
+    appSettings.yeastModel = document.getElementById('setting-yeast-model')?.value || 'alchemist';
+    appSettings.yeastFactor = parseFloat(document.getElementById('yeastFactor')?.value || 100);
     
     saveSettings();
     applySettingsToUI();
@@ -982,6 +957,16 @@
   // Nyomtatás közvetlen indítása (Mindenféle megerősítő párbeszéd nélkül)
   // ---------------------------------------------------------------------
   document.getElementById('btn-print').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!lastResult) return;
+    const nameToggle = document.getElementById('toggle-recipe-name');
+    const name = (nameToggle && nameToggle.checked)
+      ? (document.getElementById('recipe-title-input').value.trim() || "Gregory's Special")
+      : null;
+    printRecipe(name, lastResult, '');
+  });
+
+  document.getElementById('btn-download-pdf')?.addEventListener('click', (e) => {
     e.preventDefault();
     if (!lastResult) return;
     const nameToggle = document.getElementById('toggle-recipe-name');
