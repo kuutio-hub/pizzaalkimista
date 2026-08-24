@@ -260,6 +260,7 @@ const PizzaCalc = (() => {
     const timeline = buildTimeline(input, totalHours);
 
     return {
+      input,
       style,
       styleLabel: preset.label,
       hydration, salt, oil, yeastPct,

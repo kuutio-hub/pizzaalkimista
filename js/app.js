@@ -1012,15 +1012,21 @@
     document.getElementById('p-footer-date').textContent = 'Készült: ' + new Date().toLocaleString('hu-HU');
 
     // Kelesztési adatok kibővített kiírása a PDF-re
+    const inp = r.input || {};
+    const roomH = inp.roomHours !== undefined ? inp.roomHours : (r.roomHours || 0);
+    const roomT = inp.roomTempC !== undefined ? inp.roomTempC : (r.roomTempC || 22);
+    const coldH = inp.coldHours !== undefined ? inp.coldHours : (r.coldHours || 0);
+    const coldT = inp.coldTempC !== undefined ? inp.coldTempC : (r.coldTempC || 4);
+
     let badgesHtml = `
       <span class="p-badge">${fmt(r.hydration,0)}% hidratáció</span>
       <span class="p-badge">${fmt(r.salt,1)}% só</span>`;
     if (r.oil > 0) {
       badgesHtml += `<span class="p-badge">${fmt(r.oil,1)}% zsiradék</span>`;
     }
-    badgesHtml += `<span class="p-badge">Szobahőn: ${formatDuration(r.input.roomHours)} (${r.input.roomTempC}°C)</span>`;
-    if (r.input.coldHours > 0) {
-      badgesHtml += `<span class="p-badge">Hűtőben: ${formatDuration(r.input.coldHours)} (${r.input.coldTempC}°C)</span>`;
+    badgesHtml += `<span class="p-badge">Szobahőn: ${formatDuration(roomH)} (${roomT}°C)</span>`;
+    if (coldH > 0) {
+      badgesHtml += `<span class="p-badge">Hűtőben: ${formatDuration(coldH)} (${coldT}°C)</span>`;
     }
     document.getElementById('p-badges').innerHTML = badgesHtml;
 
