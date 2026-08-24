@@ -745,8 +745,93 @@
     }
     document.getElementById('res-timeline').innerHTML = timelineHtml;
     renderAutolyseSection(r);
-    updateColorCodes();
   }
+
+  // ---------------------------------------------------------------------
+  // Kelesztési Emlékeztetők & Értesítések (Web Notification & Calendar ICS)
+  // ---------------------------------------------------------------------
+  function scheduleTimelineNotifications() {
+    if (!lastResult || !lastResult.timeline) return;
+
+    if (!("Notification" in window)) {
+      exportTimelineToICS(lastResult);
+      return;
+    }
+
+    if (Notification.permission === "granted") {
+      setupScheduledNotifications(lastResult);
+    } else if (Notification.permission !== "denied") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          setupScheduledNotifications(lastResult);
+        } else {
+          exportTimelineToICS(lastResult);
+        }
+      });
+    } else {
+      exportTimelineToICS(lastResult);
+    }
+  }
+
+  function setupScheduledNotifications(r) {
+    const now = Date.now();
+    let count = 0;
+    r.timeline.forEach(item => {
+      if (item.h > 0) {
+        const delayMs = item.h * 3600 * 1000;
+        const translationKey = 'timeline' + item.label;
+        const desc = PizzaAlkimistaStrings[translationKey] || item.label;
+        
+        setTimeout(() => {
+          if (Notification.permission === "granted") {
+            new Notification("🍕 PizzaAlkimista Emlékeztető!", {
+              body: desc,
+              icon: "icons/icon-192.png",
+              badge: "icons/icon-32.png"
+            });
+          }
+        }, delayMs);
+        count++;
+      }
+    });
+
+    showToast(`⏰ ${count} db értesítés beidőzítve! Naptár bejegyzés is letöltve.`);
+    exportTimelineToICS(r);
+  }
+
+  function exportTimelineToICS(r) {
+    const startTime = new Date();
+    let icsContent = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PizzaAlkimista//PWA//HU\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n";
+
+    r.timeline.forEach(item => {
+      if (item.h > 0) {
+        const eventTime = new Date(startTime.getTime() + item.h * 3600 * 1000);
+        const formatICSDate = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        const translationKey = 'timeline' + item.label;
+        const desc = PizzaAlkimistaStrings[translationKey] || item.label;
+
+        icsContent += "BEGIN:VEVENT\r\n";
+        icsContent += `SUMMARY:🍕 PizzaAlkimista: ${item.label}\r\n`;
+        icsContent += `DESCRIPTION:${desc.replace(/\n/g, ' ')}\r\n`;
+        icsContent += `DTSTART:${formatICSDate(eventTime)}\r\n`;
+        icsContent += `DTEND:${formatICSDate(new Date(eventTime.getTime() + 15 * 60 * 1000))}\r\n`;
+        icsContent += "STATUS:CONFIRMED\r\n";
+        icsContent += "END:VEVENT\r\n";
+      }
+    });
+
+    icsContent += "END:VCALENDAR\r\n";
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'pizza_kelesztesi_idovonal.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  document.getElementById('btn-schedule-notifications')?.addEventListener('click', scheduleTimelineNotifications);
 
   // ---------------------------------------------------------------------
   // Recept mentése és gyűjtemény

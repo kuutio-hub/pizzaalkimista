@@ -2,7 +2,7 @@
  * PizzaAlkimista — db.js
  * IndexedDB wrapper a mentett receptek tárolásához.
  */
-const PizzaAlkimistaDB = (() => {
+const PizzaDB = (() => {
   'use strict';
 
   const DB_NAME = 'pizzaalkimista';
