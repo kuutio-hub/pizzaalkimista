@@ -110,11 +110,11 @@ const PizzaAlkimistaStrings = {
   timelineBigaMix: 'Biga belekeverése: Az előtészta hozzáadása a fő dagasztáshoz a többi összetevővel együtt.',
   timelinePoolishStart: 'Poolish előkészítése: Liszt és víz 1:1 arányú bekeverése élesztővel (híg előtészta).',
   timelinePoolishMix: 'Poolish belekeverése: A habos, érett poolish hozzáadása a fő dagasztáshoz.',
-  timelineGombocolas: 'Gombócolás: A tészta egyenlő részekre osztása és a tésztagolyók formázása.',
-  timelineHutoBe: 'Hűtőszekrénybe helyezés: Az alacsony hőmérsékletű fermentáció megkezdése a lassú érés érdekében.',
-  timelineHutoKi: 'Hűtőszekrényből kivétel: A tészta szobahőmérsékletre melegítése a sütés előtti nyújthatóságért.',
-  timelineTakeOutOld: 'Öregtészta kivétele: A megadott mennyiségű tészta elkülönítése és hűtőbe tétele a következő sütéshez.',
-  timelineSutes: 'Nyújtás és sütés: A tészta óvatos formázása és magas hőmérsékleten történő kisütése.',
+  timelineGombocolas: 'Gombócolás: A tészta porciózása és golyók formázása.',
+  timelineHutoBe: 'Hűtőszekrénybe helyezés: Hideg kelesztési fázis megkezdése.',
+  timelineHutoKi: 'Hűtőszekrényből kivétel: Sütés előtti 2 órás szobahőmérsékletű bemelegedés.',
+  timelineTakeOutOld: 'Öregtészta kivétele: Elkülönítés a következő sütéshez.',
+  timelineSutes: 'Nyújtás és sütés: Formázás, feltétezés és sütés high-heat hőfokon.',
 
   // Elkészítési útmutató szövege (Nyomtatólapra)
   methodSteps: {

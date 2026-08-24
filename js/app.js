@@ -7,18 +7,22 @@
 (() => {
   'use strict';
 
-  // ---------------------------------------------------------------------
   const fmt = (n, d = 0) => Number(n).toLocaleString('hu-HU', { maximumFractionDigits: d, minimumFractionDigits: d });
   const fmtG = n => fmt(n, 1) + ' g';
+  const fmtG2 = n => fmt(n, 2) + ' g';
 
-  // Időtartam formázása: pl. 5.5 -> 5ó 30p, vagy 0.8 -> 48p
+  // Időtartam formázása 5 perces kerekítéssel: pl. 1.35 óra -> 1ó 20p
   function formatDuration(hours) {
     if (hours <= 0) return 'most';
-    if (hours < 1) {
-      return Math.round(hours * 60) + 'p';
+    let totalMinutes = Math.round(hours * 60);
+    // 5 perces kerekítés a receptek olvashatóságáért
+    totalMinutes = Math.round(totalMinutes / 5) * 5;
+    
+    if (totalMinutes < 60) {
+      return totalMinutes + 'p';
     }
-    const h = Math.floor(hours);
-    const m = Math.round((hours - h) * 60);
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
     return `${h}ó` + (m > 0 ? ` ${m}p` : '');
   }
 
@@ -606,7 +610,7 @@
       <tr style="font-weight:700; color:var(--gold-dark);">
         <td>${getActiveYeastLabel(activeYeastType)}</td>
         <td class="pct">${fmt(r.yeastPct, 2)}%</td>
-        <td class="amt">${fmtG(yeastVal)}</td>
+        <td class="amt">${fmtG2(yeastVal)}</td>
       </tr>`;
     
     if (r.takeOutOldDoughG > 0) {
@@ -1096,7 +1100,8 @@
       steps.push(`<b>Készre kelesztés szobahőn</b>: Hagyd a gombócokat kelesztőedényben szobahőmérsékleten (${roomT}°C) kelni további ${formatDuration(remainingRoom)} ideig.`);
     }
 
-    steps.push(`<b>Sütés</b>: Formázd a tésztát nápolyi vagy tepsis stílusnak megfelelően, tetszőlegesen feltétezd és a lehető legmagasabb hőfokon süsd készre.`);
+    const isTeglia = r.style === 'teglia';
+    steps.push(`<b>Sütés</b>: ${isTeglia ? 'Olajozott tepsiben finoman terítsd szét a tésztát a szélekig, előnyújtsd, feltétezd és sütőben/kemencében süsd készre.' : 'Nyújtsd ki a tésztagolyót kézzel (a szélén a levegőbuborékokat megtartva), tetszőlegesen feltétezd és a lehető legmagasabb hőfokon süsd készre.'}`);
 
     document.getElementById('p-method-list').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
     document.getElementById('p-notes').textContent = notes || '';

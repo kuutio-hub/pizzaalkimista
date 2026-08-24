@@ -4,7 +4,7 @@
  * elinduljon. A GitHub Pages relatív útvonalakat használ, ezért a CACHE
  * kulcsokat is relatívan soroljuk fel.
  */
-const CACHE_NAME = 'pizzaalkimista-v6';
+const CACHE_NAME = 'pizzaalkimista-v8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -48,14 +48,15 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(res => {
-        // Csak azonos-eredetű, sikeres válaszokat cache-elünk (a Google Fonts
-        // kéréseket kihagyjuk a leiratkozási bonyodalmak elkerülése végett)
         if (res.ok && event.request.url.startsWith(self.location.origin)) {
           const clone = res.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return res;
-      }).catch(() => cached);
+      }).catch(err => {
+        if (cached) return cached;
+        return new Response('Network error', { status: 408, headers: { 'Content-Type': 'text/plain' } });
+      });
     })
   );
 });
