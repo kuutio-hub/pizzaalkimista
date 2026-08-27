@@ -1651,14 +1651,24 @@
           window.print();
         });
       } else {
-        // PDF megnyitása / nyomtatása biztonságos blob: URL segítségével
+        // PDF megnyitása / nyomtatása biztonságos blob: URL segítségével és automatikus nyomtatási ablak indítással
         try {
-          const pdfBlob = await html2pdf().set(opt).from(printRoot).outputPdf('blob');
+          const pdfBlob = await html2pdf()
+            .set(opt)
+            .from(printRoot)
+            .toPdf()
+            .get('pdf')
+            .then(pdf => {
+              // Beágyazzuk a nyomtatási parancsot a PDF metaadataiba
+              pdf.autoPrint();
+            })
+            .outputPdf('blob');
+          
           cleanup();
           
           const pdfUrl = URL.createObjectURL(pdfBlob);
           
-          // Megnyitjuk új böngészőlapon
+          // Megnyitjuk új böngészőlapon, ahol a beágyazott autoPrint miatt azonnal felugrik a nyomtatás
           window.open(pdfUrl, '_blank');
 
           // A blob URL-t csak késleltetve szabadítjuk fel, hogy a böngésző biztosan betölthesse
