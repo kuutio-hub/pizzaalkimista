@@ -1176,11 +1176,8 @@
           <button class="icon-btn btn-sm act-load" style="width:34px;height:34px" title="Betöltés">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           </button>
-          <button class="icon-btn btn-sm act-download-pdf" style="width:34px;height:34px" title="PDF Letöltése">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </button>
-          <button class="icon-btn btn-sm act-open-pdf" style="width:34px;height:34px" title="PDF Megnyitása / Nyomtatása">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <button class="icon-btn btn-sm act-print" style="width:34px;height:34px" title="Nyomtatás">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           </button>
           <button class="icon-btn btn-sm act-del" style="width:34px;height:34px" title="Törlés">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
@@ -1276,10 +1273,8 @@
         renderResult(lastResult);
         document.getElementById('result-wrap').hidden = false;
         showToast('Recept betöltve');
-      } else if (e.target.closest('.act-download-pdf')) {
-        printRecipe(rec.name, rec.result, rec.notes, 'save');
-      } else if (e.target.closest('.act-open-pdf')) {
-        printRecipe(rec.name, rec.result, rec.notes, 'open');
+      } else if (e.target.closest('.act-print')) {
+        printRecipe(rec.name, rec.result, rec.notes);
       } else if (e.target.closest('.act-del')) {
         if (confirm(`Törlöd a(z) „${rec.name}” receptet?`)) {
           await PizzaDB.remove(id);
@@ -1290,40 +1285,17 @@
     });
   }
 
-  document.getElementById('btn-download-pdf')?.addEventListener('click', (e) => {
+  document.getElementById('btn-print')?.addEventListener('click', (e) => {
     e.preventDefault();
     if (!lastResult) return;
     const nameToggle = document.getElementById('toggle-recipe-name');
     const name = (nameToggle && nameToggle.checked)
       ? (document.getElementById('recipe-title-input').value.trim() || "Gregory's Special")
       : null;
-    printRecipe(name, lastResult, '', 'save');
+    printRecipe(name, lastResult, '');
   });
 
-  document.getElementById('btn-open-pdf')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!lastResult) return;
-    const nameToggle = document.getElementById('toggle-recipe-name');
-    const name = (nameToggle && nameToggle.checked)
-      ? (document.getElementById('recipe-title-input').value.trim() || "Gregory's Special")
-      : null;
-    printRecipe(name, lastResult, '', 'open');
-  });
-
-  async function printRecipe(name, r, notes, action = 'save') {
-    const printRoot = document.getElementById('print-root');
-
-    // Ideiglenesen láthatóvá tesszük a valós DOM-ban a méretezéshez és rajzoláshoz (fő tartalom mögé bújtatva)
-    printRoot.style.display = 'block';
-    printRoot.style.position = 'fixed';
-    printRoot.style.left = '0';
-    printRoot.style.top = '0';
-    printRoot.style.width = '794px';
-    printRoot.style.background = '#ffffff';
-    printRoot.style.color = '#111113';
-    printRoot.style.zIndex = '-9999';
-    printRoot.style.opacity = '1';
-
+  function printRecipe(name, r, notes) {
     const titleEl = document.getElementById('p-title');
     if (!name || name === "Gregory's Special") {
       titleEl.style.display = 'none';
@@ -1542,172 +1514,9 @@
 
     document.getElementById('p-method-list').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
     document.getElementById('p-notes').textContent = notes || '';
-    
-    // A printRoot már felül deklarálva és formázva van
 
-    const now = new Date();
-    const yy = String(now.getFullYear()).slice(-2);
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    const dateStr = yy + mm + dd;
-    const pdfFilename = `PizzaAlkimista recept ${dateStr}.pdf`;
-
-    const opt = {
-      margin:       [10, 12, 10, 12],
-      filename:     pdfFilename,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { 
-        scale: 2, 
-        useCORS: false, 
-        logging: true,
-        onclone: (clonedDoc) => {
-          // Eltávolítjuk a Google Fonts-ot a klónozott dokumentumból, hogy az html2canvas ne próbálja letölteni és ne omoljon össze
-          const fonts = clonedDoc.querySelectorAll('link[href*="fonts.googleapis.com"], link[href*="fonts.gstatic.com"]');
-          fonts.forEach(f => f.remove());
-
-          // A háttérben klónozott dokumentumban tesszük láthatóvá a print-rootot és beállítjuk az A4 méretet
-          const el = clonedDoc.getElementById('print-root');
-          if (el) {
-            el.style.display = 'block';
-            el.style.visibility = 'visible';
-            el.style.width = '794px';
-            el.style.background = '#ffffff';
-            el.style.color = '#111113';
-            el.style.position = 'relative';
-
-            // PDF-optimalizált háttér dekorációk generálása (2-5 nagyon halvány szürke elem, alacsony tintaigény)
-            const pdfBg = clonedDoc.createElement('div');
-            pdfBg.style.position = 'absolute';
-            pdfBg.style.inset = '0';
-            pdfBg.style.zIndex = '0';
-            pdfBg.style.pointerEvents = 'none';
-            pdfBg.style.overflow = 'hidden';
-
-            Array.from(el.children).forEach(child => {
-              child.style.position = 'relative';
-              child.style.zIndex = '1';
-            });
-            el.appendChild(pdfBg);
-
-            // Recept név és tésztasúly alapján determinisztikus seedelt háttér generálása a PDF-hez
-            const seedStr = (name || "Gregory") + (r.totalDoughG || 1000);
-            const pdfGen = new PizzaAlkimistaBackgroundGenerator();
-            pdfGen.container = pdfBg;
-            pdfGen.setSeed(seedStr);
-
-            const targetCount = 2 + Math.floor(pdfGen.seededRandom() * 3); // 2-4 db elem
-            const allowedAssets = ['wheat', 'dough-ball', 'rolling-pin', 'bowl', 'pizza-cutter', 'scale', 'timer', 'thermometer', 'pizza-peel'];
-            const pdfWidth = 794;
-            const pdfHeight = 1123;
-
-            let placed = 0;
-            for (let i = 0; i < 30 && placed < targetCount; i++) {
-              const assetKey = allowedAssets[Math.floor(pdfGen.seededRandom() * allowedAssets.length)];
-              const asset = window.PizzaAlkimistaBgAssets[assetKey];
-              if (!asset) continue;
-
-              const x = 0.08 + pdfGen.seededRandom() * 0.84;
-              const y = 0.15 + pdfGen.seededRandom() * 0.7;
-              const scale = 0.75 + pdfGen.seededRandom() * 0.35;
-              const rotation = -30 + pdfGen.seededRandom() * 60;
-
-              const elemSize = Math.round(scale * 120);
-              const svgEl = clonedDoc.createElementNS("http://www.w3.org/2000/svg", "svg");
-              svgEl.setAttribute("viewBox", "0 0 100 100");
-              svgEl.style.position = 'absolute';
-              svgEl.style.width = elemSize + "px";
-              svgEl.style.height = elemSize + "px";
-              svgEl.style.left = (x * pdfWidth - elemSize / 2) + "px";
-              svgEl.style.top = (y * pdfHeight - elemSize / 2) + "px";
-              svgEl.style.transform = `rotate(${rotation}deg)`;
-              svgEl.style.color = '#a1a1a5';
-              svgEl.style.opacity = '0.07';
-              svgEl.style.fill = 'none';
-              svgEl.innerHTML = asset.svg;
-
-              pdfBg.appendChild(svgEl);
-              placed++;
-            }
-          }
-        }
-      },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    const cleanup = () => {
-      printRoot.style.display = 'none';
-      printRoot.style.position = '';
-      printRoot.style.left = '';
-      printRoot.style.top = '';
-      printRoot.style.width = '';
-      printRoot.style.background = '';
-      printRoot.style.color = '';
-      printRoot.style.zIndex = '';
-      printRoot.style.opacity = '';
-    };
-
-    // Várunk 150 ms-ot, hogy a böngésző biztosan alkalmazza a stílusokat és elvégezze a layout számítást a láthatóvá tett elemen!
-    setTimeout(async () => {
-      if (action === 'save') {
-        html2pdf().set(opt).from(printRoot).save().then(cleanup).catch(err => {
-          console.error('PDF Mentési hiba:', err);
-          cleanup();
-          window.print();
-        });
-      } else {
-        // PDF közvetlen nyomtatása az aktuális oldalon láthatatlan iframe segítségével (új lap megnyitása nélkül!)
-        try {
-          const pdfBlob = await html2pdf()
-            .set(opt)
-            .from(printRoot)
-            .outputPdf('blob');
-          
-          cleanup();
-          
-          const pdfUrl = URL.createObjectURL(pdfBlob);
-          
-          // Létrehozunk egy látható méretű, de képernyőn kívül elhelyezett (így láthatatlan) iframe-et.
-          // Ez elengedhetetlen, mert a böngészők energiatakarékosságból nem töltik be a PDF-olvasó plugint a 0x0 méretű vagy display:none iframe-ekben.
-          const iframe = document.createElement('iframe');
-          iframe.style.position = 'fixed';
-          iframe.style.left = '-9999px';
-          iframe.style.top = '-9999px';
-          iframe.style.width = '600px';
-          iframe.style.height = '600px';
-          iframe.style.border = 'none';
-          iframe.style.opacity = '0.01';
-          iframe.style.pointerEvents = 'none';
-          iframe.src = pdfUrl;
-          
-          document.body.appendChild(iframe);
-          
-          // Amint a PDF betöltődött az iframe-be, elindítjuk a nyomtatást
-          iframe.addEventListener('load', () => {
-            // Egy apró (500 ms) aszinkron várakozást adunk, hogy a PDF olvasó renderelni tudja a lapokat a fókuszálás előtt
-            setTimeout(() => {
-              try {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-              } catch (printErr) {
-                console.error('Iframe nyomtatási hiba:', printErr);
-                window.print();
-              }
-            }, 500);
-            
-            // Biztonságos eltávolítás és felszabadítás kis várakozás után (hagyunk időt a nyomtatónak)
-            setTimeout(() => {
-              document.body.removeChild(iframe);
-              URL.revokeObjectURL(pdfUrl);
-            }, 60000);
-          });
-        } catch (err) {
-          console.error('PDF Nyomtatási hiba:', err);
-          cleanup();
-          // Biztonsági tartalékként elindítjuk a böngésző alapértelmezett nyomtatását
-          window.print();
-        }
-      }
-    }, 150);
+    // Elindítjuk a böngésző natív nyomtatását
+    window.print();
   }
 
   // ---------------------------------------------------------------------

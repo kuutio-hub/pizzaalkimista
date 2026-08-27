@@ -4,7 +4,7 @@
  * elinduljon. A GitHub Pages relatív útvonalakat használ, ezért a CACHE
  * kulcsokat is relatívan soroljuk fel.
  */
-const CACHE_NAME = 'pizzaalkimista-v25';
+const CACHE_NAME = 'pizzaalkimista-v27';
 const APP_SHELL = [
   './',
   './index.html',
@@ -12,7 +12,6 @@ const APP_SHELL = [
   './timeline_rules.json',
   './css/style.css',
   './css/print.css',
-  './js/html2pdf.bundle.min.js',
   './js/bg-assets.js',
   './js/strings.js',
   './js/pdf-strings.js',

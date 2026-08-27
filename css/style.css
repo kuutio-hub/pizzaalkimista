@@ -764,9 +764,6 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
 
 
 /* ---------- Nyomtatási stílusok ---------- */
-#print-root {
-  display: none;
-}
 
 @media print {
   body, html {
