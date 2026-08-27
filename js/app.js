@@ -1311,6 +1311,19 @@
   });
 
   async function printRecipe(name, r, notes, action = 'save') {
+    const printRoot = document.getElementById('print-root');
+
+    // Ideiglenesen láthatóvá tesszük a valós DOM-ban a méretezéshez és rajzoláshoz (fő tartalom mögé bújtatva)
+    printRoot.style.display = 'block';
+    printRoot.style.position = 'fixed';
+    printRoot.style.left = '0';
+    printRoot.style.top = '0';
+    printRoot.style.width = '794px';
+    printRoot.style.background = '#ffffff';
+    printRoot.style.color = '#111113';
+    printRoot.style.zIndex = '-9999';
+    printRoot.style.opacity = '1';
+
     const titleEl = document.getElementById('p-title');
     if (!name || name === "Gregory's Special") {
       titleEl.style.display = 'none';
@@ -1530,7 +1543,7 @@
     document.getElementById('p-method-list').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
     document.getElementById('p-notes').textContent = notes || '';
     
-    const printRoot = document.getElementById('print-root');
+    // A printRoot már felül deklarálva és formázva van
 
     const now = new Date();
     const yy = String(now.getFullYear()).slice(-2);
@@ -1617,15 +1630,30 @@
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
+    const cleanup = () => {
+      printRoot.style.display = 'none';
+      printRoot.style.position = '';
+      printRoot.style.left = '';
+      printRoot.style.top = '';
+      printRoot.style.width = '';
+      printRoot.style.background = '';
+      printRoot.style.color = '';
+      printRoot.style.zIndex = '';
+      printRoot.style.opacity = '';
+    };
+
     if (action === 'save') {
-      html2pdf().set(opt).from(printRoot).save().catch(err => {
+      html2pdf().set(opt).from(printRoot).save().then(cleanup).catch(err => {
         console.error('PDF Mentési hiba:', err);
+        cleanup();
         window.print();
       });
     } else {
       // PDF megnyitása / nyomtatása biztonságos blob: URL segítségével
       try {
         const pdfBlob = await html2pdf().set(opt).from(printRoot).outputPdf('blob');
+        cleanup();
+        
         const pdfUrl = URL.createObjectURL(pdfBlob);
         
         // Megnyitjuk új böngészőlapon
@@ -1637,6 +1665,7 @@
         }, 15000); // 15 másodperc után ürítjük
       } catch (err) {
         console.error('PDF Megnyitási/Nyomtatási hiba:', err);
+        cleanup();
         // Biztonsági tartalékként elindítjuk a sima nyomtatást
         window.print();
       }
