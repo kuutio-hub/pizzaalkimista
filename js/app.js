@@ -1515,33 +1515,7 @@
     document.getElementById('p-method-list').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
     document.getElementById('p-notes').textContent = notes || '';
     
-    // Golyóálló PDF generálás klónozással és inline stílusokkal (kikerüli a CSS cache/specifikációs hibákat)
-    const originalPrintRoot = document.getElementById('print-root');
-    const clone = originalPrintRoot.cloneNode(true);
-    clone.id = 'print-root-temp-clone';
-    
-    // Alkalmazzuk a megjelenítést és az A4 szélességet inline stílusként a klónon
-    clone.style.display = 'block';
-    clone.style.visibility = 'visible';
-    clone.style.position = 'absolute';
-    clone.style.left = '0';
-    clone.style.top = '0';
-    clone.style.width = '794px';
-    clone.style.background = '#ffffff';
-    clone.style.color = '#111113';
-    clone.style.zIndex = '-9999';
-    clone.style.opacity = '1';
-    
-    // Kényszerítsük a gyermekeket is láthatónak (kivéve a hidden elemeket)
-    const allChildren = clone.querySelectorAll('*');
-    allChildren.forEach(child => {
-      child.style.visibility = 'visible';
-      if (child.hasAttribute('hidden') || child.style.display === 'none') {
-        child.style.display = 'none';
-      }
-    });
-
-    document.body.appendChild(clone);
+    const printRoot = document.getElementById('print-root');
 
     const now = new Date();
     const yy = String(now.getFullYear()).slice(-2);
@@ -1550,25 +1524,34 @@
     const dateStr = yy + mm + dd;
     const pdfFilename = `PizzaAlkimista recept ${dateStr}.pdf`;
 
-    // Várunk egy kis időt, hogy a böngésző biztosan kirajzolja a klónt a DOM-ban
-    setTimeout(() => {
-      const opt = {
-        margin:       [10, 12, 10, 12],
-        filename:     pdfFilename,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
+    const opt = {
+      margin:       [10, 12, 10, 12],
+      filename:     pdfFilename,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { 
+        scale: 2, 
+        useCORS: true, 
+        logging: false,
+        onclone: (clonedDoc) => {
+          // A háttérben klónozott dokumentumban tesszük láthatóvá a print-rootot és beállítjuk az A4 méretet
+          const el = clonedDoc.getElementById('print-root');
+          if (el) {
+            el.style.display = 'block';
+            el.style.visibility = 'visible';
+            el.style.width = '794px';
+            el.style.background = '#ffffff';
+            el.style.color = '#111113';
+          }
+        }
+      },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-      html2pdf().set(opt).from(clone).save().then(() => {
-        document.body.removeChild(clone);
-      }).catch(err => {
-        console.error('PDF Generálási hiba:', err);
-        document.body.removeChild(clone);
-        // Biztonsági fallback nyomtatásra
-        window.print();
-      });
-    }, 150);
+    html2pdf().set(opt).from(printRoot).save().catch(err => {
+      console.error('PDF Generálási hiba:', err);
+      // Biztonsági fallback nyomtatásra
+      window.print();
+    });
   }
 
   // ---------------------------------------------------------------------

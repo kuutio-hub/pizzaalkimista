@@ -242,16 +242,4 @@
   display: none;
 }
 
-.pdf-mode#print-root {
-  display: block !important;
-  visibility: visible !important;
-  position: relative !important;
-  width: 794px !important; /* A4 szélesség */
-  background: #ffffff !important;
-  color: #111113 !important;
-  opacity: 1 !important;
-  margin: 0 auto !important;
-}
-.pdf-mode#print-root * {
-  visibility: visible !important;
-}
+
