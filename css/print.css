@@ -2,29 +2,25 @@
    PizzaAlkimista — Nyomtatási nézet (A4, Professzionális Receptkártya)
    ========================================================================== */
 @media print {
-  @page {
-    size: A4;
-    margin: 12mm 14mm 12mm 14mm;
-  }
-
   body * {
     visibility: hidden !important;
   }
-
   #print-root, #print-root * {
     visibility: visible !important;
   }
+}
 
-  #print-root {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #111113;
-    line-height: 1.5;
-    background: #ffffff;
-  }
+@page {
+  size: A4;
+  margin: 12mm 14mm 12mm 14mm;
+}
+
+#print-root {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #111113;
+  line-height: 1.5;
+  background: #ffffff;
+}
 
   /* Header */
   .p-header {
@@ -80,20 +76,52 @@
     font-weight: 600;
   }
 
-  .p-badges {
+  /* Szófelhős / Buborékos kelesztési adatok keretekben */
+  .p-cloud-container {
+    margin-bottom: 20px;
+    font-size: 11px;
+  }
+  .p-cloud-group-title {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #8A6B1C;
+    margin: 8px 0 4px 0;
+  }
+  .p-cloud-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 18px;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
   }
-  .p-badge {
+  .p-cloud-item {
     font-size: 10px;
     font-weight: 700;
     background: #FAF6E9;
     border: 1px solid #D4AF37;
-    color: #8A6B1C;
-    padding: 3px 10px;
-    border-radius: 6px;
+    color: #4A3A13;
+    padding: 4px 10px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(138, 107, 28, 0.05);
+  }
+  .p-cloud-main-param {
+    display: inline-block;
+    background: #F4EEDF;
+    border-color: #8A6B1C;
+    color: #111113;
+    font-size: 11px;
+    padding: 5px 12px;
+    margin-bottom: 6px;
+  }
+  .p-cloud-arrow {
+    background: none;
+    border: none;
+    color: #D4AF37;
+    padding: 0 2px;
+    font-size: 12px;
+    box-shadow: none;
   }
 
   /* 2 oszlopos törzs */
@@ -148,33 +176,6 @@
     padding-left: 10px;
   }
 
-  /* Idővonal lista */
-  .p-timeline {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    font-size: 10.5px;
-  }
-  .p-timeline li {
-    display: table-row;
-    line-height: 1.5;
-  }
-  .p-timeline li .t {
-    display: table-cell;
-    font-weight: 700;
-    color: #8A6B1C;
-    font-size: 10px;
-    padding-right: 12px;
-    white-space: nowrap;
-    vertical-align: top;
-    padding-bottom: 6px;
-  }
-  .p-timeline li span:not(.t) {
-    display: table-cell;
-    vertical-align: top;
-    padding-bottom: 6px;
-  }
-
   /* Elkészítési útmutató */
   .p-method {
     padding-left: 18px;
@@ -223,11 +224,34 @@
     font-weight: 500;
   }
 
-  .no-print {
-    display: none !important;
+.no-print {
+  display: none !important;
+}
+
+@media print {
+  #print-root {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: block !important;
   }
 }
 
 #print-root {
   display: none;
+}
+
+.pdf-mode#print-root {
+  display: block !important;
+  visibility: visible !important;
+  position: relative !important;
+  width: 794px !important; /* A4 szélesség */
+  background: #ffffff !important;
+  color: #111113 !important;
+  opacity: 1 !important;
+  margin: 0 auto !important;
+}
+.pdf-mode#print-root * {
+  visibility: visible !important;
 }

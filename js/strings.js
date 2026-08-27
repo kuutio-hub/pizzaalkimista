@@ -33,16 +33,16 @@ const PizzaAlkimistaStrings = {
   settingYeastFactor: 'Élesztő mennyiség korrekciója (%)',
 
   // Mező feliratok (Főoldal)
-  labelBallCount: 'Tésztagolyók száma',
-  labelBallWeight: 'Tésztagolyó súlya (g)',
-  labelBallCount2: 'További tésztagolyók száma',
-  labelBallWeight2: 'További tésztagolyó súlya (g)',
+  labelBallCount: 'Gombócok száma',
+  labelBallWeight: 'Súly (g)',
+  labelBallCount2: 'További gombócok száma',
+  labelBallWeight2: 'További gombóc súlya (g)',
   labelPanLen: 'Tepsi hossza (cm)',
   labelPanWid: 'Tepsi szélessége (cm)',
   labelGramPerM2: 'Tésztamennyiség (g/m²)',
-  labelHydration: 'Hidratáció (%)',
-  labelSalt: 'Só (%)',
-  labelOil: 'Zsiradék (%)',
+  labelHydration: 'Hidratáció',
+  labelSalt: 'Só',
+  labelOil: 'Zsiradék',
   labelRoomHours: 'Szobahőmérsékletű kelesztés (óra)',
   labelRoomTemp: 'Szoba hőmérséklete (°C)',
   labelColdHours: 'Hűtőszekrényben töltött idő (óra)',
@@ -98,12 +98,6 @@ const PizzaAlkimistaStrings = {
   resTotalDough: 'összes tészta',
   resTotalHours: 'óra kelesztés összesen',
 
-  // Nyomtatási feliratok
-  printTitle: 'PizzaAlkimista — Recept kártya',
-  printMethodTitle: 'Elkészítési Útmutató',
-  printNotesLabel: 'Saját jegyzetek',
-  printFooter: 'PizzaAlkimista — A tökéletes tészta tudománya',
-
   // Idővonal lépések
   timelineDagasztas: 'Dagasztás',
   timelineBigaStart: 'Biga előkészítése: A liszt, víz és élesztő csomómentes összekeverése, majd az előérlelés megkezdése.',
@@ -114,25 +108,5 @@ const PizzaAlkimistaStrings = {
   timelineHutoBe: 'Hűtőszekrénybe helyezés: Hideg kelesztési fázis megkezdése.',
   timelineHutoKi: 'Hűtőszekrényből kivétel: Sütés előtti 2 órás szobahőmérsékletű bemelegedés.',
   timelineTakeOutOld: 'Öregtészta kivétele: Elkülönítés a következő sütéshez.',
-  timelineSutes: 'Nyújtás és sütés: Formázás, feltétezés és sütés high-heat hőfokon.',
-
-  // Elkészítési útmutató szövege (Nyomtatólapra)
-  methodSteps: {
-    standard: [
-      '1. DAGASZTÁS: Keverd össze a friss lisztet a sóval (és ha használsz, olajjal). Add hozzá a vizet és az élesztőt, majd dagassz addig, amíg sima, rugalmas tésztát nem kapsz.',
-      '2. PIHENTETÉS: Takard le a tésztát egy nedves konyharuhával vagy tálkával, és hagyd szobahőmérsékleten pihenni a megadott ideig (érlelés első fázisa).',
-      '3. GOMBÓCOLÁS: Oszd el a tésztát a megadott súlyú golyókra. Formázd őket gömbölyűre, ügyelve arra, hogy a felületük feszüljön (gombócolás).',
-      '4. KÉSZRE KELESZTÉS: Helyezd a golyókat kelesztődobozba, és hagyd őket megkelni a sütésig (ha van hűtős fázis, tedd a hűtőbe, majd sütés előtt 2 órával vedd ki).'
-    ],
-    biga: [
-      '1. BIGA ELKÉSZÍTÉSE: Keverd össze a biga lisztjét, vizét és az élesztőt lazán (ne dagassz homogénné, maradjon darabos). Hagyd érni a beállított ideig és hőmérsékleten.',
-      '2. FŐ DAGASZTÁS: Tépkedd a megérett bigát apró darabokra. Add hozzá a fő dagasztás lisztjét, sóját, (olaját) és a maradék vizet. Dagassz belőle sima tésztát.',
-      '3. GOMBÓCOLÁS ÉS SÜTÉS: Formázz tésztagolyókat a megadott súlyban, majd keleszd őket készre a sütés előtti szakaszig.'
-    ],
-    oldDough: [
-      '1. ÖREGTÉSZTA BEKEVERÉSE: A dagasztás kezdetén a liszthez és vízhez add hozzá az öregtésztát is apró darabokban, majd az élesztővel együtt dagaszd össze.',
-      '2. ÖREGTÉSZTA KIVÉTELE: A dagasztás befejeztével, még mielőtt a tészta kelni kezdene, vágd le és mérd ki a kiveendő öregtészta mennyiségét. Tedd jól záródó edényben a hűtőbe a következő sütésig.',
-      '3. FOLYTATÁS: A megmaradt tésztát kelesztődobozban hagyd megkelni a sütés előtti szakaszig.'
-    ]
-  }
+  timelineSutes: 'Nyújtás és sütés: Formázás, feltétezés és sütés high-heat hőfokon.'
 };

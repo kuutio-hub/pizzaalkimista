@@ -1,42 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <radialGradient id="crust" cx="50%" cy="42%" r="65%">
-      <stop offset="0%" stop-color="#F4E4B8"/>
-      <stop offset="62%" stop-color="#E8B84B"/>
-      <stop offset="100%" stop-color="#C1401F"/>
-    </radialGradient>
-  </defs>
-  <circle cx="256" cy="256" r="248" fill="#2B2420"/>
-  <circle cx="256" cy="256" r="222" fill="url(#crust)"/>
-  <circle cx="256" cy="256" r="222" fill="none" stroke="#2B2420" stroke-width="6" opacity="0.15"/>
-  <!-- dial ticks around the rim, like an oven thermometer -->
-  <g stroke="#2B2420" stroke-width="5" stroke-linecap="round" opacity="0.55">
-    <line x1="256" y1="46" x2="256" y2="70"/>
-    <line x1="256" y1="442" x2="256" y2="466"/>
-    <line x1="46" y1="256" x2="70" y2="256"/>
-    <line x1="442" y1="256" x2="466" y2="256"/>
-    <line x1="107" y1="107" x2="124" y2="124"/>
-    <line x1="388" y1="388" x2="405" y2="405"/>
-    <line x1="107" y1="405" x2="124" y2="388"/>
-    <line x1="388" y1="124" x2="405" y2="107"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Szenesedett, buborékos nápolyi tészta perem (Cornicione leopárd pöttyökkel) -->
+  <circle cx="50" cy="50" r="44" fill="#EAD9B5" stroke="#8C6627" stroke-width="4.5"/>
+  <!-- Szenes pöttyök -->
+  <circle cx="22" cy="35" r="1.5" fill="#2E200C"/>
+  <circle cx="78" cy="35" r="2" fill="#2E200C"/>
+  <circle cx="34" cy="18" r="1.5" fill="#2E200C"/>
+  <circle cx="55" cy="12" r="2.2" fill="#2E200C"/>
+  <circle cx="68" cy="82" r="1.8" fill="#2E200C"/>
+  <circle cx="28" cy="74" r="2" fill="#2E200C"/>
+  <circle cx="84" cy="62" r="1.6" fill="#2E200C"/>
+  
+  <!-- Paradicsom alap -->
+  <circle cx="50" cy="50" r="37" fill="#C93F2B"/>
+  <circle cx="48" cy="52" r="34" fill="#D34B32" opacity="0.8"/>
+  
+  <!-- 1. szelet elmozdítva -->
+  <g transform="translate(-3, -3)">
+    <path d="M50,50 L20,24 A37,37 0 0,1 50,13 Z" fill="#C93F2B"/>
+    <path d="M20,24 A37,37 0 0,1 50,13 L50,11 A39,39 0 0,1 18,22 Z" fill="#EAD9B5" stroke="#8C6627" stroke-width="1"/>
+    <circle cx="36" cy="20" r="1" fill="#2E200C"/>
+    <circle cx="36" cy="36" r="5" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+    <circle cx="43" cy="24" r="4.5" fill="#EFE3C3"/>
+    <path d="M30,30 Q33,23 38,28 Q33,35 30,30 Z" fill="#3D7B32"/>
+    <path d="M30,30 L38,28" stroke="#25501E" stroke-width="0.5"/>
   </g>
-  <!-- slice cut lines, 6 slices -->
-  <g stroke="#B33B1E" stroke-width="4" opacity="0.5">
-    <line x1="256" y1="256" x2="256" y2="60"/>
-    <line x1="256" y1="256" x2="424" y2="158"/>
-    <line x1="256" y1="256" x2="424" y2="354"/>
-    <line x1="256" y1="256" x2="256" y2="452"/>
-    <line x1="256" y1="256" x2="88" y2="354"/>
-    <line x1="256" y1="256" x2="88" y2="158"/>
-  </g>
-  <!-- toppings: basil + pepperoni dots -->
-  <circle cx="200" cy="180" r="15" fill="#B33B1E"/>
-  <circle cx="330" cy="210" r="15" fill="#B33B1E"/>
-  <circle cx="300" cy="330" r="15" fill="#B33B1E"/>
-  <circle cx="180" cy="310" r="15" fill="#B33B1E"/>
-  <path d="M250 250c10-22 34-30 50-18-4 20-26 36-50 18z" fill="#4A7856"/>
-  <path d="M262 262c-16 6-34-4-38-24 18-10 40-2 46 14z" fill="#5C8F68"/>
-  <!-- center dial hub -->
-  <circle cx="256" cy="256" r="22" fill="#2B2420"/>
-  <circle cx="256" cy="256" r="10" fill="#F4E4B8"/>
+  
+  <!-- Megmaradt 5 szelet -->
+  <circle cx="65" cy="30" r="6" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+  <path d="M60,24 Q65,18 70,22 Q65,28 60,24 Z" fill="#3D7B32"/>
+  <circle cx="78" cy="50" r="5" fill="#EFE3C3"/>
+  <circle cx="70" cy="62" r="5.5" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+  <path d="M68,48 Q74,44 76,50 Q70,54 68,48 Z" fill="#3D7B32"/>
+  <circle cx="50" cy="78" r="6" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+  <circle cx="34" cy="68" r="4.5" fill="#EFE3C3"/>
+  <path d="M46,65 Q50,59 55,63 Q50,69 46,65 Z" fill="#3D7B32"/>
+  <circle cx="22" cy="50" r="5" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+  <circle cx="28" cy="36" r="4" fill="#EFE3C3"/>
+  <path d="M28,45 Q32,40 36,44 Q32,49 28,45 Z" fill="#3D7B32"/>
+  <circle cx="50" cy="50" r="4" fill="#EFE3C3" opacity="0.9"/>
+  
+  <!-- Vágóvonalak -->
+  <line x1="50" y1="50" x2="50" y2="13" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+  <line x1="50" y1="50" x2="80" y2="24" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+  <line x1="50" y1="50" x2="82" y2="57" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+  <line x1="50" y1="50" x2="50" y2="87" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+  <line x1="50" y1="50" x2="18" y2="57" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
 </svg>

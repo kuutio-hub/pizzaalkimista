@@ -8,8 +8,51 @@
   'use strict';
 
   const fmt = (n, d = 0) => Number(n).toLocaleString('hu-HU', { maximumFractionDigits: d, minimumFractionDigits: d });
-  const fmtG = n => fmt(n, 1) + ' g';
-  const fmtG2 = n => fmt(n, 2) + ' g';
+  
+  // Angolszász (Imperial) mértékegységekre átszámító és formázó segédfüggvények
+  const toImperial = (grams, type) => {
+    if (!appSettings.useImperial) return '';
+    // Liszt: 1 csésze (cup) ≈ 125 g
+    if (type === 'flour') {
+      const cups = grams / 125;
+      return ` (${fmt(cups, 1)} csésze)`;
+    }
+    // Víz / Folyadék: 1 csésze (cup) ≈ 236 g
+    if (type === 'water') {
+      const cups = grams / 236;
+      return ` (${fmt(cups, 1)} csésze)`;
+    }
+    // Só: 1 teáskanál (tsp) ≈ 5.7 g
+    if (type === 'salt') {
+      const tsp = grams / 5.7;
+      return ` (${fmt(tsp, 1)} tk)`;
+    }
+    // Élesztő: 1 teáskanál (tsp) ≈ 3 g szárított / 9 g friss
+    if (type === 'yeast') {
+      const tsp = grams / 3.0; // száraz alapon
+      return ` (${fmt(tsp, 1)} tk)`;
+    }
+    if (type === 'yeast_fresh') {
+      const tsp = grams / 9.0;
+      return ` (${fmt(tsp, 1)} tk)`;
+    }
+    // Olaj: 1 evőkanál (tbsp) ≈ 14 g
+    if (type === 'oil') {
+      const tbsp = grams / 14;
+      return ` (${fmt(tbsp, 1)} ek)`;
+    }
+    return '';
+  };
+
+  const fmtG = (n, type = '') => {
+    const impStr = type ? toImperial(n, type) : '';
+    return `${fmt(n, 1)} g${impStr}`;
+  };
+
+  const fmtG2 = (n, type = '') => {
+    const impStr = type ? toImperial(n, type) : '';
+    return `${fmt(n, 2)} g${impStr}`;
+  };
 
   // Időtartam formázása 5 perces kerekítéssel: pl. 1.35 óra -> 1ó 20p
   function formatDuration(hours) {
@@ -24,6 +67,31 @@
     const h = Math.floor(totalMinutes / 60);
     const m = totalMinutes % 60;
     return `${h}ó` + (m > 0 ? ` ${m}p` : '');
+  }
+
+  function parseDuration(str) {
+    if (!str) return 0;
+    str = str.trim().toLowerCase().replace(/,/g, '.');
+    
+    const hasO = str.includes('ó');
+    const hasP = str.includes('p');
+    
+    if (hasO || hasP) {
+      let hours = 0;
+      let minutes = 0;
+      
+      if (hasO) {
+        const parts = str.split('ó');
+        hours = parseFloat(parts[0].replace(/[^0-9.]/g, '')) || 0;
+        if (parts[1] && parts[1].includes('p')) {
+          minutes = parseFloat(parts[1].replace(/[^0-9.]/g, '')) || 0;
+        }
+      } else if (hasP) {
+        minutes = parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
+      }
+      return hours + (minutes / 60);
+    }
+    return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
   }
 
   const infoDot = key => `<button type="button" class="info-dot" data-info="${key}">i</button>`;
@@ -58,12 +126,14 @@
     useSecondBall: false,
     saveHistory: true,
     yeastModel: 'alchemist',
-    yeastFactor: 100, // 100% = 0% korrekció (alapértelmezett: nincs korrekció)
-    wastePct: 0, // 0% = nincs hulladék-kompenzáció (PizzApp-kompatibilis alapértelmezés)
+    yeastFactor: 105, // 105% = +5% élesztő korrekció (alapértelmezett)
+    wastePct: 3, // 3% = állandó 3% veszteség (alapértelmezett)
     useAutolyse: false,
     autolyseFlourPct: 70,
     autolyseWaterPct: 70,
-    useFahrenheit: false
+    useFahrenheit: false,
+    useImperial: false,
+    useLightMode: true
   };
 
   let appSettings = { ...DEFAULT_SETTINGS };
@@ -75,14 +145,6 @@
       try {
         const parsed = JSON.parse(saved);
         appSettings = { ...DEFAULT_SETTINGS, ...parsed };
-        // v2 migráció: régi mentett beállításokban a wastePct=5 volt default,
-        // most 0 az alapértelmezés. Ha még nincs settingsVersion, reseteljük.
-        if (!parsed.settingsVersion || parsed.settingsVersion < 2) {
-          appSettings.wastePct = 0;
-          appSettings.yeastFactor = Math.min(130, Math.max(70, appSettings.yeastFactor || 100));
-          appSettings.settingsVersion = 2;
-          localStorage.setItem('pizza_alkimista_settings', JSON.stringify(appSettings));
-        }
       } catch (e) {
         appSettings = { ...DEFAULT_SETTINGS };
       }
@@ -113,13 +175,15 @@
     check('setting-use-waste', appSettings.useWaste);
     check('setting-use-autolyse', appSettings.useAutolyse);
     check('setting-use-fahrenheit', appSettings.useFahrenheit);
+    check('setting-use-imperial', appSettings.useImperial);
+    check('setting-use-light-mode', appSettings.useLightMode);
 
     if (val('setting-waste-pct')) {
-      val('setting-waste-pct').value = appSettings.wastePct !== undefined ? appSettings.wastePct : 0;
+      val('setting-waste-pct').value = appSettings.wastePct !== undefined ? appSettings.wastePct : 3;
     }
     
     if (val('yeastFactor')) {
-      val('yeastFactor').value = appSettings.yeastFactor !== undefined ? appSettings.yeastFactor : 100;
+      val('yeastFactor').value = appSettings.yeastFactor !== undefined ? appSettings.yeastFactor : 105;
     }
 
     const warnEl = document.getElementById('yeast-factor-warn');
@@ -129,6 +193,13 @@
       } else {
         warnEl.textContent = '(0%)';
       }
+    }
+
+    // Fény / Sötét téma kezelése
+    if (appSettings.useLightMode) {
+      document.body.classList.add('light-theme');
+    } else {
+      document.body.classList.remove('light-theme');
     }
 
     // Főoldali form felépítése
@@ -141,8 +212,7 @@
     document.getElementById('olddough-in-fields').hidden = !appSettings.useOldDoughIn;
     document.getElementById('olddough-out-fields').hidden = !appSettings.useOldDoughOut;
 
-    // Globális range label és stepper bindolás az egész dokumentumra
-    bindRangeLabels(document);
+    // Globális stepper bindolás az egész dokumentumra
     initSteppers();
   }
 
@@ -169,16 +239,26 @@
     appSettings.useCold = document.getElementById('setting-use-cold').checked;
     appSettings.useSecondBall = document.getElementById('setting-use-secondball').checked;
     appSettings.saveHistory = document.getElementById('setting-save-history').checked;
-    appSettings.wastePct = parseFloat(document.getElementById('setting-waste-pct')?.value || 0);
+    appSettings.wastePct = parseFloat(document.getElementById('setting-waste-pct')?.value || 3);
+    const prevFahr = appSettings.useFahrenheit;
     appSettings.useFahrenheit = document.getElementById('setting-use-fahrenheit')?.checked || false;
+    appSettings.useImperial = document.getElementById('setting-use-imperial')?.checked || false;
+    appSettings.useLightMode = document.body.classList.contains('light-theme');
     appSettings.yeastModel = document.getElementById('setting-yeast-model')?.value || 'alchemist';
-    appSettings.yeastFactor = parseFloat(document.getElementById('yeastFactor')?.value || 100);
+    appSettings.yeastFactor = parseFloat(document.getElementById('yeastFactor')?.value || 105);
     
     saveSettings();
+    if (prevFahr !== appSettings.useFahrenheit) {
+      applyFahrenheitToForm();
+    }
     applySettingsToUI();
-    applyFahrenheitToForm();
     
-    document.getElementById('result-wrap').hidden = true;
+    // Ha van már eredmény kártya, frissítsük azt is az új mértékegységek miatt
+    if (lastResult) {
+      renderResult(lastResult);
+    }
+    
+    document.getElementById('result-wrap').hidden = lastResult ? false : true;
   }
 
   document.getElementById('useBigaCold').addEventListener('change', e => {
@@ -211,6 +291,7 @@
       btn.addEventListener('click', e => {
         e.preventDefault();
         const inputId = btn.dataset.inputId;
+        if (!inputId) return; // Dinamikus ballGroup-oknál saját kezelő van
         const dir = parseInt(btn.dataset.stepDir, 10);
         const input = document.getElementById(inputId);
         if (!input) return;
@@ -218,18 +299,25 @@
         const min = parseFloat(input.min || 0);
         const max = parseFloat(input.max || 100);
         const step = parseFloat(input.step || 1);
-        let val = parseFloat(input.value || 0);
+        
+        let val;
+        if (inputId.includes('Hours')) {
+          val = parseDuration(input.value);
+        } else {
+          let valStr = input.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+          val = parseFloat(valStr);
+        }
+        if (isNaN(val)) val = min;
 
         val = val + (dir * step);
         val = Math.round(val / step) * step; // Századpontossági float hiba elkerülése
         if (val < min) val = min;
         if (val > max) val = max;
 
-        input.value = val;
-        // Trigger live label updates
-        updateLabel(input);
-        input.dispatchEvent(new Event('input'));
-        input.dispatchEvent(new Event('change'));
+        input.value = formatInputValue(inputId, val);
+        
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
       });
     });
   }
@@ -244,9 +332,53 @@
   let numpadValue = '';
   let numpadOverwriteMode = false;
 
+  // Formázó segédfüggvény a beviteli mezők értékéhez (mértékegységek megjelenítése a mezőBEN)
+  function formatInputValue(id, val) {
+    if (val === undefined || val === '') return '';
+    const num = parseFloat(val);
+    if (isNaN(num)) return val;
+    
+    // Celsius / Fahrenheit
+    if (id.includes('Temp')) {
+      const unit = appSettings.useFahrenheit ? '°F' : '°C';
+      return `${fmt(num, 1)} ${unit}`;
+    }
+    // Óra (kelesztés)
+    if (id.includes('Hours')) {
+      return formatDuration(num);
+    }
+    // % (hidratáció, só, olaj, biga)
+    if (id === 'hydration' || id === 'salt' || id === 'oil' || id === 'bigaFlourPct' || id === 'bigaHydration') {
+      return `${fmt(num, id === 'salt' ? 1 : 0)}%`;
+    }
+    // Grammok (súly)
+    if (id === 'ballWeightG' || id.includes('Weight')) {
+      return `${fmt(num, 0)} g`;
+    }
+    // Darab (tésztagolyók száma)
+    if (id === 'ballCount' || id.includes('Count')) {
+      return `${fmt(num, 0)} db`;
+    }
+    // Gram per négyzetméter (teglia)
+    if (id === 'gramPerM2') {
+      return `${fmt(num, 0)} g/m²`;
+    }
+    // Tepsi centiméter
+    if (id === 'panLen' || id === 'panWid') {
+      return `${fmt(num, 0)} cm`;
+    }
+    return val;
+  }
+
   function openNumpad(inputEl) {
     numpadTargetInput = inputEl;
-    numpadValue = inputEl.value === '0' ? '' : inputEl.value;
+    let rawVal;
+    if (inputEl.id.includes('Hours')) {
+      rawVal = String(Math.round(parseDuration(inputEl.value) * 100) / 100);
+    } else {
+      rawVal = inputEl.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+    }
+    numpadValue = rawVal === '0' ? '' : rawVal;
     numpadOverwriteMode = true; // Új megnyitásnál az első gombnyomás felülírja az értéket
     numpadDisplay.textContent = numpadValue || '0';
     
@@ -264,6 +396,19 @@
     numpad.classList.remove('open');
     if (numpadTargetInput) {
       numpadTargetInput.classList.remove('numpad-active');
+      let rawVal = parseFloat(numpadValue.replace(/,/g, '.').replace(/[^0-9.]/g, ''));
+      if (!isNaN(rawVal)) {
+        // Korlátozzuk a beírt értéket a mező min/max attribútumai szerint
+        const min = parseFloat(numpadTargetInput.min);
+        const max = parseFloat(numpadTargetInput.max);
+        if (!isNaN(min) && rawVal < min) rawVal = min;
+        if (!isNaN(max) && rawVal > max) rawVal = max;
+
+        numpadTargetInput.value = formatInputValue(numpadTargetInput.id, rawVal);
+      }
+      // Triggereljük az újraszámítást a korlátozott értékkel
+      numpadTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+      numpadTargetInput.dispatchEvent(new Event('change', { bubbles: true }));
       numpadTargetInput = null;
     }
   }
@@ -277,11 +422,13 @@
     const key = btn.dataset.key;
     const isDecimalField = numpadTargetInput && parseFloat(numpadTargetInput.step) === 0.1;
 
+    const isDecimalAllowed = numpadTargetInput && (parseFloat(numpadTargetInput.step) % 1 !== 0 || parseFloat(numpadTargetInput.step) === 0.5 || parseFloat(numpadTargetInput.step) === 0.1);
+
     if (key === 'back') {
       numpadOverwriteMode = false;
       numpadValue = numpadValue.slice(0, -1);
     } else if (key === '.') {
-      if (!isDecimalField) {
+      if (isDecimalAllowed) {
         if (numpadOverwriteMode) {
           numpadValue = '0.';
           numpadOverwriteMode = false;
@@ -290,38 +437,42 @@
         }
       }
     } else {
-      if (isDecimalField) {
-        if (numpadOverwriteMode) {
-          numpadValue = key + '.0';
-          numpadOverwriteMode = false;
-        } else {
-          // Ha már egy egész része be van írva (pl. "2.0"), és megnyomjuk a 8-ast: "2.8" lesz!
-          const parts = numpadValue.split('.');
-          const currentInt = parts[0] || '0';
-          numpadValue = `${currentInt}.${key}`;
-        }
+      if (numpadOverwriteMode) {
+        numpadValue = key;
+        numpadOverwriteMode = false;
       } else {
-        if (numpadOverwriteMode) {
-          numpadValue = key;
-          numpadOverwriteMode = false;
-        } else {
-          if (numpadValue.length < 6) {
-            numpadValue += key;
-          }
+        if (numpadValue.length < 6) {
+          numpadValue += key;
         }
       }
     }
 
     numpadDisplay.textContent = numpadValue || '0';
-    numpadTargetInput.value = numpadValue || '0';
-    
-    // Live update dynamic state/recalculation trigger events
-    numpadTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
-    numpadTargetInput.dispatchEvent(new Event('change', { bubbles: true }));
+    if (numpadTargetInput) {
+      let rawVal = parseFloat(numpadValue.replace(/,/g, '.').replace(/[^0-9.]/g, ''));
+      if (isNaN(rawVal)) rawVal = 0;
+      
+      // Korlátozzuk a beírt értéket gombnyomásonként is
+      const min = parseFloat(numpadTargetInput.min);
+      const max = parseFloat(numpadTargetInput.max);
+      if (!isNaN(min) && rawVal < min && numpadValue.length >= String(min).length) rawVal = min;
+      // Ha a beírt szám nagyobb a megengedettnél, kényszerítsük a maximumot!
+      if (!isNaN(max) && rawVal > max) {
+        rawVal = max;
+        numpadValue = String(max);
+        numpadDisplay.textContent = numpadValue;
+      }
+      
+      numpadTargetInput.value = formatInputValue(numpadTargetInput.id, rawVal);
+      // Kiváltjuk a live frissítést
+      numpadTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+      numpadTargetInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   });
 
   document.addEventListener('click', e => {
-    const input = e.target.closest('input[readonly][type="number"]');
+    // text típusú lett az összes readonly mező a mértékegységek miatt
+    const input = e.target.closest('input[readonly][type="text"]');
     if (input) {
       e.preventDefault();
       openNumpad(input);
@@ -343,14 +494,22 @@
     if (!container) return;
 
     container.innerHTML = ballGroups.map((g, index) => `
-      <div class="row3 ball-group-row" data-id="${g.id}" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.6rem; align-items: end; margin-bottom: 0.8rem;">
+      <div class="row3 ball-group-row" data-id="${g.id}" style="display: grid; grid-template-columns: 1.2fr 1.2fr auto; gap: 0.6rem; align-items: end; margin-bottom: 0.8rem;">
         <div class="field" style="margin-bottom:0;">
           <label class="field-label">${index === 0 ? 'Gombócok száma' : 'További gombócok'}</label>
-          <input type="number" class="ball-count-input" min="1" max="30" value="${g.count}" readonly>
+          <div class="mobile-stepper">
+            <button type="button" class="step-btn ball-count-dec" data-id="${g.id}">◀</button>
+            <input type="text" class="ball-count-input" id="ballCountRow-${g.id}" min="1" max="30" value="${formatInputValue('ballCount', g.count)}" readonly>
+            <button type="button" class="step-btn ball-count-inc" data-id="${g.id}">▶</button>
+          </div>
         </div>
         <div class="field" style="margin-bottom:0;">
           <label class="field-label">Súly (g)</label>
-          <input type="number" class="ball-weight-input" min="150" max="500" step="10" value="${g.weight}" readonly>
+          <div class="mobile-stepper">
+            <button type="button" class="step-btn ball-weight-dec" data-id="${g.id}">◀</button>
+            <input type="text" class="ball-weight-input" id="ballWeightRow-${g.id}" min="150" max="500" step="10" value="${formatInputValue('ballWeightG', g.weight)}" readonly>
+            <button type="button" class="step-btn ball-weight-inc" data-id="${g.id}">▶</button>
+          </div>
         </div>
         <button type="button" class="icon-btn btn-del-group" style="width: 44px; height: 44px; margin-bottom:0; border-color: var(--danger); color: var(--danger);" ${ballGroups.length === 1 ? 'disabled' : ''}>🗑️</button>
       </div>
@@ -361,17 +520,89 @@
       const id = parseInt(row.dataset.id, 10);
       const group = ballGroups.find(g => g.id === id);
 
+      row.querySelector('.ball-count-input').addEventListener('input', e => {
+        const cleanedVal = parseInt(e.target.value.replace(/[^0-9]/g, ''), 10) || 1;
+        group.count = cleanedVal;
+        if (appSettings.saveHistory) {
+          lastInput = readInput();
+          localStorage.setItem('pizza_alkimista_last_input', JSON.stringify(lastInput));
+        }
+      });
       row.querySelector('.ball-count-input').addEventListener('change', e => {
-        group.count = parseInt(e.target.value, 10) || 1;
+        const cleanedVal = parseInt(e.target.value.replace(/[^0-9]/g, ''), 10) || 1;
+        group.count = cleanedVal;
+        if (appSettings.saveHistory) {
+          lastInput = readInput();
+          localStorage.setItem('pizza_alkimista_last_input', JSON.stringify(lastInput));
+        }
+      });
+      row.querySelector('.ball-weight-input').addEventListener('input', e => {
+        const cleanedVal = parseFloat(e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '')) || 280;
+        group.weight = cleanedVal;
+        if (appSettings.saveHistory) {
+          lastInput = readInput();
+          localStorage.setItem('pizza_alkimista_last_input', JSON.stringify(lastInput));
+        }
       });
       row.querySelector('.ball-weight-input').addEventListener('change', e => {
-        group.weight = parseFloat(e.target.value) || 280;
+        const cleanedVal = parseFloat(e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '')) || 280;
+        group.weight = cleanedVal;
+        if (appSettings.saveHistory) {
+          lastInput = readInput();
+          localStorage.setItem('pizza_alkimista_last_input', JSON.stringify(lastInput));
+        }
+      });
+
+      // Dinamikus léptetőgombok kattintáskezelője a dynamic ball listában
+      row.querySelector('.ball-count-dec').addEventListener('click', e => {
+        e.preventDefault();
+        const input = row.querySelector('.ball-count-input');
+        const currentVal = parseInt(input.value.replace(/[^0-9]/g, ''), 10) || 1;
+        let val = Math.max(1, currentVal - 1);
+        input.value = formatInputValue('ballCount', val);
+        group.count = val;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      row.querySelector('.ball-count-inc').addEventListener('click', e => {
+        e.preventDefault();
+        const input = row.querySelector('.ball-count-input');
+        const currentVal = parseInt(input.value.replace(/[^0-9]/g, ''), 10) || 1;
+        let val = Math.min(30, currentVal + 1);
+        input.value = formatInputValue('ballCount', val);
+        group.count = val;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      row.querySelector('.ball-weight-dec').addEventListener('click', e => {
+        e.preventDefault();
+        const input = row.querySelector('.ball-weight-input');
+        const currentVal = parseFloat(input.value.replace(/[^0-9.]/g, '')) || 280;
+        let val = Math.max(150, currentVal - 10);
+        input.value = formatInputValue('ballWeightG', val);
+        group.weight = val;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      row.querySelector('.ball-weight-inc').addEventListener('click', e => {
+        e.preventDefault();
+        const input = row.querySelector('.ball-weight-input');
+        const currentVal = parseFloat(input.value.replace(/[^0-9.]/g, '')) || 280;
+        let val = Math.min(500, currentVal + 10);
+        input.value = formatInputValue('ballWeightG', val);
+        group.weight = val;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
       });
 
       row.querySelector('.btn-del-group').addEventListener('click', () => {
         if (ballGroups.length > 1) {
           ballGroups = ballGroups.filter(g => g.id !== id);
+          const currentRoomTemp = document.getElementById('roomTempC')?.value;
+          const currentRoomHours = document.getElementById('roomHours')?.value;
           renderBallGroups();
+          if (currentRoomTemp && document.getElementById('roomTempC')) {
+            document.getElementById('roomTempC').value = currentRoomTemp;
+          }
+          if (currentRoomHours && document.getElementById('roomHours')) {
+            document.getElementById('roomHours').value = currentRoomHours;
+          }
         }
       });
     });
@@ -384,55 +615,100 @@
     const wrap = document.getElementById('form-fields');
     if (!wrap) return;
 
+    // Megőrizzük a jelenlegi beviteli mezők értékeit az újrarajzolás előtt
+    const cleanVal = val => {
+      if (!val) return undefined;
+      const parsed = parseFloat(val.replace(/,/g, '.').replace(/[^0-9.]/g, ''));
+      return isNaN(parsed) ? undefined : parsed;
+    };
+    const prevRoomTemp = document.getElementById('roomTempC')?.value || (lastInput?.roomTempC !== undefined ? (appSettings.useFahrenheit ? cToF(lastInput.roomTempC) : lastInput.roomTempC) : 21.5);
+    const prevRoomHours = document.getElementById('roomHours')?.value || (lastInput?.roomHours !== undefined ? lastInput.roomHours : 5);
+    const prevHydration = cleanVal(document.getElementById('hydration')?.value);
+    const prevSalt = cleanVal(document.getElementById('salt')?.value);
+    const prevOil = cleanVal(document.getElementById('oil')?.value);
+
     if (style === 'egyeni') {
+      let ballGroupHtml = '';
       if (appSettings.useSecondBall) {
-        wrap.innerHTML = `
+        ballGroupHtml = `
           <div id="ball-groups-container"></div>
           <button type="button" class="btn btn-ghost btn-sm btn-block" id="btn-add-ball-group" style="margin-top:0.4rem; margin-bottom: 1.2rem;">+ Új méret hozzáadása</button>
         `;
-        document.getElementById('btn-add-ball-group').addEventListener('click', e => {
-          e.preventDefault();
-          ballGroups.push({ id: nextBallGroupId++, count: 2, weight: 200 });
-          renderBallGroups();
-        });
-        renderBallGroups();
       } else {
-        wrap.innerHTML = `
+        ballGroupHtml = `
           <div class="row2">
             <div class="field">
               <label class="field-label">${PizzaAlkimistaStrings.labelBallCount}</label>
-              <input type="number" id="ballCount" min="1" max="30" value="4" readonly>
+              <div class="mobile-stepper">
+                <button type="button" class="step-btn" data-step-dir="-1" data-input-id="ballCount">◀</button>
+                <input type="text" id="ballCount" min="1" max="30" value="${formatInputValue('ballCount', 4)}" readonly>
+                <button type="button" class="step-btn" data-step-dir="1" data-input-id="ballCount">▶</button>
+              </div>
             </div>
             <div class="field">
               <label class="field-label">${PizzaAlkimistaStrings.labelBallWeight}</label>
-              <input type="number" id="ballWeightG" min="150" max="500" step="10" value="280" readonly>
+              <div class="mobile-stepper">
+                <button type="button" class="step-btn" data-step-dir="-1" data-input-id="ballWeightG">◀</button>
+                <input type="text" id="ballWeightG" min="150" max="500" step="10" value="${formatInputValue('ballWeightG', 280)}" readonly>
+                <button type="button" class="step-btn" data-step-dir="1" data-input-id="ballWeightG">▶</button>
+              </div>
             </div>
           </div>
         `;
       }
 
-      wrap.innerHTML += `
+      wrap.innerHTML = ballGroupHtml + `
         <div class="field">
           <label class="field-label">${PizzaAlkimistaStrings.labelHydration} ${infoDot('hydration')}</label>
-          <div class="range-row mobile-stepper">
-            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="hydration">-</button>
-            <input type="range" id="hydration" min="50" max="85" step="1" value="65">
-            <button type="button" class="step-btn" data-step-dir="1" data-input-id="hydration">+</button>
-            <span class="range-value" id="hydration-val">65%</span>
+          <div class="mobile-stepper">
+            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="hydration">◀</button>
+            <input type="text" id="hydration" min="50" max="85" step="1" value="${formatInputValue('hydration', prevHydration || 64)}" readonly>
+            <button type="button" class="step-btn" data-step-dir="1" data-input-id="hydration">▶</button>
           </div>
         </div>
 
         <div class="row2">
           <div class="field">
             <label class="field-label">${PizzaAlkimistaStrings.labelSalt} ${infoDot('salt')}</label>
-            <input type="number" id="salt" min="1" max="4" step="0.1" value="3.0" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="salt">◀</button>
+              <input type="text" id="salt" min="1" max="4" step="0.1" value="${formatInputValue('salt', prevSalt || 3.0)}" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="salt">▶</button>
+            </div>
           </div>
           <div class="field" id="oil-field-wrapper" ${appSettings.useOil ? '' : 'hidden'}>
             <label class="field-label">${PizzaAlkimistaStrings.labelOil} ${infoDot('oil')}</label>
-            <input type="number" id="oil" min="0" max="6" step="0.5" value="0" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="oil">◀</button>
+              <input type="text" id="oil" min="0" max="6" step="0.5" value="${formatInputValue('oil', prevOil || 0)}" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="oil">▶</button>
+            </div>
           </div>
         </div>
       `;
+
+      if (appSettings.useSecondBall) {
+        document.getElementById('btn-add-ball-group')?.addEventListener('click', e => {
+          e.preventDefault();
+          const currentRoomTemp = document.getElementById('roomTempC')?.value;
+          const currentRoomHours = document.getElementById('roomHours')?.value;
+          
+          ballGroups.push({ id: nextBallGroupId++, count: 2, weight: 200 });
+          renderBallGroups();
+          
+          if (currentRoomTemp && document.getElementById('roomTempC')) {
+            document.getElementById('roomTempC').value = currentRoomTemp;
+            updateLabel(document.getElementById('roomTempC'));
+          }
+          if (currentRoomHours && document.getElementById('roomHours')) {
+            document.getElementById('roomHours').value = currentRoomHours;
+            updateLabel(document.getElementById('roomHours'));
+          }
+          
+          document.getElementById('calc-form')?.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        renderBallGroups();
+      }
 
       if (appSettings.lockNapolyi) {
         const hyd = document.getElementById('hydration');
@@ -447,56 +723,69 @@
         <div class="row2">
           <div class="field">
             <label class="field-label">${PizzaAlkimistaStrings.labelPanLen}</label>
-            <input type="number" id="panLen" min="10" max="100" value="40" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="panLen">◀</button>
+              <input type="text" id="panLen" min="10" max="100" value="${formatInputValue('panLen', 40)}" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="panLen">▶</button>
+            </div>
           </div>
           <div class="field">
             <label class="field-label">${PizzaAlkimistaStrings.labelPanWid}</label>
-            <input type="number" id="panWid" min="10" max="100" value="30" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="panWid">◀</button>
+              <input type="text" id="panWid" min="10" max="100" value="${formatInputValue('panWid', 30)}" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="panWid">▶</button>
+            </div>
           </div>
         </div>
         <div class="field">
           <label class="field-label">${PizzaAlkimistaStrings.labelGramPerM2} ${infoDot('gramPerM2')}</label>
-          <div class="range-row mobile-stepper">
-            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="gramPerM2">-</button>
-            <input type="range" id="gramPerM2" min="4000" max="8000" step="100" value="5500">
-            <button type="button" class="step-btn" data-step-dir="1" data-input-id="gramPerM2">+</button>
-            <span class="range-value" id="gramPerM2-val">5500 g/m²</span>
+          <div class="mobile-stepper">
+            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="gramPerM2">◀</button>
+            <input type="text" id="gramPerM2" min="4000" max="8000" step="100" value="${formatInputValue('gramPerM2', 5500)}" readonly>
+            <button type="button" class="step-btn" data-step-dir="1" data-input-id="gramPerM2">▶</button>
           </div>
         </div>
         <div class="field">
           <label class="field-label">${PizzaAlkimistaStrings.labelHydration} ${infoDot('hydration')}</label>
-          <div class="range-row mobile-stepper">
-            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="hydration">-</button>
-            <input type="range" id="hydration" min="65" max="90" step="1" value="75">
-            <button type="button" class="step-btn" data-step-dir="1" data-input-id="hydration">+</button>
-            <span class="range-value" id="hydration-val">75%</span>
+          <div class="mobile-stepper">
+            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="hydration">◀</button>
+            <input type="text" id="hydration" min="65" max="90" step="1" value="${formatInputValue('hydration', prevHydration || 75)}" readonly>
+            <button type="button" class="step-btn" data-step-dir="1" data-input-id="hydration">▶</button>
           </div>
         </div>
         <div class="row2">
           <div class="field">
             <label class="field-label">${PizzaAlkimistaStrings.labelSalt} ${infoDot('salt')}</label>
-            <input type="number" id="salt" min="1" max="4" step="0.1" value="2.5" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="salt">◀</button>
+              <input type="text" id="salt" min="1" max="4" step="0.1" value="${formatInputValue('salt', prevSalt || 2.5)}" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="salt">▶</button>
+            </div>
           </div>
           <div class="field" id="oil-field-wrapper" ${appSettings.useOil ? '' : 'hidden'}>
             <label class="field-label">${PizzaAlkimistaStrings.labelOil} ${infoDot('oil')}</label>
-            <input type="number" id="oil" min="0" max="6" step="0.5" value="3" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="oil">◀</button>
+              <input type="text" id="oil" min="0" max="6" step="0.5" value="${formatInputValue('oil', prevOil || 3)}" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="oil">▶</button>
+            </div>
           </div>
         </div>
       `;
     }
     
-    bindRangeLabels(wrap);
-    initSteppers();
-  }
+    // Állítsuk vissza a szobahőmérsékletet és kelesztési időt, ha változtak
+    if (prevRoomTemp && document.getElementById('roomTempC')) {
+      document.getElementById('roomTempC').value = prevRoomTemp;
+      updateLabel(document.getElementById('roomTempC'));
+    }
+    if (prevRoomHours && document.getElementById('roomHours')) {
+      document.getElementById('roomHours').value = prevRoomHours;
+      updateLabel(document.getElementById('roomHours'));
+    }
 
-  function bindRangeLabels(scope) {
-    scope.querySelectorAll('input[type=range]').forEach(r => {
-      updateLabel(r);
-      // Megszüntetjük a duplikált eseményfigyelőket
-      r.removeEventListener('input', r._liveUpdate);
-      r._liveUpdate = () => updateLabel(r);
-      r.addEventListener('input', r._liveUpdate);
-    });
+    initSteppers();
   }
 
   // Bind info sheet modals
@@ -523,7 +812,16 @@
   let lastResult = null, lastInput = null;
 
   function readInput() {
-    const v = id => document.getElementById(id)?.value;
+    const v = id => {
+      const el = document.getElementById(id);
+      if (!el) return '';
+      if (id.includes('Hours')) {
+        return String(parseDuration(el.value));
+      }
+      // A vesszőt pontra cseréljük, majd megtartjuk a számokat és a tizedespontot
+      const valStr = el.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+      return valStr;
+    };
     const checked = id => !!document.getElementById(id)?.checked;
     
     const input = {
@@ -537,8 +835,8 @@
       useBiga: appSettings.useBiga,
       useOldDough: appSettings.useOldDoughIn || appSettings.useOldDoughOut,
       takeOutOldDough: appSettings.useOldDoughOut,
-      // Hulladék kompenzáció
-      wastePct: parseFloat(v('setting-waste-pct') || appSettings.wastePct || 5),
+      // Hulladék kompenzáció és élesztő korrekció a beállítások / alapértelmezések szerint
+      wastePct: parseFloat(v('setting-waste-pct') !== undefined && v('setting-waste-pct') !== '' ? v('setting-waste-pct') : (appSettings.wastePct !== undefined ? appSettings.wastePct : 3)),
       // Autolízis
       useAutolyse: appSettings.useAutolyse,
       autolyseFlourPct: appSettings.useAutolyse ? (appSettings.autolyseFlourPct || 70) : 0,
@@ -549,9 +847,9 @@
       input.bigaFlourPct = parseFloat(v('bigaFlourPct') || 50);
       input.bigaHydration = parseFloat(v('bigaHydration') || 45);
       input.bigaRoomHours = parseFloat(v('bigaRoomHours') || 16);
-      input.bigaRoomTempC = parseFloat(v('bigaRoomTempC') || 18);
+      input.bigaRoomTempC = appSettings.useFahrenheit ? fToC(parseFloat(v('bigaRoomTempC') || 67.1)) : parseFloat(v('bigaRoomTempC') || 19.5);
       input.bigaColdHours = checked('useBigaCold') ? parseFloat(v('bigaColdHours') || 24) : 0;
-      input.bigaColdTempC = parseFloat(v('bigaColdTempC') || 4);
+      input.bigaColdTempC = appSettings.useFahrenheit ? fToC(parseFloat(v('bigaColdTempC') || 41)) : parseFloat(v('bigaColdTempC') || 5);
     }
 
     if (appSettings.useOldDoughIn) {
@@ -575,7 +873,23 @@
       input.oil = appSettings.useOil ? parseFloat(v('oil') || 0) : 0;
     } else {
       if (appSettings.useSecondBall) {
-        input.ballGroups = ballGroups.map(g => ({ count: g.count, weight: g.weight }));
+        input.ballGroups = [];
+        const rows = document.querySelectorAll('.ball-group-row');
+        rows.forEach(row => {
+          const rawCount = row.querySelector('.ball-count-input')?.value.replace(/[^0-9]/g, '') || '1';
+          const rawWeight = row.querySelector('.ball-weight-input')?.value.replace(/[^0-9]/g, '') || '280';
+          input.ballGroups.push({ count: parseInt(rawCount, 10), weight: parseFloat(rawWeight) });
+        });
+        // Frissítsük a memóriában lévő tömböt is a biztonság kedvéért
+        ballGroups = Array.from(rows).map((row, i) => {
+          const rawCount = row.querySelector('.ball-count-input')?.value.replace(/[^0-9]/g, '') || '1';
+          const rawWeight = row.querySelector('.ball-weight-input')?.value.replace(/[^0-9]/g, '') || '280';
+          return {
+            id: parseInt(row.dataset.id, 10) || (i + 1),
+            count: parseInt(rawCount, 10),
+            weight: parseFloat(rawWeight)
+          };
+        });
       } else {
         const count = parseInt(v('ballCount'), 10) || 4;
         const weight = parseFloat(v('ballWeightG')) || 280;
@@ -616,42 +930,49 @@
   function ingredientRows(r, activeYeastType = 'fresh') {
     let rows = '';
     if (r.useOldDough && r.oldDoughG > 0) {
-      rows += `<tr class="accent-row"><td>Öregtészta (bevitt)</td><td class="pct"></td><td class="amt">${fmtG(r.oldDoughG)}</td></tr>`;
+      rows += `<tr class="accent-row"><td>Öregtészta (bevitt)</td><td class="pct"></td><td class="amt">${fmtG(r.oldDoughG, 'flour')}</td></tr>`;
     }
     
     let yeastVal = r.yeast.fresh;
     let activeYeastPct = r.yeastPct;
+    let yeastTypeKey = 'yeast_fresh';
     if (activeYeastType === 'instantDry') {
       yeastVal = r.yeast.instantDry;
       activeYeastPct = r.yeastPct * 0.415;
+      yeastTypeKey = 'yeast';
     } else if (activeYeastType === 'activeDry') {
       yeastVal = r.yeast.activeDry;
       activeYeastPct = r.yeastPct * 0.52;
+      yeastTypeKey = 'yeast';
     }
 
     rows += `
-      <tr><td style="width: 55%;">Friss Liszt</td><td class="pct" style="width: 20%;">100%</td><td class="amt" style="width: 25%;">${fmtG(r.flour)}</td></tr>
-      <tr><td>Friss Víz</td><td class="pct">${fmt(r.hydration, 0)}%</td><td class="amt">${fmtG(r.water)}</td></tr>
-      <tr><td>Só</td><td class="pct">${fmt(r.salt, 1)}%</td><td class="amt">${fmtG(r.saltG)}</td></tr>`;
+      <tr><td style="width: 50%;">Friss Liszt</td><td class="pct" style="width: 22%;">100%</td><td class="amt" style="width: 28%;">${fmtG(r.flour, 'flour')}</td></tr>
+      <tr><td>Friss Víz</td><td class="pct">${fmt(r.hydration, 0)}%</td><td class="amt">${fmtG(r.water, 'water')}</td></tr>
+      <tr><td>Só</td><td class="pct">${fmt(r.salt, 1)}%</td><td class="amt">${fmtG(r.saltG, 'salt')}</td></tr>`;
     
     if (r.oilG > 0) {
-      rows += `<tr><td>Olívaolaj</td><td class="pct">${fmt(r.oil, 1)}%</td><td class="amt">${fmtG(r.oilG)}</td></tr>`;
+      rows += `<tr><td>Olívaolaj</td><td class="pct">${fmt(r.oil, 1)}%</td><td class="amt">${fmtG(r.oilG, 'oil')}</td></tr>`;
     }
     
     rows += `
       <tr style="font-weight:700; color:var(--gold-dark);">
-        <td>${getActiveYeastLabel(activeYeastType)}</td>
+        <td>
+          <div style="display:inline-flex; align-items:center; gap:0.4rem;">
+            <button type="button" class="yeast-arrow-btn" id="yeast-prev">◀</button>
+            <span style="font-size:0.9rem;">${getActiveYeastLabel(activeYeastType)}</span>
+            <button type="button" class="yeast-arrow-btn" id="yeast-next">▶</button>
+          </div>
+        </td>
         <td class="pct">${fmt(activeYeastPct, 2)}%</td>
-        <td class="amt">${fmtG2(yeastVal)}</td>
+        <td class="amt">${fmtG2(yeastVal, yeastTypeKey)}</td>
       </tr>`;
     
     if (r.takeOutOldDoughG > 0) {
-      rows += `<tr class="accent-row"><td>Kiveendő öregtészta (végén)</td><td></td><td class="amt">${fmtG(r.takeOutOldDoughG)}</td></tr>`;
+      rows += `<tr class="accent-row"><td>Kiveendő öregtészta (végén)</td><td></td><td class="amt">${fmtG(r.takeOutOldDoughG, 'flour')}</td></tr>`;
     }
     return rows;
   }
-
-
 
   // Autolízis eredmény megjelenítése
   function renderAutolyseSection(r) {
@@ -664,9 +985,9 @@
         <div class="result-card" style="border-color: var(--accent-dim);">
           <div class="result-title">🌿 Autolízis</div>
           <table class="ing-table">
-            <tr><td>Autolízisos liszt</td><td class="pct">${fmt(a.flourPct,0)}%</td><td class="amt">${fmtG(a.flour)}</td></tr>
-            <tr><td>Autolízisos víz</td><td class="pct">${fmt(a.waterPct,0)}%</td><td class="amt">${fmtG(a.water)}</td></tr>
-            <tr style="opacity:0.7;font-size:.85em;"><td colspan="3">↳ pihentetés után add hozzá a maradék ${fmtG(a.finalFlour)} lisztet, ${fmtG(a.finalWater)} vizet, sót, élesztőt</td></tr>
+            <tr><td>Autolízisos liszt</td><td class="pct">${fmt(a.flourPct,0)}%</td><td class="amt">${fmtG(a.flour, 'flour')}</td></tr>
+            <tr><td>Autolízisos víz</td><td class="pct">${fmt(a.waterPct,0)}%</td><td class="amt">${fmtG(a.water, 'water')}</td></tr>
+            <tr style="opacity:0.7;font-size:.85em;"><td colspan="3">↳ pihentetés után add hozzá a maradék ${fmtG(a.finalFlour, 'flour')} lisztet, ${fmtG(a.finalWater, 'water')} vizet, sót, élesztőt</td></tr>
           </table>
         </div>`;
     } else {
@@ -674,29 +995,30 @@
     }
   }
 
-  // Élesztő pörgető nyilak eseménykezelője
+  // Élesztő pörgető nyilak eseménykezelője eseménydelegálással az ing-table konténeren
   function setupYeastSwitcher() {
-    const label = document.getElementById('yeast-active-display');
-    
-    const updateYeastView = () => {
+    const table = document.getElementById('ing-table');
+    if (!table) return;
+
+    table.addEventListener('click', e => {
+      const prevBtn = e.target.closest('#yeast-prev');
+      const nextBtn = e.target.closest('#yeast-next');
+      if (!prevBtn && !nextBtn) return;
+      
+      e.preventDefault();
       const type = YEAST_TYPES[currentYeastTypeIndex];
-      label.textContent = getActiveYeastLabel(type);
-      if (lastResult) {
-        document.getElementById('ing-table').innerHTML = ingredientRows(lastResult, type);
+      
+      if (prevBtn) {
+        currentYeastTypeIndex = (currentYeastTypeIndex - 1 + YEAST_TYPES.length) % YEAST_TYPES.length;
+      } else if (nextBtn) {
+        currentYeastTypeIndex = (currentYeastTypeIndex + 1) % YEAST_TYPES.length;
       }
-    };
-
-    document.getElementById('yeast-prev').onclick = (e) => {
-      e.preventDefault();
-      currentYeastTypeIndex = (currentYeastTypeIndex - 1 + YEAST_TYPES.length) % YEAST_TYPES.length;
-      updateYeastView();
-    };
-
-    document.getElementById('yeast-next').onclick = (e) => {
-      e.preventDefault();
-      currentYeastTypeIndex = (currentYeastTypeIndex + 1) % YEAST_TYPES.length;
-      updateYeastView();
-    };
+      
+      const newType = YEAST_TYPES[currentYeastTypeIndex];
+      if (lastResult) {
+        table.innerHTML = ingredientRows(lastResult, newType);
+      }
+    });
   }
 
   function renderResult(r) {
@@ -713,18 +1035,17 @@
     document.getElementById('res-meta').textContent = `${meta} · ${formatDuration(r.totalHours)} ${PizzaAlkimistaStrings.resTotalHours}`;
 
     const type = YEAST_TYPES[currentYeastTypeIndex];
-    document.getElementById('yeast-active-display').textContent = getActiveYeastLabel(type);
     document.getElementById('ing-table').innerHTML = ingredientRows(r, type);
 
     const bigaCard = document.getElementById('biga-card');
     if (r.biga) {
       bigaCard.hidden = false;
       document.getElementById('biga-table').innerHTML = `
-        <tr><td style="width: 55%;">Biga liszt</td><td class="pct" style="width: 20%;">${fmt((r.biga.biga.flour / (r.flour + r.oldDoughFlour)) * 100, 0)}%</td><td class="amt" style="width: 25%;">${fmtG(r.biga.biga.flour)}</td></tr>
-        <tr><td>Biga víz</td><td class="pct">${r.biga.biga.hydration}%</td><td class="amt">${fmtG(r.biga.biga.water)}</td></tr>
-        <tr><td>Biga élesztő (friss)</td><td class="pct">${fmt(r.biga.biga.yeastPct, 2)}%</td><td class="amt">${fmtG(r.biga.biga.yeastFresh)}</td></tr>
-        <tr><td>Végső dagasztás liszt</td><td></td><td class="amt">${fmtG(r.biga.final.flour)}</td></tr>
-        <tr><td>Végső dagasztás víz</td><td></td><td class="amt">${fmtG(r.biga.final.water)}</td></tr>`;
+        <tr><td style="width: 55%;">Biga liszt</td><td class="pct" style="width: 20%;">${fmt((r.biga.biga.flour / (r.flour + r.oldDoughFlour)) * 100, 0)}%</td><td class="amt" style="width: 25%;">${fmtG(r.biga.biga.flour, 'flour')}</td></tr>
+        <tr><td>Biga víz</td><td class="pct">${r.biga.biga.hydration}%</td><td class="amt">${fmtG(r.biga.biga.water, 'water')}</td></tr>
+        <tr><td>Biga élesztő (friss)</td><td class="pct">${fmt(r.biga.biga.yeastPct, 2)}%</td><td class="amt">${fmtG2(r.biga.biga.yeastFresh, 'yeast_fresh')}</td></tr>
+        <tr><td>Végső dagasztás liszt</td><td></td><td class="amt">${fmtG(r.biga.final.flour, 'flour')}</td></tr>
+        <tr><td>Végső dagasztás víz</td><td></td><td class="amt">${fmtG(r.biga.final.water, 'water')}</td></tr>`;
     } else {
       bigaCard.hidden = true;
     }
@@ -855,8 +1176,8 @@
           <button class="icon-btn btn-sm act-load" style="width:34px;height:34px" title="Betöltés">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           </button>
-          <button class="icon-btn btn-sm act-print" style="width:34px;height:34px" title="Nyomtatás">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+          <button class="icon-btn btn-sm act-download-pdf" style="width:34px;height:34px" title="PDF Letöltése">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </button>
           <button class="icon-btn btn-sm act-del" style="width:34px;height:34px" title="Törlés">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
@@ -952,7 +1273,7 @@
         renderResult(lastResult);
         document.getElementById('result-wrap').hidden = false;
         showToast('Recept betöltve');
-      } else if (e.target.closest('.act-print')) {
+      } else if (e.target.closest('.act-download-pdf')) {
         printRecipe(rec.name, rec.result, rec.notes);
       } else if (e.target.closest('.act-del')) {
         if (confirm(`Törlöd a(z) „${rec.name}” receptet?`)) {
@@ -963,19 +1284,6 @@
       }
     });
   }
-
-  // ---------------------------------------------------------------------
-  // Nyomtatás közvetlen indítása (Mindenféle megerősítő párbeszéd nélkül)
-  // ---------------------------------------------------------------------
-  document.getElementById('btn-print').addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!lastResult) return;
-    const nameToggle = document.getElementById('toggle-recipe-name');
-    const name = (nameToggle && nameToggle.checked)
-      ? (document.getElementById('recipe-title-input').value.trim() || "Gregory's Special")
-      : null;
-    printRecipe(name, lastResult, '');
-  });
 
   document.getElementById('btn-download-pdf')?.addEventListener('click', (e) => {
     e.preventDefault();
@@ -996,141 +1304,271 @@
       titleEl.textContent = name;
     }
 
+    const pdfS = PizzaAlkimistaPDFStrings;
+    const pi = pdfS.steps;
+
     let subtitle = '';
     if (r.style === 'teglia') {
-      subtitle = `${fmt(r.panAreaM2, 2)} m² tepsis pizza`;
+      subtitle = `${fmt(r.panAreaM2, 2)} m² ${pdfS.badges.styleTeglia.toLowerCase()}`;
     } else {
-      subtitle = r.ballGroups.map(g => `${g.count} × ${fmt(g.weight, 0)} g`).join(' + ');
-      subtitle += ' gombóc — PizzaAlkimista Receptúra';
+      subtitle = r.ballGroups.map(g => `${g.count} × ${fmt(g.weight, 0)} g`).join(' + ') + ' gombóc';
     }
     document.getElementById('p-subtitle').textContent = subtitle;
     document.getElementById('p-date').textContent = new Date().toLocaleDateString('hu-HU');
     document.getElementById('p-footer-date').textContent = 'Készült: ' + new Date().toLocaleString('hu-HU');
 
-    // Kelesztési adatok kibővített kiírása a PDF-re
+    // Kelesztési adatok kibővített kiírása a PDF-re (Szófelhők / Buborékok)
     const inp = r.input || {};
     const roomH = inp.roomHours !== undefined ? inp.roomHours : (r.roomHours || 0);
     const roomT = inp.roomTempC !== undefined ? inp.roomTempC : (r.roomTempC || 22);
     const coldH = inp.coldHours !== undefined ? inp.coldHours : (r.coldHours || 0);
     const coldT = inp.coldTempC !== undefined ? inp.coldTempC : (r.coldTempC || 4);
 
-    let badgesHtml = `
-      <span class="p-badge">${fmt(r.hydration,0)}% hidratáció</span>
-      <span class="p-badge">${fmt(r.salt,1)}% só</span>`;
+    let cloudsHtml = '';
+    
+    // Alap tészta paraméterei szófelhők (Soksok technológiai infóval feltöltve!)
+    cloudsHtml += `<div class="p-cloud-row" style="flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin-bottom: 0.8rem;">`;
+    
+    const styleLabel = r.style === 'teglia' ? pdfS.badges.styleTeglia : pdfS.badges.styleEgyeni;
+    cloudsHtml += `<div class="p-cloud-item p-cloud-main-param"><b>Stílus:</b> ${styleLabel}</div>`;
+    cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.hydration.replace('{val}', fmt(r.hydration, 0))}</div>`;
+    cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.salt.replace('{val}', fmt(r.salt, 1))}</div>`;
     if (r.oil > 0) {
-      badgesHtml += `<span class="p-badge">${fmt(r.oil,1)}% zsiradék</span>`;
+      cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.oil.replace('{val}', fmt(r.oil, 1))}</div>`;
     }
-    badgesHtml += `<span class="p-badge">Szobahőn: ${formatDuration(roomH)} (${roomT}°C)</span>`;
+    
+    // Liszt ajánlott erőssége és technológiai paraméterek
+    let recommendedW = 'W220–260 (Közepes)';
+    const totalHours = roomH + coldH;
+    if (totalHours > 24) recommendedW = 'W280–320 (Erős)';
+    if (totalHours > 48) recommendedW = 'W320+ (Nagyon erős / Manitoba)';
+    if (totalHours < 12) recommendedW = 'W180–220 (Gyenge)';
+    cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.recommendedFlour.replace('{val}', recommendedW)}</div>`;
+    
+    // Kompenzációk és modellek
+    const modelLabel = inp.yeastModel === 'alchemist' ? 'Alkimista' : 'Craig';
+    cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.yeastModel.replace('{val}', modelLabel)}</div>`;
+    if (inp.wastePct > 0) {
+      cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.wastePct.replace('{val}', inp.wastePct)}</div>`;
+    }
+    if (inp.yeastFactor !== 100) {
+      cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.yeastFactor.replace('{val}', inp.yeastFactor)}</div>`;
+    }
+    if (r.useAutolyse) {
+      cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.autolyse.replace('{val}', r.autolyseFlourPct || 70)}</div>`;
+    }
+    if (r.useOldDough) {
+      cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.oldDough}</div>`;
+    }
+    cloudsHtml += `</div>`;
+
+    // Érlelési etapok (kapcsolatokkal összekötött buborékokként)
+    // 1. szakasz: Biga (ha van)
+    if (r.biga) {
+      const bRoomH = inp.bigaRoomHours !== undefined ? inp.bigaRoomHours : 16;
+      const bRoomT = inp.bigaRoomTempC !== undefined ? inp.bigaRoomTempC : 19.5;
+      const bColdH = inp.bigaColdHours !== undefined ? inp.bigaColdHours : 0;
+      const bColdT = inp.bigaColdTempC !== undefined ? inp.bigaColdTempC : 5;
+
+      cloudsHtml += `<div class="p-cloud-group-title">${pdfS.badges.bigaPhaseTitle}</div>`;
+      cloudsHtml += `<div class="p-cloud-row">`;
+      cloudsHtml += `<div class="p-cloud-item">🕒 ${formatDuration(bRoomH)} szobahőn</div>`;
+      cloudsHtml += `<div class="p-cloud-item p-cloud-arrow">➔</div>`;
+      cloudsHtml += `<div class="p-cloud-item">🌡️ ${bRoomT}°C</div>`;
+      
+      if (bColdH > 0) {
+        cloudsHtml += `<div class="p-cloud-item p-cloud-arrow">➔</div>`;
+        cloudsHtml += `<div class="p-cloud-item">❄️ ${formatDuration(bColdH)} hűtőben (${bColdT}°C)</div>`;
+      }
+      cloudsHtml += `</div>`;
+    }
+
+    // 2. szakasz: Fő tészta kelesztés
+    const mainPhaseTitle = r.biga ? pdfS.badges.mainPhaseTitleBiga : pdfS.badges.mainPhaseTitleDirect;
+    cloudsHtml += `<div class="p-cloud-group-title">${mainPhaseTitle}</div>`;
+    cloudsHtml += `<div class="p-cloud-row">`;
+    cloudsHtml += `<div class="p-cloud-item">🕒 ${formatDuration(roomH)} szobahőn</div>`;
+    cloudsHtml += `<div class="p-cloud-item p-cloud-arrow">➔</div>`;
+    cloudsHtml += `<div class="p-cloud-item">🌡️ ${roomT}°C</div>`;
+    
     if (coldH > 0) {
-      badgesHtml += `<span class="p-badge">Hűtőben: ${formatDuration(coldH)} (${coldT}°C)</span>`;
+      cloudsHtml += `<div class="p-cloud-item p-cloud-arrow">➔</div>`;
+      cloudsHtml += `<div class="p-cloud-item">❄️ ${formatDuration(coldH)} hűtőben (${coldT}°C)</div>`;
     }
-    document.getElementById('p-badges').innerHTML = badgesHtml;
+    cloudsHtml += `</div>`;
+
+    document.getElementById('p-badges').innerHTML = cloudsHtml;
 
     let ingHtml = `
-      <tr><td style="width: 60%;">Friss Liszt</td><td class="amt" style="width: 40%;">${fmtG(r.flour)}</td></tr>
-      <tr><td>Friss Víz</td><td class="amt">${fmtG(r.water)}</td></tr>
-      <tr><td>Só</td><td class="amt">${fmtG(r.saltG)}</td></tr>`;
+      <tr><td style="width: 60%;">Friss Liszt</td><td class="amt" style="width: 40%;">${fmtG(r.flour, 'flour')}</td></tr>
+      <tr><td>Friss Víz</td><td class="amt">${fmtG(r.water, 'water')}</td></tr>
+      <tr><td>Só</td><td class="amt">${fmtG(r.saltG, 'salt')}</td></tr>`;
     if (r.oilG > 0) {
-      ingHtml += `<tr><td>Zsiradék</td><td class="amt">${fmtG(r.oilG)}</td></tr>`;
+      ingHtml += `<tr><td>Zsiradék</td><td class="amt">${fmtG(r.oilG, 'oil')}</td></tr>`;
     }
     if (r.useOldDough && r.oldDoughG > 0) {
-      ingHtml += `<tr style="border-top:1px solid #ccc; font-weight:bold;"><td>Öregtészta (bevitt)</td><td class="amt">${fmtG(r.oldDoughG)}</td></tr>`;
+      ingHtml += `<tr style="border-top:1px solid #ccc; font-weight:bold;"><td>Öregtészta (bevitt)</td><td class="amt">${fmtG(r.oldDoughG, 'flour')}</td></tr>`;
     }
     ingHtml += `
       <tr style="border-top:1px solid #ccc;"><td style="font-weight:bold;">Élesztő fajták:</td><td></td></tr>
-      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastFresh}</td><td class="amt">${fmtG2(r.yeast.fresh)}</td></tr>
-      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastInstant}</td><td class="amt">${fmtG2(r.yeast.instantDry)}</td></tr>
-      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastActive}</td><td class="amt">${fmtG2(r.yeast.activeDry)}</td></tr>`;
+      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastFresh}</td><td class="amt">${fmtG2(r.yeast.fresh, 'yeast_fresh')}</td></tr>
+      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastInstant}</td><td class="amt">${fmtG2(r.yeast.instantDry, 'yeast')}</td></tr>
+      <tr><td class="small">— ${PizzaAlkimistaStrings.yeastActive}</td><td class="amt">${fmtG2(r.yeast.activeDry, 'yeast')}</td></tr>`;
     
     if (r.takeOutOldDoughG > 0) {
-      ingHtml += `<tr style="border-top:1px dashed #ccc; font-weight:bold;"><td>Kiveendő öregtészta a végén</td><td class="amt">${fmtG(r.takeOutOldDoughG)}</td></tr>`;
+      ingHtml += `<tr style="border-top:1px dashed #ccc; font-weight:bold;"><td>Kiveendő öregtészta a végén</td><td class="amt">${fmtG(r.takeOutOldDoughG, 'flour')}</td></tr>`;
     }
 
     document.getElementById('p-ingredients').innerHTML = ingHtml;
-
-    let printTimelineHtml = '';
-    for (let i = 0; i < r.timeline.length; i++) {
-      const item = r.timeline[i];
-      const prevItem = i > 0 ? r.timeline[i - 1] : null;
-      const translationKey = 'timeline' + item.label;
-      const desc = PizzaAlkimistaStrings[translationKey] || item.label;
-      
-      let stepName = '';
-      let timeLabel = '';
-
-      if (item.label.includes('Start') || item.label === 'Dagasztas') {
-        stepName = 'Dagasztás';
-        timeLabel = 'Kezdet (most)';
-      } else if (item.label === 'Gombocolas') {
-        stepName = 'Gombócolás';
-        const bulkHours = item.h - (prevItem ? prevItem.h : 0);
-        timeLabel = `Tömbös előérlelés: ${formatDuration(bulkHours)}`;
-      } else if (item.label === 'HutoBe') {
-        stepName = 'Hűtős érlelés';
-        timeLabel = `Hűtőbe tétel (${formatDuration(item.h)} után)`;
-      } else if (item.label === 'HutoKi') {
-        stepName = 'Bemelegedés';
-        timeLabel = `Hűtőből kivétel (Sütés előtt 2ó)`;
-      } else if (item.label === 'Sutes') {
-        stepName = 'Nyújtás & Sütés';
-        const finalPhaseHours = item.h - (prevItem ? prevItem.h : 0);
-        timeLabel = `Készre kelesztés: ${formatDuration(finalPhaseHours)} (Összesen: ${formatDuration(item.h)})`;
-      } else {
-        stepName = item.label;
-        timeLabel = `${formatDuration(item.h)} után`;
-      }
-      printTimelineHtml += `<li><span class="t">${stepName}</span> <span>[${timeLabel}] — ${desc}</span></li>`;
-    }
-    const pTimelineEl = document.getElementById('p-timeline');
-    if (pTimelineEl) pTimelineEl.innerHTML = printTimelineHtml;
 
     const bigaSection = document.getElementById('p-biga-section');
     if (r.biga) {
       bigaSection.hidden = false;
       document.getElementById('p-biga').innerHTML = `
-        <tr><td>Biga liszt</td><td class="amt">${fmtG(r.biga.biga.flour)}</td></tr>
-        <tr><td>Biga víz</td><td class="amt">${fmtG(r.biga.biga.water)}</td></tr>
-        <tr><td>Biga élesztő (friss)</td><td class="amt">${fmtG(r.biga.biga.yeastFresh)}</td></tr>`;
+        <tr><td>Biga liszt</td><td class="amt">${fmtG(r.biga.biga.flour, 'flour')}</td></tr>
+        <tr><td>Biga víz</td><td class="amt">${fmtG(r.biga.biga.water, 'water')}</td></tr>
+        <tr><td>Biga élesztő (friss)</td><td class="amt">${fmtG2(r.biga.biga.yeastFresh, 'yeast_fresh')}</td></tr>`;
     } else { 
       bigaSection.hidden = true; 
     }
 
-    // Dinamikus, a beállítások alapján testreszabott instrukciók (hülyebiztos, konkrét grammokkal és időkkel)
+    // Dinamikus, a beállítások alapján testreszabott instrukciók (sablon alapon)
     let steps = [];
     if (r.biga) {
-      steps.push(`<b>Biga előkészítése</b>: Mérj ki ${fmtG(r.biga.biga.flour)} lisztet, ${fmtG(r.biga.biga.water)} vizet és ${fmtG(r.biga.biga.yeastFresh)} friss élesztőt. Keverd össze lazán, darabosra. Takard le és keleszd szobahőmérsékleten (${inp.bigaRoomTempC || 18}°C) ${formatDuration(inp.bigaRoomHours || 16)} ideig${inp.bigaColdHours > 0 ? ` + hűtőszekrényben (${inp.bigaColdTempC || 4}°C) ${formatDuration(inp.bigaColdHours)} ideig` : ''}.`);
-      steps.push(`<b>Fő dagasztás</b>: Tépkedd apró darabokra a megérett bigát. Add hozzá a fő lisztet (${fmtG(r.biga.final.flour)}), vizet (${fmtG(r.biga.final.water)}), sót (${fmtG(r.saltG)})${r.oilG > 0 ? `, zsiradékot (${fmtG(r.oilG)})` : ''}${r.useOldDough ? ` és a bevinni kívánt öregtésztát (${fmtG(r.oldDoughG)})` : ''}. Dagassz sima, rugalmas tésztát.`);
+      let bRoomH = inp.bigaRoomHours !== undefined ? inp.bigaRoomHours : 16;
+      let bRoomT = inp.bigaRoomTempC !== undefined ? inp.bigaRoomTempC : 19.5;
+      let bColdH = inp.bigaColdHours !== undefined ? inp.bigaColdHours : 0;
+      let bColdT = inp.bigaColdTempC !== undefined ? inp.bigaColdTempC : 5;
+
+      let coldSuffix = '';
+      if (bColdH > 0) {
+        coldSuffix = pi.bigaColdSection
+          .replace('{bigaColdTemp}', `${bColdT}°C`)
+          .replace('{bigaColdHours}', formatDuration(bColdH));
+      }
+      const bigaPrepText = pi.bigaPrep
+        .replace('{bigaFlour}', fmtG(r.biga.biga.flour))
+        .replace('{bigaWater}', fmtG(r.biga.biga.water))
+        .replace('{bigaYeast}', fmtG2(r.biga.biga.yeastFresh, 'yeast_fresh'))
+        .replace('{bigaRoomTemp}', `${bRoomT}°C`)
+        .replace('{bigaRoomHours}', formatDuration(bRoomH))
+        .replace('{bigaColdSection}', coldSuffix);
+      steps.push(bigaPrepText);
+
+      const oilText = r.oilG > 0 ? pi.mixOilText.replace('{oil}', fmtG(r.oilG, 'oil')) : '';
+      const oldDoughText = r.useOldDough ? pi.mixOldDoughText.replace('{oldDough}', fmtG(r.oldDoughG, 'flour')) : '';
+      
+      const mainMixText = pi.mainMix
+        .replace('{mixType}', pi.mixTypeBiga)
+        .replace('{mixBigaText}', pi.mixBigaText)
+        .replace('{flour}', fmtG(r.biga.final.flour, 'flour'))
+        .replace('{water}', fmtG(r.biga.final.water, 'water'))
+        .replace('{salt}', fmtG(r.saltG, 'salt'))
+        .replace('{oil}', oilText)
+        .replace('{oldDough}', oldDoughText)
+        .replace('{yeast}', '');
+      steps.push(mainMixText);
     } else {
-      steps.push(`<b>Dagasztás</b>: Keverd össze és dolgozd össze alaposan a lisztet (${fmtG(r.flour)}), vizet (${fmtG(r.water)}), sót (${fmtG(r.saltG)})${r.oilG > 0 ? `, zsiradékot (${fmtG(r.oilG)})` : ''}${r.useOldDough ? ` és az öregtésztát (${fmtG(r.oldDoughG)})` : ''}. Az élesztő mennyisége Friss: ${fmtG(r.yeast.fresh)} (vagy Instant: ${fmtG(r.yeast.instantDry)}, vagy Aktív száraz: ${fmtG(r.yeast.activeDry)}). Dagassz addig, amíg szép sima és feszes tésztát kapsz.`);
+      const oilText = r.oilG > 0 ? pi.mixOilText.replace('{oil}', fmtG(r.oilG, 'oil')) : '';
+      const oldDoughText = r.useOldDough ? pi.mixOldDoughText.replace('{oldDough}', fmtG(r.oldDoughG, 'flour')) : '';
+      const yeastText = pi.mixYeastText
+        .replace('{yeastFresh}', fmtG2(r.yeast.fresh, 'yeast_fresh'))
+        .replace('{yeastInstant}', fmtG2(r.yeast.instantDry, 'yeast'))
+        .replace('{yeastActive}', fmtG2(r.yeast.activeDry, 'yeast'));
+
+      const mainMixText = pi.mainMix
+        .replace('{mixType}', pi.mixTypeDirect)
+        .replace('{mixBigaText}', '')
+        .replace('{flour}', fmtG(r.flour, 'flour'))
+        .replace('{water}', fmtG(r.water, 'water'))
+        .replace('{salt}', fmtG(r.saltG, 'salt'))
+        .replace('{oil}', oilText)
+        .replace('{oldDough}', oldDoughText)
+        .replace('{yeast}', yeastText);
+      steps.push(mainMixText);
     }
 
     if (r.takeOutOldDoughG > 0) {
-      steps.push(`<b>Öregtészta elmentése (KI)</b>: A dagasztás végeztével azonnal mérj ki belőle ${fmtG(r.takeOutOldDoughG)} tésztát, tedd jól záródó edénybe és tedd a hűtőbe a következő sütéshez.`);
+      steps.push(pi.oldDoughSave.replace('{weight}', fmtG(r.takeOutOldDoughG, 'flour')));
     }
 
     const bulkHours = Math.min(1.5, Math.max(0.5, r.totalHours * 0.15));
-    steps.push(`<b>Tömbös előkelesztés (Massa)</b>: Takard le a tésztát és hagyd szobahőmérsékleten (${roomT}°C) pihenni ${formatDuration(bulkHours)} ideig, hogy a gluténszerkezet ellazuljon.`);
+    steps.push(pi.bulkFerment.replace('{temp}', `${roomT}°C`).replace('{duration}', formatDuration(bulkHours)));
     
-    steps.push(`<b>Gombócolás</b>: Vágd a tésztát a kívánt darabokra (${r.style === 'teglia' ? 'tepsi méretre' : r.ballGroups.map(g => `${g.count} db × ${g.weight}g`).join(' + ')}), formázz belőlük feszes felületű tésztagolyókat.`);
+    const bunsText = r.style === 'teglia' ? 'tepsi méretre' : r.ballGroups.map(g => `${g.count} db × ${g.weight}g`).join(' + ');
+    steps.push(pi.shaping.replace('{buns}', bunsText));
 
     if (coldH > 0) {
-      steps.push(`<b>Hideg kelesztés (hűtő)</b>: Helyezd a golyókat kelesztőedénybe, és keleszd a hűtőben (${coldT}°C) ${formatDuration(coldH)} ideig.`);
-      steps.push(`<b>Sütés előtti bemelegítés</b>: A hűtőből kivéve hagyd a gombócokat szobahőmérsékleten (${roomT}°C) kelni további 2 órán át, hogy elérjék a megfelelő sütési hőmérsékletet és nyújthatóságot.`);
+      steps.push(pi.coldFerment.replace('{temp}', `${coldT}°C`).replace('{duration}', formatDuration(coldH)));
+      steps.push(pi.warmingUp.replace('{temp}', `${roomT}°C`));
     } else {
       const remainingRoom = Math.max(0, roomH - bulkHours);
-      steps.push(`<b>Készre kelesztés szobahőn</b>: Hagyd a gombócokat kelesztőedényben szobahőmérsékleten (${roomT}°C) kelni további ${formatDuration(remainingRoom)} ideig.`);
+      steps.push(pi.roomFerment.replace('{temp}', `${roomT}°C`).replace('{duration}', formatDuration(remainingRoom)));
     }
 
-    const isTeglia = r.style === 'teglia';
-    steps.push(`<b>Sütés</b>: ${isTeglia ? 'Olajozott tepsiben finoman terítsd szét a tésztát a szélekig, előnyújtsd, feltétezd és sütőben/kemencében süsd készre.' : 'Nyújtsd ki a tésztagolyót kézzel (a szélén a levegőbuborékokat megtartva), tetszőlegesen feltétezd és a lehető legmagasabb hőfokon süsd készre.'}`);
+    if (r.style === 'teglia') {
+      steps.push(pi.bakingTeglia);
+    } else {
+      steps.push(pi.bakingPizza);
+    }
 
     document.getElementById('p-method-list').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
     document.getElementById('p-notes').textContent = notes || '';
     
-    // Mobil böngészőknél a DOM frissülés megvárása a nyomtatási párbeszédablak megnyitása előtt
+    // Golyóálló PDF generálás klónozással és inline stílusokkal (kikerüli a CSS cache/specifikációs hibákat)
+    const originalPrintRoot = document.getElementById('print-root');
+    const clone = originalPrintRoot.cloneNode(true);
+    clone.id = 'print-root-temp-clone';
+    
+    // Alkalmazzuk a megjelenítést és az A4 szélességet inline stílusként a klónon
+    clone.style.display = 'block';
+    clone.style.visibility = 'visible';
+    clone.style.position = 'absolute';
+    clone.style.left = '0';
+    clone.style.top = '0';
+    clone.style.width = '794px';
+    clone.style.background = '#ffffff';
+    clone.style.color = '#111113';
+    clone.style.zIndex = '-9999';
+    clone.style.opacity = '1';
+    
+    // Kényszerítsük a gyermekeket is láthatónak (kivéve a hidden elemeket)
+    const allChildren = clone.querySelectorAll('*');
+    allChildren.forEach(child => {
+      child.style.visibility = 'visible';
+      if (child.hasAttribute('hidden') || child.style.display === 'none') {
+        child.style.display = 'none';
+      }
+    });
+
+    document.body.appendChild(clone);
+
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const dateStr = yy + mm + dd;
+    const pdfFilename = `PizzaAlkimista recept ${dateStr}.pdf`;
+
+    // Várunk egy kis időt, hogy a böngésző biztosan kirajzolja a klónt a DOM-ban
     setTimeout(() => {
-      window.print();
-    }, 100);
+      const opt = {
+        margin:       [10, 12, 10, 12],
+        filename:     pdfFilename,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(clone).save().then(() => {
+        document.body.removeChild(clone);
+      }).catch(err => {
+        console.error('PDF Generálási hiba:', err);
+        document.body.removeChild(clone);
+        // Biztonsági fallback nyomtatásra
+        window.print();
+      });
+    }, 150);
   }
 
   // ---------------------------------------------------------------------
@@ -1266,7 +1704,18 @@
       
       const setVal = (id, val) => {
         const el = document.getElementById(id);
-        if (el) { el.value = val; el.dispatchEvent(new Event('input')); }
+        if (el) { 
+          let num = parseFloat(val);
+          if (!isNaN(num)) {
+            const min = parseFloat(el.min);
+            const max = parseFloat(el.max);
+            if (!isNaN(min) && num < min) num = min;
+            if (!isNaN(max) && num > max) num = max;
+            val = num;
+          }
+          el.value = formatInputValue(id, val); 
+          el.dispatchEvent(new Event('input', { bubbles: true })); 
+        }
       };
 
       if (last.style) {
@@ -1278,20 +1727,20 @@
       }
       
       if (last.roomHours !== undefined) setVal('roomHours', last.roomHours);
-      if (last.roomTempC !== undefined) setVal('roomTempC', last.roomTempC);
+      if (last.roomTempC !== undefined) setVal('roomTempC', appSettings.useFahrenheit ? cToF(last.roomTempC) : last.roomTempC);
       if (last.yeastFactor !== undefined) {
         // Szigorú val idáció: csak 70-130 közötti érték fogadható el (a select megengedett tartománya)
         const safeYF = parseFloat(last.yeastFactor);
-        appSettings.yeastFactor = (isNaN(safeYF) || safeYF < 70 || safeYF > 130) ? 100 : safeYF;
+        appSettings.yeastFactor = (isNaN(safeYF) || safeYF < 70 || safeYF > 130) ? 105 : safeYF;
         setVal('yeastFactor', appSettings.yeastFactor);
       }
       if (last.coldHours !== undefined) setVal('coldHours', last.coldHours);
-      if (last.coldTempC !== undefined) setVal('coldTempC', last.coldTempC);
+      if (last.coldTempC !== undefined) setVal('coldTempC', appSettings.useFahrenheit ? cToF(last.coldTempC) : last.coldTempC);
       
       if (last.bigaFlourPct !== undefined) setVal('bigaFlourPct', last.bigaFlourPct);
       if (last.bigaHydration !== undefined) setVal('bigaHydration', last.bigaHydration);
       if (last.bigaRoomHours !== undefined) setVal('bigaRoomHours', last.bigaRoomHours);
-      if (last.bigaRoomTempC !== undefined) setVal('bigaRoomTempC', last.bigaRoomTempC);
+      if (last.bigaRoomTempC !== undefined) setVal('bigaRoomTempC', appSettings.useFahrenheit ? cToF(last.bigaRoomTempC) : last.bigaRoomTempC);
       if (last.bigaColdHours !== undefined) {
         const useBigaCold = document.getElementById('useBigaCold');
         if (useBigaCold) {
@@ -1300,7 +1749,7 @@
         }
         setVal('bigaColdHours', last.bigaColdHours);
       }
-      if (last.bigaColdTempC !== undefined) setVal('bigaColdTempC', last.bigaColdTempC);
+      if (last.bigaColdTempC !== undefined) setVal('bigaColdTempC', appSettings.useFahrenheit ? cToF(last.bigaColdTempC) : last.bigaColdTempC);
 
       if (last.oldDoughG !== undefined) setVal('oldDoughG', last.oldDoughG);
       if (last.oldDoughHydration !== undefined) setVal('oldDoughHydration', last.oldDoughHydration);
@@ -1343,18 +1792,27 @@
   function applyFahrenheitToForm() {
     const isFahr = appSettings.useFahrenheit;
     const tempFields = [
-      { id: 'roomTempC', min: isFahr ? 50 : 16, max: isFahr ? 105 : 40, step: isFahr ? 1 : 0.5 },
-      { id: 'coldTempC', min: isFahr ? 35 : 2, max: isFahr ? 68 : 20, step: isFahr ? 1 : 0.5 },
-      { id: 'bigaRoomTempC', min: isFahr ? 50 : 16, max: isFahr ? 105 : 40, step: isFahr ? 1 : 0.5 },
-      { id: 'bigaColdTempC', min: isFahr ? 35 : 2, max: isFahr ? 68 : 20, step: isFahr ? 1 : 0.5 }
+      { id: 'roomTempC', min: isFahr ? 33 : 0.5, max: isFahr ? 113 : 45, step: isFahr ? 1 : 0.5 },
+      { id: 'coldTempC', min: isFahr ? 33 : 0.5, max: isFahr ? 68 : 20, step: isFahr ? 1 : 0.5 },
+      { id: 'bigaRoomTempC', min: isFahr ? 33 : 0.5, max: isFahr ? 113 : 45, step: isFahr ? 1 : 0.5 },
+      { id: 'bigaColdTempC', min: isFahr ? 33 : 0.5, max: isFahr ? 68 : 20, step: isFahr ? 1 : 0.5 }
     ];
     tempFields.forEach(({ id, min, max, step }) => {
       const el = document.getElementById(id);
       if (!el) return;
-      const curVal = parseFloat(el.value);
+      
+      const isCurrentFahr = el.value.includes('°F');
+      const curVal = parseFloat(el.value.replace(/,/g, '.').replace(/[^0-9.]/g, ''));
+      
       el.min = min; el.max = max; el.step = step;
       if (!isNaN(curVal)) {
-        el.value = isFahr ? cToF(curVal) : fToC(curVal);
+        let valToSet = curVal;
+        if (isFahr && !isCurrentFahr) {
+          valToSet = cToF(curVal);
+        } else if (!isFahr && isCurrentFahr) {
+          valToSet = fToC(curVal);
+        }
+        el.value = formatInputValue(id, valToSet);
         updateLabel(el);
       }
       // Unit label
@@ -1372,11 +1830,33 @@
   window.addEventListener('load', () => {
     translateDOM();
     loadSettings();
+    applyFahrenheitToForm();
     applySettingsToUI();
     loadLastInput();
     renderWikiCats();
     renderRecipeList();
     setupYeastSwitcher();
+
+    // Form beviteli mezők kezdeti formázása mértékegységekkel
+    document.querySelectorAll('#calc-form input[readonly]').forEach(el => {
+      let rawVal;
+      if (el.id.includes('Hours')) {
+        rawVal = parseDuration(el.value);
+      } else {
+        rawVal = parseFloat(el.value.replace(/,/g, '.').replace(/[^0-9.]/g, ''));
+      }
+      if (!isNaN(rawVal)) {
+        el.value = formatInputValue(el.id, rawVal);
+      }
+    });
+
+    // Fejléc téma-váltó gomb kezelője
+    document.getElementById('btn-theme-toggle')?.addEventListener('click', e => {
+      e.preventDefault();
+      document.body.classList.toggle('light-theme');
+      appSettings.useLightMode = document.body.classList.contains('light-theme');
+      saveSettings();
+    });
 
     // Hulladék % slider élő label
     document.getElementById('setting-waste-pct')?.addEventListener('input', function() {
@@ -1393,6 +1873,16 @@
     document.getElementById('setting-use-autolyse')?.addEventListener('change', function() {
       const fields = document.getElementById('setting-autolyse-fields');
       if (fields) fields.style.display = this.checked ? 'block' : 'none';
+    });
+
+    document.getElementById('calc-form')?.addEventListener('input', () => {
+      lastInput = readInput();
+      if (appSettings.saveHistory) {
+        localStorage.setItem('pizza_alkimista_last_input', JSON.stringify(lastInput));
+      }
+      // Live újraszámítás ha már van megjelenített eredmény vagy folyamatosan számolunk
+      lastResult = PizzaCalc.calculate(lastInput);
+      renderResult(lastResult);
     });
 
     document.getElementById('toggle-recipe-name')?.addEventListener('change', e => {

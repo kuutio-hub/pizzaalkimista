@@ -28,18 +28,53 @@
 </div>
 
 <header class="app-header">
-  <!-- ELEGÁNS ALKIMISTA PIZZA LOGÓ (SVG) -->
+  <!-- BRAND LOGÓ (SVG Nápolyi Margherita Pizza) -->
   <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:36px; height:36px;">
-    <!-- Háromszög (Alkimista Tűz szimbólum és szabadkőműves piramis) -->
-    <polygon points="50,15 15,80 85,80" fill="none" stroke="#D4AF37" stroke-width="4"/>
-    <!-- Körök és Pizzaszelet sugarak -->
-    <circle cx="50" cy="55" r="20" fill="none" stroke="#D4AF37" stroke-width="2" stroke-dasharray="3 3"/>
-    <line x1="50" y1="55" x2="50" y2="35" stroke="#D4AF37" stroke-width="2"/>
-    <line x1="50" y1="55" x2="33" y2="65" stroke="#D4AF37" stroke-width="2"/>
-    <line x1="50" y1="55" x2="67" y2="65" stroke="#D4AF37" stroke-width="2"/>
-    <!-- Mindent látó Alkimista Szem a piramis tetején -->
-    <path d="M40,30 Q50,20 60,30 Q50,40 40,30 Z" fill="none" stroke="#D4AF37" stroke-width="2"/>
-    <circle cx="50" cy="30" r="3" fill="#D4AF37"/>
+    <!-- Szenesedett, buborékos nápolyi tészta perem (Cornicione leopárd pöttyökkel) -->
+    <circle cx="50" cy="50" r="44" fill="#EAD9B5" stroke="#8C6627" stroke-width="4.5"/>
+    <circle cx="22" cy="35" r="1.5" fill="#2E200C"/>
+    <circle cx="78" cy="35" r="2" fill="#2E200C"/>
+    <circle cx="34" cy="18" r="1.5" fill="#2E200C"/>
+    <circle cx="55" cy="12" r="2.2" fill="#2E200C"/>
+    <circle cx="68" cy="82" r="1.8" fill="#2E200C"/>
+    <circle cx="28" cy="74" r="2" fill="#2E200C"/>
+    <circle cx="84" cy="62" r="1.6" fill="#2E200C"/>
+    
+    <!-- Paradicsom alap -->
+    <circle cx="50" cy="50" r="37" fill="#C93F2B"/>
+    <circle cx="48" cy="52" r="34" fill="#D34B32" opacity="0.8"/>
+    
+    <!-- 1. szelet elmozdítva -->
+    <g transform="translate(-3, -3)">
+      <path d="M50,50 L20,24 A37,37 0 0,1 50,13 Z" fill="#C93F2B"/>
+      <path d="M20,24 A37,37 0 0,1 50,13 L50,11 A39,39 0 0,1 18,22 Z" fill="#EAD9B5" stroke="#8C6627" stroke-width="1"/>
+      <circle cx="36" cy="20" r="1" fill="#2E200C"/>
+      <circle cx="36" cy="36" r="5" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+      <circle cx="43" cy="24" r="4.5" fill="#EFE3C3"/>
+      <path d="M30,30 Q33,23 38,28 Q33,35 30,30 Z" fill="#3D7B32"/>
+      <path d="M30,30 L38,28" stroke="#25501E" stroke-width="0.5"/>
+    </g>
+    
+    <!-- Megmaradt 5 szelet -->
+    <circle cx="65" cy="30" r="6" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+    <path d="M60,24 Q65,18 70,22 Q65,28 60,24 Z" fill="#3D7B32"/>
+    <circle cx="78" cy="50" r="5" fill="#EFE3C3"/>
+    <circle cx="70" cy="62" r="5.5" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+    <path d="M68,48 Q74,44 76,50 Q70,54 68,48 Z" fill="#3D7B32"/>
+    <circle cx="50" cy="78" r="6" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+    <circle cx="34" cy="68" r="4.5" fill="#EFE3C3"/>
+    <path d="M46,65 Q50,59 55,63 Q50,69 46,65 Z" fill="#3D7B32"/>
+    <circle cx="22" cy="50" r="5" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+    <circle cx="28" cy="36" r="4" fill="#EFE3C3"/>
+    <path d="M28,45 Q32,40 36,44 Q32,49 28,45 Z" fill="#3D7B32"/>
+    <circle cx="50" cy="50" r="4" fill="#EFE3C3" opacity="0.9"/>
+    
+    <!-- Vágóvonalak -->
+    <line x1="50" y1="50" x2="50" y2="13" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+    <line x1="50" y1="50" x2="80" y2="24" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+    <line x1="50" y1="50" x2="82" y2="57" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+    <line x1="50" y1="50" x2="50" y2="87" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+    <line x1="50" y1="50" x2="18" y2="57" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
   </svg>
 
   <div class="brand" data-str="brandName">PizzaAlkimista<small data-str="brandSubtitle">A tökéletes tészta tudománya</small></div>
@@ -59,14 +94,14 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       <span>Tudástár</span>
     </button>
-    <button data-view="view-info" class="desktop-nav-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <span>Infó</span>
-    </button>
   </nav>
 
   <button class="icon-btn mobile-only-btn" id="btn-burger" title="Menü" aria-label="Menü megnyitása">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <button class="icon-btn" id="btn-theme-toggle" title="Téma váltása" aria-label="Világos/Sötét téma váltása">
+    <!-- Nap és hold ikon (SVG) -->
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="theme-icon-sun"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
   </button>
   <button class="icon-btn" id="btn-settings" title="Beállítások">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -94,23 +129,21 @@
         <label class="field-label"><span data-str="labelRoomHours">Szobahőmérsékletű kelesztés</span>
           <button type="button" class="info-dot" data-info="roomHours">i</button>
         </label>
-        <div class="range-row mobile-stepper">
-          <button type="button" class="step-btn" data-step-dir="-1" data-input-id="roomHours">-</button>
-          <input type="range" id="roomHours" min="0.5" max="24" step="0.5" value="4">
-          <button type="button" class="step-btn" data-step-dir="1" data-input-id="roomHours">+</button>
-          <span class="range-value" id="roomHours-val">4 óra</span>
+        <div class="mobile-stepper">
+          <button type="button" class="step-btn" data-step-dir="-1" data-input-id="roomHours">◀</button>
+          <input type="text" id="roomHours" min="0.5" max="24" step="0.5" value="5" readonly>
+          <button type="button" class="step-btn" data-step-dir="1" data-input-id="roomHours">▶</button>
         </div>
       </div>
 
       <div class="field">
-        <label class="field-label"><span data-str="labelRoomTemp">Szoba hőmérséklete (°C)</span>
+        <label class="field-label"><span data-str="labelRoomTemp">Szoba hőmérséklete</span>
           <button type="button" class="info-dot" data-info="roomTemp">i</button>
         </label>
-        <div class="range-row mobile-stepper">
-          <button type="button" class="step-btn" data-step-dir="-1" data-input-id="roomTempC">-</button>
-          <input type="range" id="roomTempC" min="16" max="32" step="0.5" value="22">
-          <button type="button" class="step-btn" data-step-dir="1" data-input-id="roomTempC">+</button>
-          <span class="range-value" id="roomTempC-val">22°C</span>
+        <div class="mobile-stepper">
+          <button type="button" class="step-btn" data-step-dir="-1" data-input-id="roomTempC">◀</button>
+          <input type="text" id="roomTempC" min="0.5" max="45" step="0.5" value="21.5" readonly>
+          <button type="button" class="step-btn" data-step-dir="1" data-input-id="roomTempC">▶</button>
         </div>
       </div>
 
@@ -118,20 +151,18 @@
       <div id="cold-fields" hidden>
         <div class="field">
           <label class="field-label" data-str="labelColdHours">Hűtőszekrényben töltött idő</label>
-          <div class="range-row mobile-stepper">
-            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="coldHours">-</button>
-            <input type="range" id="coldHours" min="1" max="72" step="1" value="24">
-            <button type="button" class="step-btn" data-step-dir="1" data-input-id="coldHours">+</button>
-            <span class="range-value" id="coldHours-val">24 óra</span>
+          <div class="mobile-stepper">
+            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="coldHours">◀</button>
+            <input type="text" id="coldHours" min="1" max="72" step="1" value="24" readonly>
+            <button type="button" class="step-btn" data-step-dir="1" data-input-id="coldHours">▶</button>
           </div>
         </div>
         <div class="field">
-          <label class="field-label" data-str="labelColdTemp">Hűtőszekrény hőmérséklete (°C)</label>
-          <div class="range-row mobile-stepper">
-            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="coldTempC">-</button>
-            <input type="range" id="coldTempC" min="1" max="12" step="0.5" value="4">
-            <button type="button" class="step-btn" data-step-dir="1" data-input-id="coldTempC">+</button>
-            <span class="range-value" id="coldTempC-val">4°C</span>
+          <label class="field-label" data-str="labelColdTemp">Hűtőszekrény hőmérséklete</label>
+          <div class="mobile-stepper">
+            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="coldTempC">◀</button>
+            <input type="text" id="coldTempC" min="1" max="12" step="0.5" value="4" readonly>
+            <button type="button" class="step-btn" data-step-dir="1" data-input-id="coldTempC">▶</button>
           </div>
         </div>
       </div>
@@ -141,22 +172,22 @@
         <h3 class="mt" data-str="resHeadingBiga">Biga beállítások</h3>
         <div class="row2">
           <div class="field">
-            <label class="field-label" data-str="labelBigaFlourPct">Biga liszt (%)</label>
-            <input type="number" id="bigaFlourPct" min="10" max="100" value="50" readonly>
+            <label class="field-label" data-str="labelBigaFlourPct">Biga liszt</label>
+            <input type="text" id="bigaFlourPct" min="10" max="100" value="50" readonly>
           </div>
           <div class="field">
-            <label class="field-label" data-str="labelBigaHydration">Biga hidratáció (%)</label>
-            <input type="number" id="bigaHydration" min="40" max="100" value="45" readonly>
+            <label class="field-label" data-str="labelBigaHydration">Biga hidratáció</label>
+            <input type="text" id="bigaHydration" min="40" max="100" value="45" readonly>
           </div>
         </div>
         <div class="row2">
           <div class="field">
-            <label class="field-label" data-str="labelBigaRoomHours">Biga szobahős kelesztés (óra)</label>
-            <input type="number" id="bigaRoomHours" min="0.5" max="48" step="0.5" value="16" readonly>
+            <label class="field-label" data-str="labelBigaRoomHours">Biga szobahős kelesztés</label>
+            <input type="text" id="bigaRoomHours" min="0.5" max="48" step="0.5" value="16" readonly>
           </div>
           <div class="field">
-            <label class="field-label" data-str="labelBigaRoomTemp">Biga szobahőmérséklet (°C)</label>
-            <input type="number" id="bigaRoomTempC" min="12" max="30" step="0.5" value="18" readonly>
+            <label class="field-label" data-str="labelBigaRoomTemp">Biga szobahőmérséklet</label>
+            <input type="text" id="bigaRoomTempC" min="0.5" max="45" step="0.5" value="18" readonly>
           </div>
         </div>
         <div class="toggle-row" style="border-top:0; padding-top:0;">
@@ -166,12 +197,12 @@
         <div id="biga-cold-fields" hidden>
           <div class="row2">
             <div class="field">
-              <label class="field-label" data-str="labelBigaColdHours">Biga hűtős kelesztés (óra)</label>
-              <input type="number" id="bigaColdHours" min="1" max="72" value="24" readonly>
+              <label class="field-label" data-str="labelBigaColdHours">Biga hűtős kelesztés</label>
+              <input type="text" id="bigaColdHours" min="1" max="72" value="24" readonly>
             </div>
             <div class="field">
-              <label class="field-label" data-str="labelBigaColdTemp">Biga hűtő hőmérséklet (°C)</label>
-              <input type="number" id="bigaColdTempC" min="1" max="12" step="0.5" value="4" readonly>
+              <label class="field-label" data-str="labelBigaColdTemp">Biga hűtő hőmérséklet</label>
+              <input type="text" id="bigaColdTempC" min="1" max="12" step="0.5" value="4" readonly>
             </div>
           </div>
         </div>
@@ -182,12 +213,12 @@
         <h3 class="mt">Öregtészta hozzáadása (BE)</h3>
         <div class="row2">
           <div class="field">
-            <label class="field-label" data-str="labelOldDoughG">Öregtészta mennyisége (g)</label>
-            <input type="number" id="oldDoughG" min="10" max="500" value="100" readonly>
+            <label class="field-label" data-str="labelOldDoughG">Öregtészta mennyisége</label>
+            <input type="text" id="oldDoughG" min="10" max="500" value="100" readonly>
           </div>
           <div class="field">
-            <label class="field-label" data-str="labelOldDoughHydration">Öregtészta hidratációja (%)</label>
-            <input type="number" id="oldDoughHydration" min="40" max="100" value="60" readonly>
+            <label class="field-label" data-str="labelOldDoughHydration">Öregtészta hidratációja</label>
+            <input type="text" id="oldDoughHydration" min="40" max="100" value="60" readonly>
           </div>
         </div>
       </div>
@@ -196,8 +227,8 @@
       <div id="olddough-out-fields" hidden class="conditional-section">
         <h3 class="mt">Öregtészta kivétele (KI)</h3>
         <div class="field">
-          <label class="field-label" data-str="labelTakeOutOldDoughG">Kiveendő mennyiség (g)</label>
-          <input type="number" id="takeOutOldDoughG" min="10" max="500" value="150" readonly>
+          <label class="field-label" data-str="labelTakeOutOldDoughG">Kiveendő mennyiség</label>
+          <input type="text" id="takeOutOldDoughG" min="10" max="500" value="150" readonly>
         </div>
       </div>
 
@@ -215,13 +246,6 @@
       <div class="card">
         <div class="flex" style="justify-content:space-between; align-items:center; margin-bottom:1rem;">
           <h3 data-str="resHeadingIngredients">Hozzávalók</h3>
-          
-          <!-- Új, asztali/mobil-kompatibilis élesztőválasztó nyilakkal -->
-          <div class="yeast-switcher-inline">
-            <button type="button" class="yeast-arrow-btn" id="yeast-prev">◀</button>
-            <span id="yeast-active-display" style="font-weight:700; color:var(--gold); font-size:0.85rem; min-width:140px; text-align:center;">Friss élesztő</span>
-            <button type="button" class="yeast-arrow-btn" id="yeast-next">▶</button>
-          </div>
         </div>
         
         <!-- Fix oszlopszélességű, ugrásmentes hozzávalók táblázat -->
@@ -245,8 +269,7 @@
           <label class="switch"><input type="checkbox" id="toggle-recipe-name"><span class="track"></span><span class="thumb"></span></label>
         </div>
         <div class="field" id="recipe-name-field-wrapper" hidden style="margin-bottom:0; margin-top:0.6rem;">
-          <label class="field-label">Recept elnevezése</label>
-          <input type="text" id="recipe-title-input" value="Gregory's Special">
+          <input type="text" id="recipe-title-input" value="Gregory's Special" placeholder="Írd be a recept nevét...">
         </div>
       </div>
 
@@ -254,10 +277,6 @@
         <button class="btn btn-ghost btn-block btn-icon" id="btn-save">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 4.5 3 1-1.5 2.5-3 4.5-3C19 5 21.5 8.5 19.5 12.5 17 16.65 12 21 12 21z"/></svg>
           <span data-str="btnSave">Mentés kedvencekbe</span>
-        </button>
-        <button class="btn btn-ghost btn-block btn-icon" id="btn-print">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
-          <span data-str="btnPrint">Nyomtatási nézet</span>
         </button>
         <button class="btn btn-primary btn-block btn-icon" id="btn-download-pdf">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -289,19 +308,7 @@
     </div>
   </section>
 
-  <!-- ===================== INFÓ ===================== -->
-  <section class="view" id="view-info">
-    <div class="section-eyebrow">Rólunk</div>
-    <h1>Infó</h1>
-    <div class="card">
-      <h3>Mit tud ez az app?</h3>
-      <p>PizzaAlkimista receptek pontos liszt, víz, só, élesztő és olaj mennyiségének meghatározásával, az alacsony hőmérsékletű fermentáció (hűtős érlelés) és a Biga előtészta integrációjával.</p>
-    </div>
-    <div class="card">
-      <h3>Adatkezelés</h3>
-      <p>Nincs szerver, nincs nyomkövetés. Minden mentett recept a böngésző IndexedDB tárolójában marad offline módon.</p>
-    </div>
-  </section>
+  <!-- ===================== INFÓ ELTÁVOLÍTVA (ÁTHELYEZVE A WIKIBE) ===================== -->
 
 </main>
 
@@ -318,10 +325,6 @@
   <button data-view="view-wiki">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
     Tudástár
-  </button>
-  <button data-view="view-info">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-    Infó
   </button>
 </nav>
 
@@ -342,10 +345,6 @@
       <button class="burger-nav-item" data-view="view-wiki">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         <span>Tudástár</span>
-      </button>
-      <button class="burger-nav-item" data-view="view-info">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        <span>Infó</span>
       </button>
     </div>
   </div>
@@ -380,8 +379,8 @@
       <div class="field">
         <label class="field-label">Élesztő-aktivitási görbe</label>
         <select id="setting-yeast-model">
-          <option value="craig">Craig-féle (Alapértelmezett)</option>
-          <option value="alchemist">Alkimista modell</option>
+          <option value="alchemist">Alkimista formula</option>
+          <option value="craig">Craig formula</option>
         </select>
       </div>
 
@@ -427,41 +426,53 @@
 
       <hr style="border-color: var(--accent-dim); margin: 1rem 0;">
 
+      <!-- Hulladék kompenzáció -->
       <div class="field" style="margin-top:1.2rem;">
-        <label class="field-label">Hulladék kompenzáció</label>
+        <label class="field-label">Hulladék kompenzáció (gépveszteség)</label>
         <select id="setting-waste-pct">
-          <option value="0" selected>0% (Nincs kompenzáció — alapértelmezett)</option>
+          <option value="0">0%</option>
           <option value="1">1%</option>
           <option value="2">2%</option>
-          <option value="3">3%</option>
+          <option value="3" selected>3%</option>
           <option value="4">4%</option>
           <option value="5">5%</option>
         </select>
       </div>
 
-      <div class="toggle-row" style="margin-top:0.8rem;">
-        <label class="field-label" style="margin:0;">Fahrenheit mód (°F)</label>
-        <label class="switch"><input type="checkbox" id="setting-use-fahrenheit"><span class="track"></span><span class="thumb"></span></label>
-      </div>
-
-      <div class="field" style="margin-top:1.5rem;" id="yeast-correction-field-wrapper">
+      <!-- Élesztő korrekció szorosan a hulladék után -->
+      <div class="field" style="margin-top:1.2rem;" id="yeast-correction-field-wrapper">
         <label class="field-label" data-str="settingYeastFactor">Élesztő mennyiség korrekciója (%) <span id="yeast-factor-warn" style="color: var(--gold); font-size: 0.85rem; margin-left: 0.5rem; font-weight: bold;"></span></label>
         <select id="yeastFactor">
-          <option value="70">-30% (Gyengébb élesztő)</option>
+          <option value="70">-30%</option>
           <option value="75">-25%</option>
           <option value="80">-20%</option>
           <option value="85">-15%</option>
           <option value="90">-10%</option>
           <option value="95">-5%</option>
-          <option value="100" selected>0% (Alapértelmezett / Normál)</option>
-          <option value="105">+5%</option>
+          <option value="100">0%</option>
+          <option value="105" selected>+5%</option>
           <option value="110">+10%</option>
           <option value="115">+15%</option>
           <option value="120">+20%</option>
           <option value="125">+25%</option>
-          <option value="130">+30% (Erősebb élesztő)</option>
+          <option value="130">+30%</option>
         </select>
       </div>
+
+      <hr style="border-color: var(--accent-dim); margin: 1rem 0;">
+
+      <!-- Angolszász mértékegységek -->
+      <div class="toggle-row">
+        <label class="field-label" style="margin:0;">Angolszász mértékegységek (csésze/kanál)</label>
+        <label class="switch"><input type="checkbox" id="setting-use-imperial"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
+      <!-- Fahrenheit mód -->
+      <div class="toggle-row" style="margin-top:0.8rem;">
+        <label class="field-label" style="margin:0;">Fahrenheit mód (°F)</label>
+        <label class="switch"><input type="checkbox" id="setting-use-fahrenheit"><span class="track"></span><span class="thumb"></span></label>
+      </div>
+
     </div>
   </div>
 </div>
@@ -499,13 +510,80 @@
 <!-- ===================== NYOMTATÁSI / PDF SABLON ===================== -->
 <div id="print-root">
   <div class="p-header">
-    <img src="icons/icon.svg" alt="">
+    <!-- SVG Nápolyi Pizza grafika (a kért bazsalikommal, mozzarella foltokkal, 6 szelettel, 1 elmozdított szelettel) -->
+    <svg class="pizza-pdf-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:70px; height:70px; flex:none; margin-right:10px;">
+      <!-- Szenesedett, buborékos nápolyi tészta perem (Cornicione leopárd pöttyökkel) -->
+      <circle cx="50" cy="50" r="44" fill="#EAD9B5" stroke="#8C6627" stroke-width="4.5"/>
+      <!-- Szenes pici pöttyök a szélén -->
+      <circle cx="22" cy="35" r="1.5" fill="#2E200C"/>
+      <circle cx="78" cy="35" r="2" fill="#2E200C"/>
+      <circle cx="34" cy="18" r="1.5" fill="#2E200C"/>
+      <circle cx="55" cy="12" r="2.2" fill="#2E200C"/>
+      <circle cx="68" cy="82" r="1.8" fill="#2E200C"/>
+      <circle cx="28" cy="74" r="2" fill="#2E200C"/>
+      <circle cx="84" cy="62" r="1.6" fill="#2E200C"/>
+      
+      <!-- Paradicsom alap (nem egységes piros) -->
+      <circle cx="50" cy="50" r="37" fill="#C93F2B"/>
+      <circle cx="48" cy="52" r="34" fill="#D34B32" opacity="0.8"/>
+      
+      <!-- Mozzarella foltok és bazsalikomok az egész pizzán -->
+      <!-- Szelet elosztás (6 szelet) -->
+      <!-- 1. szelet elmozdítva (bal felső szelet, kicsit eltolva balra és fel) -->
+      <g transform="translate(-3, -3)">
+        <!-- Szelet cikk háttér -->
+        <path d="M50,50 L20,24 A37,37 0 0,1 50,13 Z" fill="#C93F2B"/>
+        <!-- Tészta perem -->
+        <path d="M20,24 A37,37 0 0,1 50,13 L50,11 A39,39 0 0,1 18,22 Z" fill="#EAD9B5" stroke="#8C6627" stroke-width="1"/>
+        <circle cx="36" cy="20" r="1" fill="#2E200C"/>
+        <!-- Mozzarella foltok ezen a szeleten -->
+        <circle cx="36" cy="36" r="5" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+        <circle cx="43" cy="24" r="4.5" fill="#EFE3C3"/>
+        <!-- Bazsalikomlevél -->
+        <path d="M30,30 Q33,23 38,28 Q33,35 30,30 Z" fill="#3D7B32"/>
+        <path d="M30,30 L38,28" stroke="#25501E" stroke-width="0.5"/>
+      </g>
+      
+      <!-- Megmaradt 5 szelet (egyben) -->
+      <!-- Szelet 2 -->
+      <path d="M50,50 L50,13 A37,37 0 0,1 80,24 Z" fill="none"/>
+      <circle cx="65" cy="30" r="6" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+      <path d="M60,24 Q65,18 70,22 Q65,28 60,24 Z" fill="#3D7B32"/>
+      
+      <!-- Szelet 3 -->
+      <circle cx="78" cy="50" r="5" fill="#EFE3C3"/>
+      <circle cx="70" cy="62" r="5.5" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+      <path d="M68,48 Q74,44 76,50 Q70,54 68,48 Z" fill="#3D7B32"/>
+      
+      <!-- Szelet 4 -->
+      <circle cx="50" cy="78" r="6" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+      <circle cx="34" cy="68" r="4.5" fill="#EFE3C3"/>
+      <path d="M46,65 Q50,59 55,63 Q50,69 46,65 Z" fill="#3D7B32"/>
+      
+      <!-- Szelet 5 & 6 -->
+      <circle cx="22" cy="50" r="5" fill="#F4EAD4" stroke="#DFD0A8" stroke-width="0.5"/>
+      <circle cx="28" cy="36" r="4" fill="#EFE3C3"/>
+      <path d="M28,45 Q32,40 36,44 Q32,49 28,45 Z" fill="#3D7B32"/>
+      
+      <!-- Középső sajtos-szaftos összefolyás -->
+      <circle cx="50" cy="50" r="4" fill="#EFE3C3" opacity="0.9"/>
+      
+      <!-- Vágóvonalak (a szeletelés jelzésére) -->
+      <line x1="50" y1="50" x2="50" y2="13" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+      <line x1="50" y1="50" x2="80" y2="24" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+      <line x1="50" y1="50" x2="82" y2="57" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+      <line x1="50" y1="50" x2="50" y2="87" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+      <line x1="50" y1="50" x2="18" y2="57" stroke="#8C6627" stroke-width="0.5" stroke-dasharray="1 2"/>
+    </svg>
     <div class="brand">PizzaAlkimista<small>A tökéletes tészta tudománya</small></div>
     <div class="meta" id="p-date"></div>
   </div>
   <div class="p-title" id="p-title">Gregory's Special</div>
   <div class="p-subtitle" id="p-subtitle"></div>
-  <div class="p-badges" id="p-badges"></div>
+  
+  <!-- Szófelhős / Buborékos kelesztési adatok keretekben -->
+  <div class="p-cloud-container" id="p-badges"></div>
+  
   <div class="p-section">
     <h3 data-str="resHeadingIngredients">Hozzávalók</h3>
     <table class="p-table" id="p-ingredients"></table>
@@ -513,11 +591,6 @@
   <div class="p-section" id="p-biga-section" hidden>
     <h3 data-str="resHeadingBiga">Biga (előtészta)</h3>
     <table class="p-table" id="p-biga"></table>
-  </div>
-
-  <div class="p-section" style="margin-top:1.2rem;">
-    <h3 data-str="resHeadingTimeline">Technológiai Idővonal</h3>
-    <ul class="p-timeline" id="p-timeline"></ul>
   </div>
 
   <div class="p-section" style="margin-top:1.5rem;">
@@ -537,7 +610,9 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="js/strings.js"></script>
+<script src="js/pdf-strings.js"></script>
 <script src="js/calc.js"></script>
 <script src="js/db.js"></script>
 <script src="js/wiki-data.js"></script>

@@ -1,5 +1,7 @@
 dev_tools/
 *.py
 *.json
+*.xlsx
+*.csv
 .DS_Store
 Thumbs.db

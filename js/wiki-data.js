@@ -46,7 +46,10 @@ const WIKI_DATA = [
         <tr><td>Aktív szárított élesztő</td><td>Vízben feloldva aktiválandó felhasználás előtt</td><td>friss mennyiség ≈ fele</td></tr>
         <tr><td>Instant (gyors) szárított élesztő</td><td>Közvetlenül a liszthez keverhető</td><td>friss mennyiség ≈ harmada</td></tr>
       </table>
-      <p>Ez az alkalmazás mindig a <strong>friss élesztő</strong> mennyiségét számolja ki elsőként, ebből vezeti le a szárított változatokat — ezért lesz konzisztens az eredmény, függetlenül attól, melyik élesztőtípust szereted használni.</p>
+      <p>Ez az alkalmazás mindig a <strong>friss élesztő</strong> mennyiségét számolja ki elsőként, ebből vezeti le a szárított változatokat — ezért lesz konzisztens az eredmény, függetlenül attól, melyik élesztőtípust szereted használó.</p>
+      <h3>Mi a teendő, ha nem eléggé szép és aktív a kelesztett tésztád?</h3>
+      <p>Nem minden élesztő egyforma! A bolti élesztők frissessége, aktivitása és tárolási körülményei nagyban eltérhetnek egymástól. Ha azt tapasztalod, hogy a tésztád a megadott idő alatt nem kel meg eléggé, nem elég szellős vagy lassabban indul be, <strong>alkalmazz többlet élesztő korrekciót a beállításokban</strong> (⚙️ ikon -> Élesztő mennyiség korrekciója).</p>
+      <p>Itt finomhangolhatod az élesztő erejét -30% és +30% közötti tartományban. Ha gyengébb az élesztőd vagy hűvösebb van a lakásban az átlagosnál, egy +5% vagy +10%-os korrekció csodákra képes.</p>
       <h3>Miért kell kevesebb élesztő, ha hosszabb ideig vagy hidegebben kelesztesz?</h3>
       <p>Az élesztő anyagcseréje hőmérsékletfüggő: melegben gyorsan, hidegben lassan dolgozik. Ha sok időt adsz a tésztának, kevesebb élesztő is elég ugyanahhoz a kelettséghez — sőt, a hosszabb, lassabb erjedés mélyebb, összetettebb ízt is eredményez, mert a tésztában lévő enzimek és a tejsavbaktériumok is több időt kapnak dolgozni.</p>
       <p>A számítás emögötti logikáját (a hőmérséklet-szorzót és a referenciaértéket) a Kalkulátor „i” infógombjai mindenhol megmutatják, ahol felhasználjuk.</p>
@@ -103,6 +106,27 @@ const WIKI_DATA = [
       <p>Magas hidratációjú (70–85%), tepsiben sült, hosszú kelesztésű, nagyon levegős belsejű, ropogós aljú pizza. Négyzetméterenkénti tésztatömeggel számolják, nem darabszám szerint — a köztudott „Bonci-szabály” szerint a tepsi cm²-ét egy 0,5–0,6-os szorzóval kell megszorozni, ami kb. 5000–6000 g/m²-nek felel meg.</p>
       <h3>New York style</h3>
       <p>Nagy, hajtogatható szeletek, közepes hidratáció (60–65%), gyakran kevés cukor és olaj a receptben, otthoni sütőben is jól működik.</p>
+    `
+  },
+  {
+    id: 'alkalmazas',
+    title: 'Alkalmazás használata',
+    icon: 'book',
+    summary: 'Mit tud az app? Adatkezelés és működés',
+    html: `
+      <h3>Mit tud ez az app?</h3>
+      <p>A PizzaAlkimista egy offline, böngészőből futtatható pizzatészta-kalkulátor. Segítségével hajszálpontosan kiszámíthatod a liszt, víz, só, élesztő és opcionális olaj mennyiségét.</p>
+      <p><strong>Főbb funkciók:</strong></p>
+      <ul>
+        <li>Biga előtészta és öregtészta (Pasta Riportata) kezelése</li>
+        <li>Hideg fermentáció (hűtős érlelés) órák és hőmérséklet szerinti integrációja</li>
+        <li>Többféle gombócméret egyidejű hozzáadása</li>
+        <li>Hulladék (veszteség) kompenzáció és élesztő-korrekció</li>
+        <li>Angolszász mértékegységek és Fahrenheit hőmérséklet támogatása</li>
+        <li>Kedvencek mentése és professzionális, nyomtatható A4-es PDF receptlap</li>
+      </ul>
+      <h3>Adatkezelés és adatvédelem</h3>
+      <p>Nincs szerver, nincs nyomkövetés, nincs adatgyűjtés. Minden mentett recept és beállítás kizárólag a böngésződ saját offline IndexedDB és LocalStorage tárolójában marad. Az app internetkapcsolat nélkül is 100%-ban működőképes.</p>
     `
   }
 ];
