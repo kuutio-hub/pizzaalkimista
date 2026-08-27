@@ -30,6 +30,11 @@
   --nav-h:         68px;
   --header-h:      64px;
   --safe-b:        env(safe-area-inset-bottom, 0px);
+  
+  /* PizzaMűhely dinamikus háttérváltozók */
+  --pizza-bg-line:      rgba(212, 175, 55, 0.35);
+  --pizza-bg-fill:      rgba(212, 175, 55, 0.02);
+  --pizza-bg-opacity:   0.11;
 }
 
 /* ---------- Világos Nézet (Light Theme) ---------- */
@@ -51,6 +56,11 @@ body.light-theme {
   --gold-light:    #FAF2DE;
   --shadow-sm:     0 2px 10px rgba(138, 107, 28, 0.08);
   --shadow-md:     0 12px 30px rgba(138, 107, 28, 0.12);
+
+  /* PizzaMűhely dinamikus háttérváltozók (light) */
+  --pizza-bg-line:      rgba(138, 107, 28, 0.45);
+  --pizza-bg-fill:      rgba(138, 107, 28, 0.03);
+  --pizza-bg-opacity:   0.08;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -75,25 +85,17 @@ body {
   z-index: -1;
   pointer-events: none;
   background-color: var(--bg);
+  overflow: hidden;
 }
-/* Lebegő alkimista pizza-készítési SVG szimbólumok a háttérben */
-.masonic-background::before {
-  content: "";
+
+/* Dinamikus háttér SVG elemek */
+.bg-element {
   position: absolute;
-  inset: 0;
-  opacity: 0.025;
-  background-image: 
-    /* Kemence (Tűz fázis) */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23d4af37' stroke-width='2'%3E%3Cpath d='M20,80 A30,30 0 0,1 80,80 Z'/%3E%3Crect x='35' y='55' width='30' height='25'/%3E%3Ccircle cx='50' cy='35' r='6'/%3E%3C/svg%3E"),
-    /* Búzakalász (Föld fázis) */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23d4af37' stroke-width='2'%3E%3Cpath d='M50,90 L50,20 M50,40 C40,30 40,20 50,30 C60,20 60,30 50,40 M50,60 C40,50 40,40 50,50 C60,40 60,50 50,60'/%3E%3C/svg%3E"),
-    /* Vízcsepp (Víz fázis) */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23d4af37' stroke-width='2'%3E%3Cpath d='M50,20 C50,20 80,55 80,70 A30,30 0 0,1 20,70 C20,55 50,20 50,20 Z'/%3E%3C/svg%3E"),
-    /* Pizza szeletelő kerék */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23d4af37' stroke-width='2'%3E%3Ccircle cx='50' cy='40' r='25'/%3E%3Cpath d='M50,65 L50,90 M40,90 L60,90 M50,40 L65,25'/%3E%3C/svg%3E");
-  background-position: 8% 12%, 88% 18%, 12% 82%, 84% 78%;
-  background-size: 140px 140px, 120px 120px, 130px 130px, 150px 150px;
-  background-repeat: no-repeat;
+  pointer-events: none;
+  opacity: var(--pizza-bg-opacity);
+  color: var(--pizza-bg-line);
+  fill: var(--pizza-bg-fill);
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
 /* Témaváltó gomb ikon váltása sötét / világos mód szerint */
 #btn-theme-toggle svg {

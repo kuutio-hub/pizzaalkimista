@@ -1541,6 +1541,61 @@
             el.style.width = '794px';
             el.style.background = '#ffffff';
             el.style.color = '#111113';
+            el.style.position = 'relative';
+
+            // PDF-optimalizált háttér dekorációk generálása (2-5 nagyon halvány szürke elem, alacsony tintaigény)
+            const pdfBg = clonedDoc.createElement('div');
+            pdfBg.style.position = 'absolute';
+            pdfBg.style.inset = '0';
+            pdfBg.style.zIndex = '0';
+            pdfBg.style.pointerEvents = 'none';
+            pdfBg.style.overflow = 'hidden';
+
+            Array.from(el.children).forEach(child => {
+              child.style.position = 'relative';
+              child.style.zIndex = '1';
+            });
+            el.appendChild(pdfBg);
+
+            // Recept név és tésztasúly alapján determinisztikus seedelt háttér generálása a PDF-hez
+            const seedStr = (name || "Gregory") + (r.totalDoughG || 1000);
+            const pdfGen = new PizzaAlkimistaBackgroundGenerator();
+            pdfGen.container = pdfBg;
+            pdfGen.setSeed(seedStr);
+
+            const targetCount = 2 + Math.floor(pdfGen.seededRandom() * 3); // 2-4 db elem
+            const allowedAssets = ['wheat', 'dough-ball', 'rolling-pin', 'bowl', 'pizza-cutter', 'scale', 'timer', 'thermometer', 'pizza-peel'];
+            const pdfWidth = 794;
+            const pdfHeight = 1123;
+
+            let placed = 0;
+            for (let i = 0; i < 30 && placed < targetCount; i++) {
+              const assetKey = allowedAssets[Math.floor(pdfGen.seededRandom() * allowedAssets.length)];
+              const asset = window.PizzaAlkimistaBgAssets[assetKey];
+              if (!asset) continue;
+
+              const x = 0.08 + pdfGen.seededRandom() * 0.84;
+              const y = 0.15 + pdfGen.seededRandom() * 0.7;
+              const scale = 0.75 + pdfGen.seededRandom() * 0.35;
+              const rotation = -30 + pdfGen.seededRandom() * 60;
+
+              const elemSize = Math.round(scale * 120);
+              const svgEl = clonedDoc.createElementNS("http://www.w3.org/2000/svg", "svg");
+              svgEl.setAttribute("viewBox", "0 0 100 100");
+              svgEl.style.position = 'absolute';
+              svgEl.style.width = elemSize + "px";
+              svgEl.style.height = elemSize + "px";
+              svgEl.style.left = (x * pdfWidth - elemSize / 2) + "px";
+              svgEl.style.top = (y * pdfHeight - elemSize / 2) + "px";
+              svgEl.style.transform = `rotate(${rotation}deg)`;
+              svgEl.style.color = '#a1a1a5';
+              svgEl.style.opacity = '0.07';
+              svgEl.style.fill = 'none';
+              svgEl.innerHTML = asset.svg;
+
+              pdfBg.appendChild(svgEl);
+              placed++;
+            }
           }
         }
       },
@@ -1621,6 +1676,12 @@
     document.querySelectorAll('.burger-nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === id));
     document.querySelectorAll('.desktop-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === id));
     window.scrollTo(0, 0);
+
+    // Frissítjük a háttér aktív fülét és újrageneráljuk a mintát a kontextus szerint
+    if (window.PizzaAlkimistaBgGen) {
+      window.PizzaAlkimistaBgGen.activeTab = id;
+      window.PizzaAlkimistaBgGen.generate();
+    }
   }
 
   const desktopNav = document.querySelector('.desktop-nav');
@@ -1808,6 +1869,202 @@
   const _origReadInput = readInput;
 
   // ---------------------------------------------------------------------
+  // Dinamikus Háttérgenerátor Rendszer
+  // ---------------------------------------------------------------------
+  class PizzaAlkimistaBackgroundGenerator {
+    constructor() {
+      this.container = document.querySelector('.masonic-background');
+      this.seed = 42;
+      this.activeTab = 'view-calc';
+      this.activeFocus = null;
+      this.elements = [];
+    }
+
+    seededRandom() {
+      const m = 0x80000000;
+      const a = 1103515245;
+      const c = 12345;
+      this.seed = (a * this.seed + c) % m;
+      return this.seed / (m - 1);
+    }
+
+    setSeed(seedStr) {
+      let hash = 0;
+      for (let i = 0; i < seedStr.length; i++) {
+        hash = seedStr.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      this.seed = Math.abs(hash) || 42;
+    }
+
+    pickWeightedAsset(contextWeights = {}) {
+      const assets = window.PizzaAlkimistaBgAssets;
+      if (!assets) return null;
+
+      const keys = Object.keys(assets);
+      let totalWeight = 0;
+      const weightedKeys = keys.map(key => {
+        const asset = assets[key];
+        let w = asset.weight || 1;
+        if (contextWeights[key]) {
+          w *= contextWeights[key];
+        }
+        totalWeight += w;
+        return { key, cumulativeWeight: totalWeight };
+      });
+
+      const rand = this.seededRandom() * totalWeight;
+      for (const item of weightedKeys) {
+        if (rand <= item.cumulativeWeight) {
+          return item.key;
+        }
+      }
+      return keys[0];
+    }
+
+    getContextWeights() {
+      const weights = {};
+      if (this.activeFocus === 'hours' || this.activeFocus === 'temp') {
+        weights['timer'] = 8;
+        weights['dough-ball'] = 5;
+        weights['thermometer'] = 8;
+      } else if (this.activeFocus === 'flour' || this.activeFocus === 'salt' || this.activeFocus === 'yeast') {
+        weights['flour'] = 8;
+        weights['flour-cloud'] = 5;
+        weights['wheat'] = 6;
+        weights['scale'] = 8;
+      } else if (this.activeFocus === 'water' || this.activeFocus === 'hyd') {
+        weights['water-drop'] = 8;
+        weights['bowl'] = 5;
+      } else if (this.activeFocus === 'biga' || this.activeFocus === 'dough') {
+        weights['dough-ball'] = 8;
+        weights['rolling-pin'] = 6;
+        weights['bowl'] = 8;
+      } else {
+        if (this.activeTab === 'view-calc') {
+          // Alap kalkulátor nézet
+        } else if (this.activeTab === 'view-recipes') {
+          weights['pizza'] = 8;
+          weights['pizza-slice'] = 8;
+          weights['pizza-cutter'] = 6;
+        } else if (this.activeTab === 'view-wiki') {
+          weights['wheat'] = 6;
+          weights['flour'] = 6;
+          weights['bowl'] = 5;
+          weights['scale'] = 5;
+        }
+      }
+      return weights;
+    }
+
+    isInsideExclusionZone(x, y, scale, width, height) {
+      const card = document.querySelector('.main-card') || document.querySelector('.calc-container') || document.querySelector('main');
+      if (!card) return false;
+
+      const rect = card.getBoundingClientRect();
+      const pad = 30; // 30px kizárási zóna
+      
+      const elemPxX = x * width;
+      const elemPxY = y * height;
+      const elemSize = scale * 120;
+
+      const elemLeft = elemPxX - elemSize / 2;
+      const elemRight = elemPxX + elemSize / 2;
+      const elemTop = elemPxY - elemSize / 2;
+      const elemBottom = elemPxY + elemSize / 2;
+
+      const cardLeft = rect.left - pad;
+      const cardRight = rect.right + pad;
+      const cardTop = rect.top - pad;
+      const cardBottom = rect.bottom + pad;
+
+      return !(elemRight < cardLeft || 
+               elemLeft > cardRight || 
+               elemBottom < cardTop || 
+               elemTop > cardBottom);
+    }
+
+    generate(customSeedStr = null) {
+      if (!this.container) return;
+      this.container.innerHTML = '';
+      
+      if (customSeedStr) {
+        this.setSeed(customSeedStr);
+      } else {
+        this.setSeed(new Date().toDateString() + this.activeTab + (this.activeFocus || ''));
+      }
+
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      let minElements = 12;
+      let maxElements = 18;
+      if (width < 600) {
+        minElements = 4;
+        maxElements = 8;
+      } else if (width < 1024) {
+        minElements = 8;
+        maxElements = 12;
+      }
+
+      const targetCount = Math.floor(minElements + this.seededRandom() * (maxElements - minElements + 1));
+      const contextWeights = this.getContextWeights();
+
+      let placedCount = 0;
+      let attempts = 0;
+      const maxAttempts = 120;
+
+      while (placedCount < targetCount && attempts < maxAttempts) {
+        attempts++;
+        const assetKey = this.pickWeightedAsset(contextWeights);
+        const asset = window.PizzaAlkimistaBgAssets[assetKey];
+        if (!asset) continue;
+
+        const x = this.seededRandom();
+        const y = this.seededRandom();
+        const scale = 0.55 + this.seededRandom() * 0.55;
+        const rotation = -40 + this.seededRandom() * 80;
+
+        if (attempts < maxAttempts * 0.8 && this.isInsideExclusionZone(x, y, scale, width, height)) {
+          continue;
+        }
+
+        let tooClose = false;
+        for (const placed of this.elements) {
+          const dx = placed.x - x;
+          const dy = placed.y - y;
+          if (Math.sqrt(dx*dx + dy*dy) < 0.16) {
+            tooClose = true;
+            break;
+          }
+        }
+        if (tooClose && attempts < maxAttempts * 0.8) continue;
+
+        this.elements.push({ x, y, scale, rotation });
+
+        const elemPxX = x * width;
+        const elemPxY = y * height;
+        const elemSize = Math.round(scale * 110);
+
+        const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svgEl.setAttribute("viewBox", "0 0 100 100");
+        svgEl.setAttribute("class", "bg-element");
+        svgEl.style.width = elemSize + "px";
+        svgEl.style.height = elemSize + "px";
+        svgEl.style.left = (elemPxX - elemSize / 2) + "px";
+        svgEl.style.top = (elemPxY - elemSize / 2) + "px";
+        svgEl.style.transform = `rotate(${rotation}deg)`;
+        
+        svgEl.innerHTML = asset.svg;
+        this.container.appendChild(svgEl);
+        placedCount++;
+      }
+      this.elements = [];
+    }
+  }
+
+  window.PizzaAlkimistaBgGen = new PizzaAlkimistaBackgroundGenerator();
+
+  // ---------------------------------------------------------------------
   // Alkalmazás indítása és inicializálás
   // ---------------------------------------------------------------------
   window.addEventListener('load', () => {
@@ -1819,6 +2076,47 @@
     renderWikiCats();
     renderRecipeList();
     setupYeastSwitcher();
+
+    // Háttér inicializálása és eseménykezelők
+    if (window.PizzaAlkimistaBgGen) {
+      window.PizzaAlkimistaBgGen.generate();
+
+      // Átméretezéskor újragenerálunk reszponzívan, kis késleltetéssel
+      window.addEventListener('resize', () => {
+        clearTimeout(window.bgResizeTimer);
+        window.bgResizeTimer = setTimeout(() => {
+          window.PizzaAlkimistaBgGen.generate();
+        }, 200);
+      });
+
+      // Beviteli mezők fókuszának figyelése a környezetfüggő háttérsúlyozáshoz
+      document.querySelectorAll('#calc-form input, #calc-form select').forEach(el => {
+        el.addEventListener('focus', () => {
+          const id = el.id;
+          if (id.includes('Hours') || id.includes('TempC')) {
+            window.PizzaAlkimistaBgGen.activeFocus = 'hours';
+          } else if (id.includes('Flour') || id.includes('wheat') || id.includes('scale')) {
+            window.PizzaAlkimistaBgGen.activeFocus = 'flour';
+          } else if (id.includes('hydration') || id.includes('water') || id.includes('salt') || id.includes('oil')) {
+            window.PizzaAlkimistaBgGen.activeFocus = 'water';
+          } else if (id.includes('biga')) {
+            window.PizzaAlkimistaBgGen.activeFocus = 'biga';
+          } else {
+            window.PizzaAlkimistaBgGen.activeFocus = null;
+          }
+          window.PizzaAlkimistaBgGen.generate();
+        });
+        el.addEventListener('blur', () => {
+          window.PizzaAlkimistaBgGen.activeFocus = null;
+          clearTimeout(window.bgFocusTimer);
+          window.bgFocusTimer = setTimeout(() => {
+            if (window.PizzaAlkimistaBgGen.activeFocus === null) {
+              window.PizzaAlkimistaBgGen.generate();
+            }
+          }, 120);
+        });
+      });
+    }
 
     // Form beviteli mezők kezdeti formázása mértékegységekkel
     document.querySelectorAll('#calc-form input[readonly]').forEach(el => {
@@ -1839,6 +2137,8 @@
       document.body.classList.toggle('light-theme');
       appSettings.useLightMode = document.body.classList.contains('light-theme');
       saveSettings();
+      // Háttér újragenerálása a téma színeinek / opacitásának frissítéséhez
+      window.PizzaAlkimistaBgGen?.generate();
     });
 
     // Hulladék % slider élő label
