@@ -1179,6 +1179,9 @@
           <button class="icon-btn btn-sm act-download-pdf" style="width:34px;height:34px" title="PDF Letöltése">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </button>
+          <button class="icon-btn btn-sm act-open-pdf" style="width:34px;height:34px" title="PDF Megnyitása / Nyomtatása">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </button>
           <button class="icon-btn btn-sm act-del" style="width:34px;height:34px" title="Törlés">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
           </button>
@@ -1274,7 +1277,9 @@
         document.getElementById('result-wrap').hidden = false;
         showToast('Recept betöltve');
       } else if (e.target.closest('.act-download-pdf')) {
-        printRecipe(rec.name, rec.result, rec.notes);
+        printRecipe(rec.name, rec.result, rec.notes, 'save');
+      } else if (e.target.closest('.act-open-pdf')) {
+        printRecipe(rec.name, rec.result, rec.notes, 'open');
       } else if (e.target.closest('.act-del')) {
         if (confirm(`Törlöd a(z) „${rec.name}” receptet?`)) {
           await PizzaDB.remove(id);
@@ -1292,10 +1297,20 @@
     const name = (nameToggle && nameToggle.checked)
       ? (document.getElementById('recipe-title-input').value.trim() || "Gregory's Special")
       : null;
-    printRecipe(name, lastResult, '');
+    printRecipe(name, lastResult, '', 'save');
   });
 
-  function printRecipe(name, r, notes) {
+  document.getElementById('btn-open-pdf')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!lastResult) return;
+    const nameToggle = document.getElementById('toggle-recipe-name');
+    const name = (nameToggle && nameToggle.checked)
+      ? (document.getElementById('recipe-title-input').value.trim() || "Gregory's Special")
+      : null;
+    printRecipe(name, lastResult, '', 'open');
+  });
+
+  async function printRecipe(name, r, notes, action = 'save') {
     const titleEl = document.getElementById('p-title');
     if (!name || name === "Gregory's Special") {
       titleEl.style.display = 'none';
@@ -1602,11 +1617,30 @@
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    html2pdf().set(opt).from(printRoot).save().catch(err => {
-      console.error('PDF Generálási hiba:', err);
-      // Biztonsági fallback nyomtatásra
-      window.print();
-    });
+    if (action === 'save') {
+      html2pdf().set(opt).from(printRoot).save().catch(err => {
+        console.error('PDF Mentési hiba:', err);
+        window.print();
+      });
+    } else {
+      // PDF megnyitása / nyomtatása biztonságos blob: URL segítségével
+      try {
+        const pdfBlob = await html2pdf().set(opt).from(printRoot).outputPdf('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        
+        // Megnyitjuk új böngészőlapon
+        window.open(pdfUrl, '_blank');
+
+        // A blob URL-t csak késleltetve szabadítjuk fel, hogy a böngésző biztosan betölthesse
+        setTimeout(() => {
+          URL.revokeObjectURL(pdfUrl);
+        }, 15000); // 15 másodperc után ürítjük
+      } catch (err) {
+        console.error('PDF Megnyitási/Nyomtatási hiba:', err);
+        // Biztonsági tartalékként elindítjuk a sima nyomtatást
+        window.print();
+      }
+    }
   }
 
   // ---------------------------------------------------------------------
