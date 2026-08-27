@@ -1558,9 +1558,13 @@
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { 
         scale: 2, 
-        useCORS: true, 
-        logging: false,
+        useCORS: false, 
+        logging: true,
         onclone: (clonedDoc) => {
+          // Eltávolítjuk a Google Fonts-ot a klónozott dokumentumból, hogy az html2canvas ne próbálja letölteni és ne omoljon össze
+          const fonts = clonedDoc.querySelectorAll('link[href*="fonts.googleapis.com"], link[href*="fonts.gstatic.com"]');
+          fonts.forEach(f => f.remove());
+
           // A háttérben klónozott dokumentumban tesszük láthatóvá a print-rootot és beállítjuk az A4 méretet
           const el = clonedDoc.getElementById('print-root');
           if (el) {
@@ -1651,34 +1655,55 @@
           window.print();
         });
       } else {
-        // PDF megnyitása / nyomtatása biztonságos blob: URL segítségével és automatikus nyomtatási ablak indítással
+        // PDF közvetlen nyomtatása az aktuális oldalon láthatatlan iframe segítségével (új lap megnyitása nélkül!)
         try {
           const pdfBlob = await html2pdf()
             .set(opt)
             .from(printRoot)
-            .toPdf()
-            .get('pdf')
-            .then(pdf => {
-              // Beágyazzuk a nyomtatási parancsot a PDF metaadataiba
-              pdf.autoPrint();
-            })
             .outputPdf('blob');
           
           cleanup();
           
           const pdfUrl = URL.createObjectURL(pdfBlob);
           
-          // Megnyitjuk új böngészőlapon, ahol a beágyazott autoPrint miatt azonnal felugrik a nyomtatás
-          window.open(pdfUrl, '_blank');
-
-          // A blob URL-t csak késleltetve szabadítjuk fel, hogy a böngésző biztosan betölthesse
-          setTimeout(() => {
-            URL.revokeObjectURL(pdfUrl);
-          }, 15000); // 15 másodperc után ürítjük
+          // Létrehozunk egy látható méretű, de képernyőn kívül elhelyezett (így láthatatlan) iframe-et.
+          // Ez elengedhetetlen, mert a böngészők energiatakarékosságból nem töltik be a PDF-olvasó plugint a 0x0 méretű vagy display:none iframe-ekben.
+          const iframe = document.createElement('iframe');
+          iframe.style.position = 'fixed';
+          iframe.style.left = '-9999px';
+          iframe.style.top = '-9999px';
+          iframe.style.width = '600px';
+          iframe.style.height = '600px';
+          iframe.style.border = 'none';
+          iframe.style.opacity = '0.01';
+          iframe.style.pointerEvents = 'none';
+          iframe.src = pdfUrl;
+          
+          document.body.appendChild(iframe);
+          
+          // Amint a PDF betöltődött az iframe-be, elindítjuk a nyomtatást
+          iframe.addEventListener('load', () => {
+            // Egy apró (500 ms) aszinkron várakozást adunk, hogy a PDF olvasó renderelni tudja a lapokat a fókuszálás előtt
+            setTimeout(() => {
+              try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+              } catch (printErr) {
+                console.error('Iframe nyomtatási hiba:', printErr);
+                window.print();
+              }
+            }, 500);
+            
+            // Biztonságos eltávolítás és felszabadítás kis várakozás után (hagyunk időt a nyomtatónak)
+            setTimeout(() => {
+              document.body.removeChild(iframe);
+              URL.revokeObjectURL(pdfUrl);
+            }, 60000);
+          });
         } catch (err) {
-          console.error('PDF Megnyitási/Nyomtatási hiba:', err);
+          console.error('PDF Nyomtatási hiba:', err);
           cleanup();
-          // Biztonsági tartalékként elindítjuk a sima nyomtatást
+          // Biztonsági tartalékként elindítjuk a böngésző alapértelmezett nyomtatását
           window.print();
         }
       }
