@@ -322,15 +322,7 @@
     });
   }
 
-  // ---------------------------------------------------------------------
-  // Virtuális Számbillentyűzet (Numpad) Kezelése
-  // ---------------------------------------------------------------------
-  const numpad = document.getElementById('numpad');
-  const numpadDisplay = document.getElementById('numpad-display-val');
-  const numpadLabel = document.getElementById('numpad-label');
-  let numpadTargetInput = null;
-  let numpadValue = '';
-  let numpadOverwriteMode = false;
+
 
   // Formázó segédfüggvény a beviteli mezők értékéhez (mértékegységek megjelenítése a mezőBEN)
   function formatInputValue(id, val) {
@@ -370,118 +362,7 @@
     return val;
   }
 
-  function openNumpad(inputEl) {
-    numpadTargetInput = inputEl;
-    let rawVal;
-    if (inputEl.id.includes('Hours')) {
-      rawVal = String(Math.round(parseDuration(inputEl.value) * 100) / 100);
-    } else {
-      rawVal = inputEl.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
-    }
-    numpadValue = rawVal === '0' ? '' : rawVal;
-    numpadOverwriteMode = true; // Új megnyitásnál az első gombnyomás felülírja az értéket
-    numpadDisplay.textContent = numpadValue || '0';
-    
-    const fieldParent = inputEl.closest('.field');
-    const labelText = fieldParent ? fieldParent.querySelector('.field-label')?.textContent : '';
-    numpadLabel.textContent = labelText ? labelText.replace(/i$/, '').trim() : 'Szám megadása';
 
-    numpad.removeAttribute('hidden');
-    numpad.classList.add('open');
-    inputEl.classList.add('numpad-active');
-  }
-
-  function closeNumpad() {
-    numpad.setAttribute('hidden', 'true');
-    numpad.classList.remove('open');
-    if (numpadTargetInput) {
-      numpadTargetInput.classList.remove('numpad-active');
-      let rawVal = parseFloat(numpadValue.replace(/,/g, '.').replace(/[^0-9.]/g, ''));
-      if (!isNaN(rawVal)) {
-        // Korlátozzuk a beírt értéket a mező min/max attribútumai szerint
-        const min = parseFloat(numpadTargetInput.min);
-        const max = parseFloat(numpadTargetInput.max);
-        if (!isNaN(min) && rawVal < min) rawVal = min;
-        if (!isNaN(max) && rawVal > max) rawVal = max;
-
-        numpadTargetInput.value = formatInputValue(numpadTargetInput.id, rawVal);
-      }
-      // Triggereljük az újraszámítást a korlátozott értékkel
-      numpadTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
-      numpadTargetInput.dispatchEvent(new Event('change', { bubbles: true }));
-      numpadTargetInput = null;
-    }
-  }
-
-  document.getElementById('numpad-close').addEventListener('click', closeNumpad);
-  document.getElementById('numpad-ok').addEventListener('click', closeNumpad);
-
-  numpad.querySelector('.numpad-grid').addEventListener('click', e => {
-    const btn = e.target.closest('button[data-key]');
-    if (!btn || !numpadTargetInput) return;
-    const key = btn.dataset.key;
-    const isDecimalField = numpadTargetInput && parseFloat(numpadTargetInput.step) === 0.1;
-
-    const isDecimalAllowed = numpadTargetInput && (parseFloat(numpadTargetInput.step) % 1 !== 0 || parseFloat(numpadTargetInput.step) === 0.5 || parseFloat(numpadTargetInput.step) === 0.1);
-
-    if (key === 'back') {
-      numpadOverwriteMode = false;
-      numpadValue = numpadValue.slice(0, -1);
-    } else if (key === '.') {
-      if (isDecimalAllowed) {
-        if (numpadOverwriteMode) {
-          numpadValue = '0.';
-          numpadOverwriteMode = false;
-        } else if (!numpadValue.includes('.')) {
-          numpadValue += numpadValue === '' ? '0.' : '.';
-        }
-      }
-    } else {
-      if (numpadOverwriteMode) {
-        numpadValue = key;
-        numpadOverwriteMode = false;
-      } else {
-        if (numpadValue.length < 6) {
-          numpadValue += key;
-        }
-      }
-    }
-
-    numpadDisplay.textContent = numpadValue || '0';
-    if (numpadTargetInput) {
-      let rawVal = parseFloat(numpadValue.replace(/,/g, '.').replace(/[^0-9.]/g, ''));
-      if (isNaN(rawVal)) rawVal = 0;
-      
-      // Korlátozzuk a beírt értéket gombnyomásonként is
-      const min = parseFloat(numpadTargetInput.min);
-      const max = parseFloat(numpadTargetInput.max);
-      if (!isNaN(min) && rawVal < min && numpadValue.length >= String(min).length) rawVal = min;
-      // Ha a beírt szám nagyobb a megengedettnél, kényszerítsük a maximumot!
-      if (!isNaN(max) && rawVal > max) {
-        rawVal = max;
-        numpadValue = String(max);
-        numpadDisplay.textContent = numpadValue;
-      }
-      
-      numpadTargetInput.value = formatInputValue(numpadTargetInput.id, rawVal);
-      // Kiváltjuk a live frissítést
-      numpadTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
-      numpadTargetInput.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-  });
-
-  document.addEventListener('click', e => {
-    // text típusú lett az összes readonly mező a mértékegységek miatt
-    const input = e.target.closest('input[readonly][type="text"]');
-    if (input) {
-      e.preventDefault();
-      openNumpad(input);
-    } else {
-      if (!e.target.closest('.numpad') && numpadTargetInput) {
-        closeNumpad();
-      }
-    }
-  });
 
   // ---------------------------------------------------------------------
   // Többféle gombócméret (Dynamic Ball Groups) kezelése
@@ -947,12 +828,12 @@
     }
 
     rows += `
-      <tr><td style="width: 50%;">Friss Liszt</td><td class="pct" style="width: 22%;">100%</td><td class="amt" style="width: 28%;">${fmtG(r.flour, 'flour')}</td></tr>
-      <tr><td>Friss Víz</td><td class="pct">${fmt(r.hydration, 0)}%</td><td class="amt">${fmtG(r.water, 'water')}</td></tr>
-      <tr><td>Só</td><td class="pct">${fmt(r.salt, 1)}%</td><td class="amt">${fmtG(r.saltG, 'salt')}</td></tr>`;
+      <tr><td style="width: 50%;">${PizzaAlkimistaStrings.ingFreshFlour || 'Friss Liszt'}</td><td class="pct" style="width: 22%;">100%</td><td class="amt" style="width: 28%;">${fmtG(r.flour, 'flour')}</td></tr>
+      <tr><td>${PizzaAlkimistaStrings.ingFreshWater || 'Friss Víz'}</td><td class="pct">${fmt(r.hydration, 0)}%</td><td class="amt">${fmtG(r.water, 'water')}</td></tr>
+      <tr><td>${PizzaAlkimistaStrings.ingSalt || 'Só'}</td><td class="pct">${fmt(r.salt, 1)}%</td><td class="amt">${fmtG(r.saltG, 'salt')}</td></tr>`;
     
     if (r.oilG > 0) {
-      rows += `<tr><td>Olívaolaj</td><td class="pct">${fmt(r.oil, 1)}%</td><td class="amt">${fmtG(r.oilG, 'oil')}</td></tr>`;
+      rows += `<tr><td>${PizzaAlkimistaStrings.ingOliveOil || 'Olívaolaj'}</td><td class="pct">${fmt(r.oil, 1)}%</td><td class="amt">${fmtG(r.oilG, 'oil')}</td></tr>`;
     }
     
     rows += `
@@ -969,7 +850,7 @@
       </tr>`;
     
     if (r.takeOutOldDoughG > 0) {
-      rows += `<tr class="accent-row"><td>Kiveendő öregtészta (végén)</td><td></td><td class="amt">${fmtG(r.takeOutOldDoughG, 'flour')}</td></tr>`;
+      rows += `<tr class="accent-row"><td>${PizzaAlkimistaStrings.ingTakeOutOldDough || 'Kiveendő öregtészta (végén)'}</td><td></td><td class="amt">${fmtG(r.takeOutOldDoughG, 'flour')}</td></tr>`;
     }
     return rows;
   }
@@ -985,8 +866,8 @@
         <div class="result-card" style="border-color: var(--accent-dim);">
           <div class="result-title">🌿 Autolízis</div>
           <table class="ing-table">
-            <tr><td>Autolízisos liszt</td><td class="pct">${fmt(a.flourPct,0)}%</td><td class="amt">${fmtG(a.flour, 'flour')}</td></tr>
-            <tr><td>Autolízisos víz</td><td class="pct">${fmt(a.waterPct,0)}%</td><td class="amt">${fmtG(a.water, 'water')}</td></tr>
+            <tr><td>${PizzaAlkimistaStrings.ingAutolyseFlour || 'Autolízisos liszt'}</td><td class="pct">${fmt(a.flourPct,0)}%</td><td class="amt">${fmtG(a.flour, 'flour')}</td></tr>
+            <tr><td>${PizzaAlkimistaStrings.ingAutolyseWater || 'Autolízisos víz'}</td><td class="pct">${fmt(a.waterPct,0)}%</td><td class="amt">${fmtG(a.water, 'water')}</td></tr>
             <tr style="opacity:0.7;font-size:.85em;"><td colspan="3">↳ pihentetés után add hozzá a maradék ${fmtG(a.finalFlour, 'flour')} lisztet, ${fmtG(a.finalWater, 'water')} vizet, sót, élesztőt</td></tr>
           </table>
         </div>`;
@@ -1041,11 +922,11 @@
     if (r.biga) {
       bigaCard.hidden = false;
       document.getElementById('biga-table').innerHTML = `
-        <tr><td style="width: 55%;">Biga liszt</td><td class="pct" style="width: 20%;">${fmt((r.biga.biga.flour / (r.flour + r.oldDoughFlour)) * 100, 0)}%</td><td class="amt" style="width: 25%;">${fmtG(r.biga.biga.flour, 'flour')}</td></tr>
-        <tr><td>Biga víz</td><td class="pct">${r.biga.biga.hydration}%</td><td class="amt">${fmtG(r.biga.biga.water, 'water')}</td></tr>
-        <tr><td>Biga élesztő (friss)</td><td class="pct">${fmt(r.biga.biga.yeastPct, 2)}%</td><td class="amt">${fmtG2(r.biga.biga.yeastFresh, 'yeast_fresh')}</td></tr>
-        <tr><td>Végső dagasztás liszt</td><td></td><td class="amt">${fmtG(r.biga.final.flour, 'flour')}</td></tr>
-        <tr><td>Végső dagasztás víz</td><td></td><td class="amt">${fmtG(r.biga.final.water, 'water')}</td></tr>`;
+        <tr><td style="width: 55%;">${PizzaAlkimistaStrings.ingBigaFlour || 'Biga liszt'}</td><td class="pct" style="width: 20%;">${fmt((r.biga.biga.flour / (r.flour + r.oldDoughFlour)) * 100, 0)}%</td><td class="amt" style="width: 25%;">${fmtG(r.biga.biga.flour, 'flour')}</td></tr>
+        <tr><td>${PizzaAlkimistaStrings.ingBigaWater || 'Biga víz'}</td><td class="pct">${r.biga.biga.hydration}%</td><td class="amt">${fmtG(r.biga.biga.water, 'water')}</td></tr>
+        <tr><td>${PizzaAlkimistaStrings.ingBigaYeastFresh || 'Biga élesztő (friss)'}</td><td class="pct">${fmt(r.biga.biga.yeastPct, 2)}%</td><td class="amt">${fmtG2(r.biga.biga.yeastFresh, 'yeast_fresh')}</td></tr>
+        <tr><td>${PizzaAlkimistaStrings.ingFinalFlour || 'Végső dagasztás liszt'}</td><td></td><td class="amt">${fmtG(r.biga.final.flour, 'flour')}</td></tr>
+        <tr><td>${PizzaAlkimistaStrings.ingFinalWater || 'Végső dagasztás víz'}</td><td></td><td class="amt">${fmtG(r.biga.final.water, 'water')}</td></tr>`;
     } else {
       bigaCard.hidden = true;
     }
@@ -1091,7 +972,7 @@
         
         setTimeout(() => {
           if (Notification.permission === "granted") {
-            new Notification("🍕 PizzaAlkimista Emlékeztető!", {
+            new Notification(PizzaAlkimistaStrings.notificationTitle || "🍕 PizzaAlkimista Emlékeztető!", {
               body: desc,
               icon: "icons/icon-192.png",
               badge: "icons/icon-32.png"
@@ -1102,7 +983,7 @@
       }
     });
 
-    showToast(`⏰ ${count} db értesítés beidőzítve! Naptár bejegyzés is letöltve.`);
+    showToast((PizzaAlkimistaStrings.toastNotificationsScheduled || "⏰ {count} db értesítés beidőzítve! Naptár bejegyzés is letöltve.").replace('{count}', count));
     exportTimelineToICS(r);
   }
 
@@ -1150,7 +1031,7 @@
       ? (document.getElementById('recipe-title-input').value.trim() || "Gregory's Special")
       : "Gregory's Special";
     await PizzaDB.save({ name, input: lastInput, result: lastResult });
-    showToast('Recept elmentve ✓');
+    showToast(PizzaAlkimistaStrings.toastSaved || 'Recept elmentve ✓');
     renderRecipeList();
   });
 
@@ -1161,7 +1042,7 @@
     if (!recipes.length) {
       listEl.innerHTML = `<div class="empty-state">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 4.5 3 1-1.5 2.5-3 4.5-3C19 5 21.5 8.5 19.5 12.5 17 16.65 12 21 12 21z"/></svg>
-        <p>Még nincs mentett recepted.<br>Számolj ki egyet a Kalkulátorban!</p>
+        <p>${PizzaAlkimistaStrings.emptyStateText || 'Még nincs mentett recepted.<br>Számolj ki egyet a Kalkulátorban!'}</p>
       </div>`;
       return;
     }
@@ -1272,14 +1153,14 @@
         switchView('view-calc');
         renderResult(lastResult);
         document.getElementById('result-wrap').hidden = false;
-        showToast('Recept betöltve');
+        showToast(PizzaAlkimistaStrings.toastLoaded || 'Recept betöltve');
       } else if (e.target.closest('.act-print')) {
         printRecipe(rec.name, rec.result, rec.notes);
       } else if (e.target.closest('.act-del')) {
-        if (confirm(`Törlöd a(z) „${rec.name}” receptet?`)) {
+        if (confirm((PizzaAlkimistaStrings.confirmDeleteRecipe || 'Törlöd a(z) „{name}” receptet?').replace('{name}', rec.name))) {
           await PizzaDB.remove(id);
           renderRecipeList();
-          showToast('Recept törölve');
+          showToast(PizzaAlkimistaStrings.toastDeleted || 'Recept törölve');
         }
       }
     });
@@ -1400,11 +1281,11 @@
     document.getElementById('p-badges').innerHTML = cloudsHtml;
 
     let ingHtml = `
-      <tr><td style="width: 60%;">Friss Liszt</td><td class="amt" style="width: 40%;">${fmtG(r.flour, 'flour')}</td></tr>
-      <tr><td>Friss Víz</td><td class="amt">${fmtG(r.water, 'water')}</td></tr>
-      <tr><td>Só</td><td class="amt">${fmtG(r.saltG, 'salt')}</td></tr>`;
+      <tr><td style="width: 60%;">${PizzaAlkimistaStrings.ingFreshFlour || 'Friss Liszt'}</td><td class="amt" style="width: 40%;">${fmtG(r.flour, 'flour')}</td></tr>
+      <tr><td>${PizzaAlkimistaStrings.ingFreshWater || 'Friss Víz'}</td><td class="amt">${fmtG(r.water, 'water')}</td></tr>
+      <tr><td>${PizzaAlkimistaStrings.ingSalt || 'Só'}</td><td class="amt">${fmtG(r.saltG, 'salt')}</td></tr>`;
     if (r.oilG > 0) {
-      ingHtml += `<tr><td>Zsiradék</td><td class="amt">${fmtG(r.oilG, 'oil')}</td></tr>`;
+      ingHtml += `<tr><td>${PizzaAlkimistaStrings.ingOliveOil || 'Olívaolaj'}</td><td class="amt">${fmtG(r.oilG, 'oil')}</td></tr>`;
     }
     if (r.useOldDough && r.oldDoughG > 0) {
       ingHtml += `<tr style="border-top:1px solid #ccc; font-weight:bold;"><td>Öregtészta (bevitt)</td><td class="amt">${fmtG(r.oldDoughG, 'flour')}</td></tr>`;
@@ -1416,7 +1297,7 @@
       <tr><td class="small">— ${PizzaAlkimistaStrings.yeastActive}</td><td class="amt">${fmtG2(r.yeast.activeDry, 'yeast')}</td></tr>`;
     
     if (r.takeOutOldDoughG > 0) {
-      ingHtml += `<tr style="border-top:1px dashed #ccc; font-weight:bold;"><td>Kiveendő öregtészta a végén</td><td class="amt">${fmtG(r.takeOutOldDoughG, 'flour')}</td></tr>`;
+      ingHtml += `<tr style="border-top:1px dashed #ccc; font-weight:bold;"><td>${PizzaAlkimistaStrings.ingTakeOutOldDough || 'Kiveendő öregtészta (végén)'}</td><td class="amt">${fmtG(r.takeOutOldDoughG, 'flour')}</td></tr>`;
     }
 
     document.getElementById('p-ingredients').innerHTML = ingHtml;
@@ -1425,9 +1306,9 @@
     if (r.biga) {
       bigaSection.hidden = false;
       document.getElementById('p-biga').innerHTML = `
-        <tr><td>Biga liszt</td><td class="amt">${fmtG(r.biga.biga.flour, 'flour')}</td></tr>
-        <tr><td>Biga víz</td><td class="amt">${fmtG(r.biga.biga.water, 'water')}</td></tr>
-        <tr><td>Biga élesztő (friss)</td><td class="amt">${fmtG2(r.biga.biga.yeastFresh, 'yeast_fresh')}</td></tr>`;
+        <tr><td>${PizzaAlkimistaStrings.ingBigaFlour || 'Biga liszt'}</td><td class="amt">${fmtG(r.biga.biga.flour, 'flour')}</td></tr>
+        <tr><td>${PizzaAlkimistaStrings.ingBigaWater || 'Biga víz'}</td><td class="amt">${fmtG(r.biga.biga.water, 'water')}</td></tr>
+        <tr><td>${PizzaAlkimistaStrings.ingBigaYeastFresh || 'Biga élesztő (friss)'}</td><td class="amt">${fmtG2(r.biga.biga.yeastFresh, 'yeast_fresh')}</td></tr>`;
     } else { 
       bigaSection.hidden = true; 
     }
