@@ -1642,34 +1642,37 @@
       printRoot.style.opacity = '';
     };
 
-    if (action === 'save') {
-      html2pdf().set(opt).from(printRoot).save().then(cleanup).catch(err => {
-        console.error('PDF Mentési hiba:', err);
-        cleanup();
-        window.print();
-      });
-    } else {
-      // PDF megnyitása / nyomtatása biztonságos blob: URL segítségével
-      try {
-        const pdfBlob = await html2pdf().set(opt).from(printRoot).outputPdf('blob');
-        cleanup();
-        
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        
-        // Megnyitjuk új böngészőlapon
-        window.open(pdfUrl, '_blank');
+    // Várunk 150 ms-ot, hogy a böngésző biztosan alkalmazza a stílusokat és elvégezze a layout számítást a láthatóvá tett elemen!
+    setTimeout(async () => {
+      if (action === 'save') {
+        html2pdf().set(opt).from(printRoot).save().then(cleanup).catch(err => {
+          console.error('PDF Mentési hiba:', err);
+          cleanup();
+          window.print();
+        });
+      } else {
+        // PDF megnyitása / nyomtatása biztonságos blob: URL segítségével
+        try {
+          const pdfBlob = await html2pdf().set(opt).from(printRoot).outputPdf('blob');
+          cleanup();
+          
+          const pdfUrl = URL.createObjectURL(pdfBlob);
+          
+          // Megnyitjuk új böngészőlapon
+          window.open(pdfUrl, '_blank');
 
-        // A blob URL-t csak késleltetve szabadítjuk fel, hogy a böngésző biztosan betölthesse
-        setTimeout(() => {
-          URL.revokeObjectURL(pdfUrl);
-        }, 15000); // 15 másodperc után ürítjük
-      } catch (err) {
-        console.error('PDF Megnyitási/Nyomtatási hiba:', err);
-        cleanup();
-        // Biztonsági tartalékként elindítjuk a sima nyomtatást
-        window.print();
+          // A blob URL-t csak késleltetve szabadítjuk fel, hogy a böngésző biztosan betölthesse
+          setTimeout(() => {
+            URL.revokeObjectURL(pdfUrl);
+          }, 15000); // 15 másodperc után ürítjük
+        } catch (err) {
+          console.error('PDF Megnyitási/Nyomtatási hiba:', err);
+          cleanup();
+          // Biztonsági tartalékként elindítjuk a sima nyomtatást
+          window.print();
+        }
       }
-    }
+    }, 150);
   }
 
   // ---------------------------------------------------------------------
