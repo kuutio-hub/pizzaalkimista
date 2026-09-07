@@ -786,17 +786,30 @@
     return input;
   }
 
-  document.getElementById('calc-form').addEventListener('submit', e => {
-    e.preventDefault();
+  function triggerLiveCalculation() {
     lastInput = readInput();
     if (appSettings.saveHistory) {
       localStorage.setItem('pizza_alkimista_last_input', JSON.stringify(lastInput));
     }
     lastResult = PizzaCalc.calculate(lastInput);
     renderResult(lastResult);
-    document.getElementById('result-wrap').hidden = false;
-    document.getElementById('result-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+    const resWrap = document.getElementById('result-wrap');
+    if (resWrap) resWrap.hidden = false;
+  }
+
+  const calcForm = document.getElementById('calc-form');
+  if (calcForm) {
+    calcForm.addEventListener('input', () => triggerLiveCalculation());
+    calcForm.addEventListener('change', () => triggerLiveCalculation());
+    calcForm.addEventListener('submit', e => {
+      e.preventDefault();
+      triggerLiveCalculation();
+      const resWrap = document.getElementById('result-wrap');
+      if (resWrap) {
+        resWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
 
   // Hozzávalók ugrásmentes (fix szélességű) táblázata és élesztő váltás
   const YEAST_TYPES = ['fresh', 'instantDry', 'activeDry'];
@@ -931,8 +944,41 @@
       bigaCard.hidden = true;
     }
 
-    // Az idővonal csak a nyomtatott recepten jelenik meg (printRecipe függvény kezeli)
     renderAutolyseSection(r);
+    renderFlourAdviceSection(r);
+  }
+
+  function renderFlourAdviceSection(r) {
+    const card = document.getElementById('flour-advice-card');
+    const body = document.getElementById('flour-advice-body');
+    if (!card || !body) return;
+
+    if (r.flourAdvice) {
+      card.hidden = false;
+      const adv = r.flourAdvice;
+      body.innerHTML = `
+        <div style="margin-top: 0.6rem; font-size: 0.95rem; line-height: 1.5;">
+          <div style="display:flex; gap:0.5rem; align-items:baseline; margin-bottom: 0.5rem;">
+            <strong>Liszterősség & Fehérje:</strong> 
+            <span style="color: var(--accent); font-weight: 700;">${adv.wRange}</span> · <span>Fehérje: ${adv.protein}</span>
+          </div>
+          
+          <div style="background: rgba(46, 204, 113, 0.12); border-left: 3px solid #2ecc71; padding: 0.5rem 0.75rem; border-radius: 4px; margin-bottom: 0.5rem;">
+            <strong style="color: #27ae60;">💚 Ajánlott liszt:</strong> ${adv.recommended}
+          </div>
+
+          <div style="background: rgba(231, 76, 60, 0.12); border-left: 3px solid #e74c3c; padding: 0.5rem 0.75rem; border-radius: 4px; margin-bottom: 0.5rem;">
+            <strong style="color: #c0392b;">⚠️ NEM ajánlott liszt:</strong> ${adv.notRecommended}
+          </div>
+
+          <div style="background: rgba(52, 152, 219, 0.12); border-left: 3px solid #3498db; padding: 0.5rem 0.75rem; border-radius: 4px;">
+            <strong style="color: #2980b9;">💡 Mestertipp:</strong> ${adv.tip}
+          </div>
+        </div>
+      `;
+    } else {
+      card.hidden = true;
+    }
   }
 
   // ---------------------------------------------------------------------
@@ -1394,7 +1440,14 @@
     }
 
     document.getElementById('p-method-list').innerHTML = steps.map(step => `<li>${step}</li>`).join('');
-    document.getElementById('p-notes').textContent = notes || '';
+    
+    let printNotesText = notes || '';
+    if (r.flourAdvice) {
+      const adv = r.flourAdvice;
+      const adviceFormatted = `🌾 Lisztajánlás: ${adv.wRange} (Fehérje: ${adv.protein})\n💚 Ajánlott: ${adv.recommended}\n⚠️ NEM ajánlott: ${adv.notRecommended}\n💡 Mestertipp: ${adv.tip}`;
+      printNotesText = printNotesText ? `${printNotesText}\n\n${adviceFormatted}` : adviceFormatted;
+    }
+    document.getElementById('p-notes').textContent = printNotesText;
 
     // Elindítjuk a böngésző natív nyomtatását
     window.print();

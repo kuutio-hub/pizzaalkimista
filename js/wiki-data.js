@@ -178,7 +178,7 @@ const WIKI_DATA = [
       <dl>
         <dt><strong>Direkt tészta</strong></dt><dd>Minden hozzávalót egyszerre dagasztunk össze, egyetlen kelesztési szakasszal.</dd>
         <dt><strong>Indirekt tészta / előtészta</strong></dt><dd>A liszt és a víz egy részéből (esetleg kevés élesztővel) előbb egy érett előtésztát készítünk, és csak ezután dagasztjuk be a végleges tésztát. Íz- és szerkezetgazdagabb eredményt ad.</dd>
-        <dt><strong>Biga</strong></dt><dd>Kemény, alacsony hidratációjú (~45–50%) olasz előtészta, jellemzően 12–24 órán át érlelve, hűvösebb helyen. Erős, strukturált gluténhálót ad a végső tésztának.</dd>
+        <dt><strong>Biga</strong></dt><dd>Kemény, alacsony hidratációjú (~44–50%) olasz előtészta, amely a teljes liszt 20%-ától egészen 100%-áig terjedhet. Jellemzően 16–18 órán át érlelik hűvös szobahőn (18–20°C) és/vagy hűtőszekrényben (4°C). A Biga-hoz mindig erős (min. W300+) Manitoba liszt javasolt, mert az enzimatikus proteolízis miatt a gyengébb lisztek gluténhálója elfolyósodna. Bekeveréskor szigorúan morzsás, darabos maradjon — ne dagaszd készre!</dd>
         <dt><strong>Poolish</strong></dt><dd>Folyékony, 100%-os hidratációjú előtészta (azonos tömegű liszt és víz), francia eredetű, enyhébb savasságot ad, mint a biga.</dd>
         <dt><strong>Autolízis</strong></dt><dd>A liszt és a víz rövid (20–60 perces) pihentetése élesztő és só nélkül, dagasztás előtt — a liszt megszívja magát vízzel, könnyebb lesz a gluténfejlesztés.</dd>
         <dt><strong>Bulizás (massa)</strong></dt><dd>Az együtt kelesztett tésztatömeg gombócokra osztása, mielőtt azok külön-külön folytatnák az érést.</dd>

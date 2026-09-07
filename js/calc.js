@@ -207,6 +207,51 @@ const PizzaCalc = (() => {
     };
   }
 
+  // ---- Liszt Ajánló és Szakmai Tipp Motor -----------------------------------
+  function getFlourAdvice(input, totalEquiv20, hydration, useBiga) {
+    const isBiga = !!useBiga;
+    const bigaPct = input.bigaFlourPct || 50;
+
+    if (totalEquiv20 < 8 && hydration <= 62 && !isBiga) {
+      return {
+        wRange: 'W200 – W240 (Gyenge / Közepes)',
+        protein: '9.5% – 11.0%',
+        recommended: 'Gyengébb pizzalisztek vagy Tipo 00 finomliszt (pl. Caputo Classica, Casillo Tipo 00).',
+        notRecommended: 'NEM javasolt a nagyon erős liszt (W350+ / Manitoba), mert 8 óra alatt nem tud megfelelően leérni a sikérháló és gumis, nehezen nyújtható marad a tészta.',
+        tip: 'Rövid kelesztésnél használj langyos/szobahőmérsékletű (20-22°C) vizet, és alaposan kidagasztott tésztával dolgozz.'
+      };
+    }
+
+    if (totalEquiv20 < 24 && hydration >= 58 && hydration <= 68 && bigaPct <= 50) {
+      return {
+        wRange: 'W260 – W300 (Erős pizzaliszt)',
+        protein: '11.5% – 12.5%',
+        recommended: 'Klasszikus nápolyi és pizzaiolo lisztek (pl. Caputo Pizzeria / Cuoco, Casillo La Pizza 00, Dallagiovanna Blu, Le 5 Stagioni Verde/Napoletana).',
+        notRecommended: 'NEM javasolt a gyenge háztartási finomliszt (BL55 / W180), mert 12-24 órás érés alatt elterül a tészta, elengedi a szén-dioxidot és túlkel.',
+        tip: 'A gombócolást (staglio) a sütés előtt 4-6 órával végezd el, hogy a gombócok felülete szép feszessé és könnyen nyújthatóvá váljon.'
+      };
+    }
+
+    if (totalEquiv20 >= 24 && totalEquiv20 < 48 || (hydration > 68 && hydration <= 75)) {
+      return {
+        wRange: 'W300 – W360 (Nagyon erős liszt)',
+        protein: '12.5% – 13.5%',
+        recommended: 'Magas fehérjetartalmú, hűtős érlelésre és Biga-hoz szánt lisztek (pl. Caputo Cuoco / Aria, Casillo Zero L / Manitoba, Dallagiovanna R Green, Le 5 Stagioni Superiore).',
+        notRecommended: 'NEM javasoltak a W240 alatti gyenge lisztek (pl. BL55), mert a 24-48 órás hűtős fermentáció proteolízise teljesen lebontja a gyenge sikérhálót.',
+        tip: 'Magas hidratációnál (>70%) hideg vizet (4-6°C) használj, és a vizet fokozatosan adagold (autolízis javasolt), hogy a tészta ne melegedjen 24°C fölé.'
+      };
+    }
+
+    // Extra hosszú érés / 100% Biga / W350+
+    return {
+      wRange: 'W350 – W400+ (Extra erős Manitoba)',
+      protein: '13.5% – 15.0%',
+      recommended: 'Extra erős Manitoba és Biga lisztek (pl. Caputo Manitoba / Americana, Casillo Zero XL, Dallagiovanna Manitoba, Le 5 Stagioni Oro/Manitoba).',
+      notRecommended: 'NEM javasolt a W260 alatti liszt használata. Biga és 48+ órás fermentáció során a proteolízis elfolyósítja a gyengébb lisztből készült tésztát.',
+      tip: 'A Biga bekeverésekor szigorúan morzsás, darabos állagra törekedj (44-50% víz), ne dagaszd simára a Biga-t! 16-18°C hűvösben érleld.'
+    };
+  }
+
   // ---- Tészta tömeg-matematika (baker's percentage) -----------------------
   /**
    * totalDoughG: a végső, kész tészta teljes tömege (liszt+víz+só+olaj+élesztő)
@@ -230,7 +275,7 @@ const PizzaCalc = (() => {
     const bigaFlour = flourTotalG * (bigaFlourPct / 100);
     const bigaWater = bigaFlour * (bigaHydration / 100);
     const bigaYeastPct = freshYeastPercentFromStages(bigaYeastStages) * yeastFactor;
-    const bigaYeastFresh = bigaFlour * bigaYeastPct / 100;
+    const bigaYeastFresh = flourTotalG * (bigaYeastPct / 100); // Teljes élesztő a Biga-ba megy!
 
     const finalFlour = Math.max(0, flourTotalG - bigaFlour - oldDoughFlour);
     const finalWater = Math.max(0, waterTotalG - bigaWater - oldDoughWater);
@@ -242,26 +287,6 @@ const PizzaCalc = (() => {
   }
 
   // ---- Fő belépési pont -----------------------------------------------------
-  /**
-   * input = {
-   *   style: 'egyeni' | 'teglia',
-   *   ballCount, ballWeightG,           // Első típus
-   *   ballCount2, ballWeightG2,         // Második típus (opcionális)
-   *   panAreaM2, gramPerM2,             // teglia
-   *   hydration, salt, oil,             // % (egyeni / teglia szabadon)
-   *   roomHours, roomTempC,             // szobahős szakasz
-   *   coldHours, coldTempC,             // hűtős szakasz (opcionális, 0 = nincs)
-   *   yeastFactor,                      // élesztő szorzó (pl. 1.0)
-   *   useBiga: bool,
-   *   bigaFlourPct, bigaHydration,
-   *   bigaRoomHours, bigaRoomTempC,
-   *   bigaColdHours, bigaColdTempC,
-   *   useOldDough: bool,
-   *   oldDoughG, oldDoughHydration,
-   *   takeOutOldDough: bool,
-   *   takeOutOldDoughG
-   * }
-   */
   function calculate(input) {
     const style = input.style || 'egyeni';
     const preset = STYLE_PRESETS[style] || STYLE_PRESETS['egyeni'];
@@ -297,18 +322,34 @@ const PizzaCalc = (() => {
       }
     }
 
-    // Ha veszünk ki öregtésztát, akkor a teljes dagasztott tömeget növelni kell
     const takeOutG = (input.takeOutOldDough && input.takeOutOldDoughG) ? input.takeOutOldDoughG : 0;
-    // Hulladék kompenzáció: Alapértelmezetten szigorúan 0% (tiszta nyers érték)
     const totalWastePct = input.wastePct !== undefined ? input.wastePct : 0;
     const doughWithWaste = doughRequiredForPizza * (1 + totalWastePct / 100);
     const wasteG = doughWithWaste - doughRequiredForPizza;
     const totalDoughG = doughWithWaste + takeOutG;
 
-    const stages = [{ hours: input.roomHours, tempC: input.roomTempC }];
-    if (input.coldHours > 0) stages.push({ hours: input.coldHours, tempC: input.coldTempC });
+    // Teljes Fermentációs Mátrix szakaszai
+    const stages = [];
+    if (input.useBiga) {
+      const bigaRH = input.bigaRoomHours !== undefined ? input.bigaRoomHours : 16;
+      const bigaRT = input.bigaRoomTempC !== undefined ? input.bigaRoomTempC : 19.5;
+      stages.push({ hours: bigaRH, tempC: bigaRT });
+
+      if (input.bigaColdHours && input.bigaColdHours > 0) {
+        const bigaCT = input.bigaColdTempC !== undefined ? input.bigaColdTempC : 4;
+        stages.push({ hours: input.bigaColdHours, tempC: bigaCT });
+      }
+    }
+
+    const mainRH = input.roomHours !== undefined ? input.roomHours : 8;
+    const mainRT = input.roomTempC !== undefined ? input.roomTempC : 20;
+    stages.push({ hours: mainRH, tempC: mainRT });
+
+    if (input.coldHours && input.coldHours > 0) {
+      const mainCT = input.coldTempC !== undefined ? input.coldTempC : 4;
+      stages.push({ hours: input.coldHours, tempC: mainCT });
+    }
     
-    // Élesztő korrekció: A beállított élesztő tényező (70% - 130%)
     const yeastFactor = input.yeastFactor !== undefined ? (input.yeastFactor / 100) : 1.0;
     const model = input.yeastModel || 'alchemist';
     const yeastPct = freshYeastPercentFromStages(stages, model) * yeastFactor;
@@ -316,7 +357,6 @@ const PizzaCalc = (() => {
     const base = doughFromTotal(totalDoughG, hydration, salt, oil, yeastPct);
     const yeast = yeastConversions(base.yeastFresh, model);
 
-    // Öregtészta számítás
     let oldDoughFlour = 0;
     let oldDoughWater = 0;
     if (input.useOldDough && input.oldDoughG > 0) {
@@ -327,24 +367,14 @@ const PizzaCalc = (() => {
 
     let bigaResult = null;
     if (input.useBiga) {
-      const bigaRoomHours = input.bigaRoomHours !== undefined ? input.bigaRoomHours : input.roomHours * 0.7;
-      const bigaRoomTempC = input.bigaRoomTempC !== undefined ? input.bigaRoomTempC : 19.5;
-      const bigaColdHours = input.bigaColdHours !== undefined ? input.bigaColdHours : 0;
-      const bigaColdTempC = input.bigaColdTempC !== undefined ? input.bigaColdTempC : 5;
-      
-      const bigaStages = [{ hours: bigaRoomHours, tempC: bigaRoomTempC }];
-      if (bigaColdHours > 0) bigaStages.push({ hours: bigaColdHours, tempC: bigaColdTempC });
-
       const bigaFlourPct = input.bigaFlourPct !== undefined ? input.bigaFlourPct : 50;
       const bigaHydr = input.bigaHydration !== undefined ? input.bigaHydration : 45;
-
-      bigaResult = bigaSplit(base.flour, base.water, base.salt, base.oil, bigaStages, bigaFlourPct, bigaHydr, yeastFactor, oldDoughFlour, oldDoughWater);
+      bigaResult = bigaSplit(base.flour, base.water, base.salt, base.oil, stages, bigaFlourPct, bigaHydr, yeastFactor, oldDoughFlour, oldDoughWater);
     }
 
     const freshFlour = Math.max(0, base.flour - oldDoughFlour);
     const freshWater = Math.max(0, base.water - oldDoughWater);
 
-    // Autolízis számítás
     let autolyseResult = null;
     if (input.useAutolyse && input.autolyseFlourPct > 0) {
       const autFlour = freshFlour * (input.autolyseFlourPct / 100);
@@ -359,8 +389,10 @@ const PizzaCalc = (() => {
       };
     }
 
-    const totalHours = input.roomHours + (input.coldHours || 0);
+    const totalHours = (input.useBiga ? ((input.bigaRoomHours || 16) + (input.bigaColdHours || 0)) : 0) + input.roomHours + (input.coldHours || 0);
     const timeline = buildTimeline(input, totalHours);
+    const totalEquiv20 = effectiveHours21(stages, model);
+    const flourAdvice = getFlourAdvice(input, totalEquiv20, hydration, input.useBiga);
 
     return {
       input,
@@ -387,7 +419,8 @@ const PizzaCalc = (() => {
       autolyse: autolyseResult,
       totalHours,
       timeline,
-      effectiveHours21: effectiveHours21(stages)
+      effectiveHours21: totalEquiv20,
+      flourAdvice
     };
   }
 
