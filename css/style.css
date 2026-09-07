@@ -527,12 +527,24 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
   color: var(--gold);
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 899px) {
   .mobile-only-btn {
     display: inline-flex;
   }
   .desktop-nav {
     display: none !important;
+  }
+  .bottom-nav {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 900px) {
+  .mobile-only-btn {
+    display: none !important;
+  }
+  .desktop-nav {
+    display: inline-flex !important;
   }
   .bottom-nav {
     display: none !important;
@@ -973,6 +985,7 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
     overflow-y: auto;
     margin-bottom: 0;
     padding-right: 0.6rem;
+    padding-bottom: 2.5rem;
   }
 
   /* Jobb oldali kimeneti oszlop */
@@ -980,6 +993,7 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
     height: 100%;
     overflow-y: auto;
     padding-right: 0.6rem;
+    padding-bottom: 2.5rem;
   }
 
   /* Kompakt meztávolságok és méretezés asztali nézetben */
