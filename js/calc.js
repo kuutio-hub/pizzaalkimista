@@ -96,7 +96,7 @@ const PizzaCalc = (() => {
   //     [3] 4h/25°C:  3.27g vs 3.44g  (−0.17g, −4.7%)
   //     [4] 16h/19°C: 1.43g vs 1.41g  (+0.02g, +1.9%)
 
-  // Alkimista-modell (Pizzaalkímia — Preyer György):
+  // Alkimista-modell:
   // 20°C-on a friss élesztő % = 1.2 / óra (4h: 0.3%, 8h: 0.15%, 16h: 0.075%, 24h: 0.05%).
   // Hőmérséklet-szorzó: ~9.6-10% gyorsulás/lassulás fokonként (f(T) = 1.096^(T-20)).
   // Élesztőváltó arány: 3g friss = 1g száraz (3:1 arány).
@@ -132,7 +132,7 @@ const PizzaCalc = (() => {
 
   function freshYeastPercentFromStages(stages, model = 'alchemist') {
     if (model === 'alchemist') {
-      // Pizzaalkímia (Preyer György) modell:
+      // Alkimista-modell:
       let equivHours20 = 0;
       stages.forEach(s => {
         const tempC = (!s.tempC || isNaN(s.tempC)) ? 20 : s.tempC;
@@ -193,7 +193,7 @@ const PizzaCalc = (() => {
   // Friss élesztő átváltás — modellfüggő arányok
   function yeastConversions(freshYeastG, model = 'alchemist') {
     if (model === 'alchemist') {
-      // Pizzaalkímia (Preyer György) 3:1 váltószám: 3g friss = 1g száraz
+      // Alkimista 3:1 váltószám: 3g friss = 1g száraz
       return {
         fresh: freshYeastG,
         instantDry: freshYeastG / 3,

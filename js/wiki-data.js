@@ -1,6 +1,6 @@
 /*!
  * PizzaAlkimista — wiki-data.js
- * A Tudástár tartalma. Minden szöveg a Pizzaalkímia (Preyer György), AVPN
+ * A Tudástár tartalma. Minden szöveg az AVPN
  * és kapcsolódó pékségi/pizzaiolo szakirodalom alapján összefoglalva.
  */
 const WIKI_DATA = [
@@ -94,13 +94,13 @@ const WIKI_DATA = [
       
       <h3>Az Alkalmazás Élesztő-modelljei</h3>
       <ul>
-        <li><strong>Alkimista formula (Pizzaalkímia / Preyer György):</strong> Preyer György $20^\circ\text{C}$-os referencia táblázatán ($p = \frac{1.2}{h}$) és $1.096^{(T-20)}$ hőmérséklet-szorzóján alapuló modell. Hosszabb kelesztésnél kíméletesebb élesztőmennyiséget ad a kényelmes emészthetőségért.</li>
+        <li><strong>Alkimista formula:</strong> A $20^\circ\text{C}$-os referencia alapegyenleten ($p = \frac{1.2}{h}$) és $1.096^{(T-20)}$ hőmérséklet-szorzón alapuló modell. Hosszabb kelesztésnél kíméletesebb élesztőmennyiséget ad a kényelmes emészthetőségért.</li>
         <li><strong>Gregory's formula:</strong> 2D felületi másodfokú log-polinóm regressziós görbe (hajszálpontos illeszkedés mérési tesztmátrixra).</li>
         <li><strong>Craig formula:</strong> A klasszikus Pizzamaking szakmai referencia modell.</li>
       </ul>
 
-      <h3>Élesztő-átváltás (Preyer György ajánlása)</h3>
-      <p>A Pizzaalkímia ajánlása alapján a friss és a száraz (instant vagy aktív) élesztő váltószáma <strong>3 az 1-hez</strong>:</p>
+      <h3>Élesztő-átváltás</h3>
+      <p>A receptjeinkben a friss és a száraz (instant vagy aktív) élesztő váltószáma <strong>3 az 1-hez</strong>:</p>
       <p><em>3 g friss élesztő = 1 g instant / száraz élesztő (száraz = friss / 3)</em></p>
 
       <h3>Vizes élesztőadagolási trükk ékszermérleg nélkül</h3>
@@ -213,7 +213,7 @@ const WIKI_DATA = [
       <p>A PizzaAlkimista egy offline, böngészőből futtatható pizzatészta-kalkulátor. Segítségével hajszálpontosan kiszámíthatod a liszt, víz, só, élesztő és opcionális olaj mennyiségét.</p>
       <p><strong>Főbb funkciók:</strong></p>
       <ul>
-        <li>Háromféle élesztőmodell: Alkimista (Pizzaalkímia / Preyer György), Gregory's formula és Craig formula</li>
+        <li>Háromféle élesztőmodell: Alkimista formula, Gregory's formula és Craig formula</li>
         <li>Biga előtészta és öregtészta (Pasta Riportata) kezelése</li>
         <li>Hideg fermentáció (hűtős érlelés) órák és hőmérséklet szerinti integrációja</li>
         <li>Többféle gombócméret egyidejű hozzáadása</li>
