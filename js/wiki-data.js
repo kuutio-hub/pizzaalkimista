@@ -94,7 +94,39 @@ const WIKI_DATA = [
       
       <h3>Az Alkalmazás Élesztő-modelljei</h3>
       <ul>
-        <li><strong>Alkimista formula:</strong> A $20^\circ\text{C}$-os referencia alapegyenleten ($p = \frac{1.2}{h}$) és $1.096^{(T-20)}$ hőmérséklet-szorzón alapuló modell. Hosszabb kelesztésnél kíméletesebb élesztőmennyiséget ad a kényelmes emészthetőségért.</li>
+        <li>
+          <strong>Alkimista formula:</strong>
+          <p>Ez a modell a 20°C-os referencia alapegyenleten és a hőmérsékleti korrekciós szorzón alapul. Hosszabb kelesztésnél kíméletesebb élesztőmennyiséget ad a könnyű emészthetőségért.</p>
+          
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--accent); border-radius: 8px; padding: 1rem; margin: 0.8rem 0;">
+            <h4 style="margin-top:0; color: var(--gold);">📊 Az Alkimista képlet lépésről lépésre:</h4>
+            
+            <p style="margin-bottom: 0.4rem;"><strong>1. Alap élesztőszázalék 20°C-on (p<sub>20</sub>):</strong></p>
+            <div style="font-family: monospace; font-size: 1.05rem; background: rgba(0,0,0,0.25); padding: 0.5rem 1rem; border-radius: 4px; display: inline-block; margin-bottom: 0.5rem;">
+              Friss Élesztő % (20°C-on) = <span style="color: #2ecc71; font-weight: bold;">1.2 / Óra</span>
+            </div>
+            <ul style="font-size: 0.9rem; margin-bottom: 0.8rem;">
+              <li>4 óra @ 20°C = 1.2 / 4 = <strong>0.30%</strong> friss élesztő</li>
+              <li>8 óra @ 20°C = 1.2 / 8 = <strong>0.15%</strong> friss élesztő</li>
+              <li>16 óra @ 20°C = 1.2 / 16 = <strong>0.075%</strong> friss élesztő</li>
+              <li>24 óra @ 20°C = 1.2 / 24 = <strong>0.050%</strong> friss élesztő</li>
+            </ul>
+
+            <p style="margin-bottom: 0.4rem;"><strong>2. Hőmérséklet-korrekciós tényező (f(T)):</strong></p>
+            <div style="font-family: monospace; font-size: 1.05rem; background: rgba(0,0,0,0.25); padding: 0.5rem 1rem; border-radius: 4px; display: inline-block; margin-bottom: 0.3rem;">
+              Hőmérséklet-szorzó = <span style="color: #3498db; font-weight: bold;">1.096<sup>(T - 20)</sup></span>
+            </div>
+            <p style="font-size: 0.85rem; opacity: 0.85; margin-bottom: 0.8rem;">(Ahol T a kelesztési hőmérséklet °C-ban. Fokonként ~9.6% lassulás vagy gyorsulás).</p>
+
+            <p style="margin-bottom: 0.4rem;"><strong>3. Végső Friss Élesztő Százalék a teljes lisztre:</strong></p>
+            <div style="font-family: monospace; font-size: 1.1rem; background: rgba(231,76,60,0.15); border-left: 3px solid #e74c3c; padding: 0.6rem 1rem; border-radius: 4px; margin-bottom: 0.5rem;">
+              Friss Élesztő % = <span style="font-weight: bold;">1.2 / [ Óra × 1.096<sup>(T - 20)</sup> ]</span>
+            </div>
+            <p style="font-size: 0.85rem; margin: 0;"><em>Példa kiszámításra (12 óra kelesztés 23°C szobahőn):</em><br>
+            Ekvivalens idő = 12 × 1.096<sup>(23-20)</sup> = 12 × 1.316 = 15.79 óra (20°C-ra átszámolva).<br>
+            Friss Élesztő % = 1.2 / 15.79 = <strong>0.076%</strong> (1000g liszthez 0.76g friss élesztő kell).</p>
+          </div>
+        </li>
         <li><strong>Gregory's formula:</strong> 2D felületi másodfokú log-polinóm regressziós görbe (hajszálpontos illeszkedés mérési tesztmátrixra).</li>
         <li><strong>Craig formula:</strong> A klasszikus Pizzamaking szakmai referencia modell.</li>
       </ul>
@@ -104,11 +136,11 @@ const WIKI_DATA = [
       <p><em>3 g friss élesztő = 1 g instant / száraz élesztő (száraz = friss / 3)</em></p>
 
       <h3>Vizes élesztőadagolási trükk ékszermérleg nélkül</h3>
-      <p>Ha nincs milligramm pontosságú ékszermérleged, de $0.5\text{ g}$ vagy $0.75\text{ g}$ élesztőt kell kimérned:</p>
+      <p>Ha nincs milligramm pontosságú ékszermérleged, de 0,5 g vagy 0,75 g élesztőt kell kimérned:</p>
       <ol>
         <li>Mérj ki <strong>10 g friss élesztőt</strong> a sima konyhai mérlegen.</li>
         <li>Oldd fel pontosan <strong>100 ml szobahőmérsékletű vízben</strong>.</li>
-        <li><strong>10 ml oldat = 1 g friss élesztő!</strong> ($1\text{ ml oldat} = 0.1\text{ g}$ friss élesztő).</li>
+        <li><strong>10 ml oldat = 1 g friss élesztő!</strong> (1 ml oldat = 0,1 g friss élesztő).</li>
         <li>Egy mérőpohárral vagy injekciós fecskendővel hajszálpontosan kimérheted a kívánt adagot!</li>
       </ol>
     `
