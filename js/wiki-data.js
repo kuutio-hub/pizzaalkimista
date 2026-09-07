@@ -82,6 +82,20 @@ const WIKI_DATA = [
         <li><strong>Le 5 Stagioni:</strong> Classica (W200), Verde (W280), Napoletana (W300), Superiore (W330), Oro (W390), Manitoba (W410).</li>
         <li><strong>Molino Casillo:</strong> Tipo 00 (W200), La Pizza 00 (W260), Aroma Tipo 1 / La 8 (W280-300), Zero L / Manitoba (W340-350), Zero XL (W380).</li>
       </ul>
+
+      <h3>Magyar vs. Olasz Lisztek: Hogyan számold ki a W-értéket a hazai zacskóról?</h3>
+      <p>A W-értéket egzaktan kizárólag laboratóriumi <strong>Chopin Alveográffal</strong> lehet mérni (mert az a tésztabuborék deformációs munkáját rögzíti, nem csupán a fehérje tömegét). Ugyanakkor a zacskó tápértéktáblázatában szereplő <strong>fehérjetartalom (g / 100g)</strong> alapján nagyon pontosan meg lehet határozni a W-érték tartományt és a megfelelő olasz kategóriát!</p>
+      
+      <table>
+        <tr><th>Fehérje (g / 100g)</th><th>Becsült W-érték</th><th>Olasz Típus (Tipo)</th><th>Megfelelő Hazai Liszt</th><th>Max. Érési Idő</th></tr>
+        <tr><td><strong>9.0 – 10.5 g</strong></td><td><strong>W160 – W200</strong> (Gyenge)</td><td>Tipo 00 / Tipo 0</td><td>Sima háztartási BL55</td><td>2 – 6 óra (szobahő)</td></tr>
+        <tr><td><strong>10.5 – 11.5 g</strong></td><td><strong>W210 – W250</strong> (Közepes)</td><td>Tipo 00 / Tipo 0</td><td>Minőségi BL55 / Rétesliszt (BFF55)</td><td>6 – 12 óra (szobahő)</td></tr>
+        <tr><td><strong>11.5 – 12.5 g</strong></td><td><strong>W260 – W300</strong> (Erős)</td><td>Tipo 00 / Tipo 0 / Tipo 1</td><td>Kenyérliszt BL80 / Magyar Pizzaliszt</td><td>12 – 24 óra (szobahő / hűtő)</td></tr>
+        <tr><td><strong>12.5 – 13.5 g</strong></td><td><strong>W300 – W350</strong> (Nagyon erős)</td><td>Tipo 00 / Tipo 0</td><td>Prémium Pizzaliszt / Sikérdús liszt</td><td>24 – 48 óra (hűtő / Biga)</td></tr>
+        <tr><td><strong>13.5 – 15.0 g</strong></td><td><strong>W350 – W400+</strong> (Extra erős)</td><td>Manitoba (Tipo 00 / 0)</td><td>Manitoba / Sikérrel dúsított liszt</td><td>48 – 120 óra (Biga / Poolish)</td></tr>
+      </table>
+
+      <p style="font-size:0.9rem; opacity:0.9; margin-top:0.6rem;"><strong>Példa:</strong> A hazai bolti <strong>BL55 finomliszt</strong> átlagosan 9.8g–10.2g fehérjét tartalmaz 100g-ban. Ez őrlési finomságban megegyezik a Tipo 00-val, de W-értéke csupán <strong>~W170–W190</strong> (gyenge), ezért 12-24 órás kelesztésnél elterül. A <strong>BL80 kenyérliszt</strong> (11.8g-12.2g fehérje) ezzel szemben <strong>~W260–W280</strong>-as Tipo 1 / Tipo 0-nak felel meg!</p>
     `
   },
   {
