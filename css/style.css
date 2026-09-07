@@ -926,3 +926,25 @@ main { max-width: 640px; margin: 0 auto; padding: 1.2rem 1.2rem 2.8rem; }
     color: #555555;
   }
 }
+
+/* ---------- Asztali nézet (Desktop 2-Column Layout) ---------- */
+@media (min-width: 900px) {
+  #view-calc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  #view-calc > .section-eyebrow,
+  #view-calc > h1,
+  #view-calc > .lead {
+    grid-column: 1 / -1;
+  }
+  #view-calc #calc-form {
+    margin-bottom: 0;
+  }
+  #view-calc #result-wrap {
+    position: sticky;
+    top: calc(var(--header-h) + 1rem);
+  }
+}

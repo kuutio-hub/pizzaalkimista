@@ -214,6 +214,7 @@
 
     // Globális stepper bindolás az egész dokumentumra
     initSteppers();
+    triggerLiveCalculation();
   }
 
   // ---------------------------------------------------------------------
@@ -252,17 +253,11 @@
       applyFahrenheitToForm();
     }
     applySettingsToUI();
-    
-    // Ha van már eredmény kártya, frissítsük azt is az új mértékegységek miatt
-    if (lastResult) {
-      renderResult(lastResult);
-    }
-    
-    document.getElementById('result-wrap').hidden = lastResult ? false : true;
   }
 
   document.getElementById('useBigaCold').addEventListener('change', e => {
     document.getElementById('biga-cold-fields').hidden = !e.target.checked;
+    triggerLiveCalculation();
   });
 
   // ---------------------------------------------------------------------

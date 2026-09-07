@@ -173,21 +173,37 @@
         <div class="row2">
           <div class="field">
             <label class="field-label" data-str="labelBigaFlourPct">Biga liszt</label>
-            <input type="text" id="bigaFlourPct" min="10" max="100" value="50" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="bigaFlourPct">◀</button>
+              <input type="text" id="bigaFlourPct" min="10" max="100" step="5" value="50" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="bigaFlourPct">▶</button>
+            </div>
           </div>
           <div class="field">
             <label class="field-label" data-str="labelBigaHydration">Biga hidratáció</label>
-            <input type="text" id="bigaHydration" min="40" max="100" value="45" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="bigaHydration">◀</button>
+              <input type="text" id="bigaHydration" min="40" max="100" step="1" value="45" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="bigaHydration">▶</button>
+            </div>
           </div>
         </div>
         <div class="row2">
           <div class="field">
             <label class="field-label" data-str="labelBigaRoomHours">Biga szobahős kelesztés</label>
-            <input type="text" id="bigaRoomHours" min="0.5" max="48" step="0.5" value="16" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="bigaRoomHours">◀</button>
+              <input type="text" id="bigaRoomHours" min="0.5" max="48" step="0.5" value="16" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="bigaRoomHours">▶</button>
+            </div>
           </div>
           <div class="field">
             <label class="field-label" data-str="labelBigaRoomTemp">Biga szobahőmérséklet</label>
-            <input type="text" id="bigaRoomTempC" min="0.5" max="45" step="0.5" value="18" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="bigaRoomTempC">◀</button>
+              <input type="text" id="bigaRoomTempC" min="0.5" max="45" step="0.5" value="18" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="bigaRoomTempC">▶</button>
+            </div>
           </div>
         </div>
         <div class="toggle-row" style="border-top:0; padding-top:0;">
@@ -198,11 +214,19 @@
           <div class="row2">
             <div class="field">
               <label class="field-label" data-str="labelBigaColdHours">Biga hűtős kelesztés</label>
-              <input type="text" id="bigaColdHours" min="1" max="72" value="24" readonly>
+              <div class="mobile-stepper">
+                <button type="button" class="step-btn" data-step-dir="-1" data-input-id="bigaColdHours">◀</button>
+                <input type="text" id="bigaColdHours" min="1" max="72" step="1" value="24" readonly>
+                <button type="button" class="step-btn" data-step-dir="1" data-input-id="bigaColdHours">▶</button>
+              </div>
             </div>
             <div class="field">
               <label class="field-label" data-str="labelBigaColdTemp">Biga hűtő hőmérséklet</label>
-              <input type="text" id="bigaColdTempC" min="1" max="12" step="0.5" value="4" readonly>
+              <div class="mobile-stepper">
+                <button type="button" class="step-btn" data-step-dir="-1" data-input-id="bigaColdTempC">◀</button>
+                <input type="text" id="bigaColdTempC" min="1" max="12" step="0.5" value="4" readonly>
+                <button type="button" class="step-btn" data-step-dir="1" data-input-id="bigaColdTempC">▶</button>
+              </div>
             </div>
           </div>
         </div>
@@ -214,11 +238,19 @@
         <div class="row2">
           <div class="field">
             <label class="field-label" data-str="labelOldDoughG">Öregtészta mennyisége</label>
-            <input type="text" id="oldDoughG" min="10" max="500" value="100" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="oldDoughG">◀</button>
+              <input type="text" id="oldDoughG" min="10" max="500" step="10" value="100" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="oldDoughG">▶</button>
+            </div>
           </div>
           <div class="field">
             <label class="field-label" data-str="labelOldDoughHydration">Öregtészta hidratációja</label>
-            <input type="text" id="oldDoughHydration" min="40" max="100" value="60" readonly>
+            <div class="mobile-stepper">
+              <button type="button" class="step-btn" data-step-dir="-1" data-input-id="oldDoughHydration">◀</button>
+              <input type="text" id="oldDoughHydration" min="40" max="100" step="5" value="60" readonly>
+              <button type="button" class="step-btn" data-step-dir="1" data-input-id="oldDoughHydration">▶</button>
+            </div>
           </div>
         </div>
       </div>
@@ -228,11 +260,13 @@
         <h3 class="mt">Öregtészta kivétele (KI)</h3>
         <div class="field">
           <label class="field-label" data-str="labelTakeOutOldDoughG">Kiveendő mennyiség</label>
-          <input type="text" id="takeOutOldDoughG" min="10" max="500" value="150" readonly>
+          <div class="mobile-stepper">
+            <button type="button" class="step-btn" data-step-dir="-1" data-input-id="takeOutOldDoughG">◀</button>
+            <input type="text" id="takeOutOldDoughG" min="10" max="500" step="10" value="150" readonly>
+            <button type="button" class="step-btn" data-step-dir="1" data-input-id="takeOutOldDoughG">▶</button>
+          </div>
         </div>
       </div>
-
-      <button type="submit" class="btn btn-primary btn-block mt" data-str="btnCalculate">Kiszámítás</button>
     </form>
 
     <!-- Eredmények megjelenítése -->
