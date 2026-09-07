@@ -115,7 +115,7 @@ const PizzaAlkimistaStrings = {
   toastDeleted: 'Recept törölve',
   toastNotificationsScheduled: '⏰ {count} db értesítés beidőzítve! Naptár bejegyzés is letöltve.',
   confirmDeleteRecipe: 'Törlöd a(z) „{name}” receptet?',
-  notificationTitle: '🍕 PizzaAlkimista Emlékeztető!',
+  notificationTitle: 'PizzaAlkimista Emlékeztető!',
   emptyStateText: 'Még nincs mentett recepted.<br>Számolj ki egyet a Kalkulátorban!',
 
   // Hozzávalók nevei (Kalkuláció eredmény és Nyomtatás)

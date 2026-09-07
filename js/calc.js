@@ -215,7 +215,7 @@ const PizzaCalc = (() => {
     if (totalEquiv20 < 8 && hydration <= 62 && !isBiga) {
       return {
         wRange: 'W200 – W240 (Gyenge / Közepes)',
-        protein: '9.5% – 11.0% (9,5g – 11,0g / 100g liszt)',
+        protein: '9,5g – 11,0g / 100g liszt',
         recommended: 'Gyengébb pizzalisztek vagy Tipo 00 finomliszt (pl. Caputo Classica, Casillo Tipo 00).',
         notRecommended: 'NEM javasolt a nagyon erős liszt (W350+ / Manitoba), mert 8 óra alatt nem tud megfelelően leérni a sikérháló és gumis, nehezen nyújtható marad a tészta.',
         tip: 'Rövid kelesztésnél használj langyos/szobahőmérsékletű (20-22°C) vizet, és alaposan kidagasztott tésztával dolgozz.'
@@ -225,7 +225,7 @@ const PizzaCalc = (() => {
     if (totalEquiv20 < 24 && hydration >= 58 && hydration <= 68 && bigaPct <= 50) {
       return {
         wRange: 'W260 – W300 (Erős pizzaliszt)',
-        protein: '11.5% – 12.5% (11,5g – 12,5g / 100g liszt)',
+        protein: '11,5g – 12,5g / 100g liszt',
         recommended: 'Klasszikus nápolyi és pizzaiolo lisztek (pl. Caputo Pizzeria / Cuoco, Casillo La Pizza 00, Dallagiovanna Blu, Le 5 Stagioni Verde/Napoletana).',
         notRecommended: 'NEM javasolt a gyenge háztartási finomliszt (BL55 / W180), mert 12-24 órás érés alatt elterül a tészta, elengedi a szén-dioxidot és túlkel.',
         tip: 'A gombócolást (staglio) a sütés előtt 4-6 órával végezd el, hogy a gombócok felülete szép feszessé és könnyen nyújthatóvá váljon.'
@@ -235,7 +235,7 @@ const PizzaCalc = (() => {
     if (totalEquiv20 >= 24 && totalEquiv20 < 48 || (hydration > 68 && hydration <= 75)) {
       return {
         wRange: 'W300 – W360 (Nagyon erős liszt)',
-        protein: '12.5% – 13.5% (12,5g – 13,5g / 100g liszt)',
+        protein: '12,5g – 13,5g / 100g liszt',
         recommended: 'Magas fehérjetartalmú, hűtős érlelésre és Biga-hoz szánt lisztek (pl. Caputo Cuoco / Aria, Casillo Zero L / Manitoba, Dallagiovanna R Green, Le 5 Stagioni Superiore).',
         notRecommended: 'NEM javasoltak a W240 alatti gyenge lisztek (pl. BL55), mert a 24-48 órás hűtős fermentáció proteolízise teljesen lebontja a gyenge sikérhálót.',
         tip: 'Magas hidratációnál (>70%) hideg vizet (4-6°C) használj, és a vizet fokozatosan adagold (autolízis javasolt), hogy a tészta ne melegedjen 24°C fölé.'
@@ -245,7 +245,7 @@ const PizzaCalc = (() => {
     // Extra hosszú érés / 100% Biga / W350+
     return {
       wRange: 'W350 – W400+ (Extra erős Manitoba)',
-      protein: '13.5% – 15.0% (13,5g – 15,0g / 100g liszt)',
+      protein: '13,5g – 15,0g / 100g liszt',
       recommended: 'Extra erős Manitoba és Biga lisztek (pl. Caputo Manitoba / Americana, Casillo Zero XL, Dallagiovanna Manitoba, Le 5 Stagioni Oro/Manitoba).',
       notRecommended: 'NEM javasolt a W260 alatti liszt használata. Biga és 48+ órás fermentáció során a proteolízis elfolyósítja a gyengébb lisztből készült tésztát.',
       tip: 'A Biga bekeverésekor szigorúan morzsás, darabos állagra törekedj (44-50% víz), ne dagaszd simára a Biga-t! 16-18°C hűvösben érleld.'

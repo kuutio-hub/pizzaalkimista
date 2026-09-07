@@ -872,7 +872,7 @@
       el.hidden = false;
       el.innerHTML = `
         <div class="result-card" style="border-color: var(--accent-dim);">
-          <div class="result-title">🌿 Autolízis</div>
+          <div class="result-title">Autolízis</div>
           <table class="ing-table">
             <tr><td>${PizzaAlkimistaStrings.ingAutolyseFlour || 'Autolízisos liszt'}</td><td class="pct">${fmt(a.flourPct,0)}%</td><td class="amt">${fmtG(a.flour, 'flour')}</td></tr>
             <tr><td>${PizzaAlkimistaStrings.ingAutolyseWater || 'Autolízisos víz'}</td><td class="pct">${fmt(a.waterPct,0)}%</td><td class="amt">${fmtG(a.water, 'water')}</td></tr>
@@ -959,15 +959,15 @@
           </div>
           
           <div style="background: rgba(46, 204, 113, 0.12); border-left: 3px solid #2ecc71; padding: 0.5rem 0.75rem; border-radius: 4px; margin-bottom: 0.5rem;">
-            <strong style="color: #27ae60;">💚 Ajánlott liszt:</strong> ${adv.recommended}
+            <strong style="color: #27ae60;">Ajánlott liszt:</strong> ${adv.recommended}
           </div>
 
           <div style="background: rgba(231, 76, 60, 0.12); border-left: 3px solid #e74c3c; padding: 0.5rem 0.75rem; border-radius: 4px; margin-bottom: 0.5rem;">
-            <strong style="color: #c0392b;">⚠️ NEM ajánlott liszt:</strong> ${adv.notRecommended}
+            <strong style="color: #c0392b;">NEM ajánlott liszt:</strong> ${adv.notRecommended}
           </div>
 
           <div style="background: rgba(52, 152, 219, 0.12); border-left: 3px solid #3498db; padding: 0.5rem 0.75rem; border-radius: 4px;">
-            <strong style="color: #2980b9;">💡 Mestertipp:</strong> ${adv.tip}
+            <strong style="color: #2980b9;">Mestertipp:</strong> ${adv.tip}
           </div>
         </div>
       `;
@@ -1294,13 +1294,13 @@
 
       cloudsHtml += `<div class="p-cloud-group-title">${pdfS.badges.bigaPhaseTitle}</div>`;
       cloudsHtml += `<div class="p-cloud-row">`;
-      cloudsHtml += `<div class="p-cloud-item">🕒 ${formatDuration(bRoomH)} szobahőn</div>`;
+      cloudsHtml += `<div class="p-cloud-item">${formatDuration(bRoomH)} szobahőn</div>`;
       cloudsHtml += `<div class="p-cloud-item p-cloud-arrow">➔</div>`;
-      cloudsHtml += `<div class="p-cloud-item">🌡️ ${bRoomT}°C</div>`;
+      cloudsHtml += `<div class="p-cloud-item">${bRoomT}°C</div>`;
       
       if (bColdH > 0) {
         cloudsHtml += `<div class="p-cloud-item p-cloud-arrow">➔</div>`;
-        cloudsHtml += `<div class="p-cloud-item">❄️ ${formatDuration(bColdH)} hűtőben (${bColdT}°C)</div>`;
+        cloudsHtml += `<div class="p-cloud-item">${formatDuration(bColdH)} hűtőben (${bColdT}°C)</div>`;
       }
       cloudsHtml += `</div>`;
     }
@@ -1309,13 +1309,13 @@
     const mainPhaseTitle = r.biga ? pdfS.badges.mainPhaseTitleBiga : pdfS.badges.mainPhaseTitleDirect;
     cloudsHtml += `<div class="p-cloud-group-title">${mainPhaseTitle}</div>`;
     cloudsHtml += `<div class="p-cloud-row">`;
-    cloudsHtml += `<div class="p-cloud-item">🕒 ${formatDuration(roomH)} szobahőn</div>`;
+    cloudsHtml += `<div class="p-cloud-item">${formatDuration(roomH)} szobahőn</div>`;
     cloudsHtml += `<div class="p-cloud-item p-cloud-arrow">➔</div>`;
-    cloudsHtml += `<div class="p-cloud-item">🌡️ ${roomT}°C</div>`;
+    cloudsHtml += `<div class="p-cloud-item">${roomT}°C</div>`;
     
     if (coldH > 0) {
       cloudsHtml += `<div class="p-cloud-item p-cloud-arrow">➔</div>`;
-      cloudsHtml += `<div class="p-cloud-item">❄️ ${formatDuration(coldH)} hűtőben (${coldT}°C)</div>`;
+      cloudsHtml += `<div class="p-cloud-item">${formatDuration(coldH)} hűtőben (${coldT}°C)</div>`;
     }
     cloudsHtml += `</div>`;
 
@@ -1439,7 +1439,7 @@
     let printNotesText = notes || '';
     if (r.flourAdvice) {
       const adv = r.flourAdvice;
-      const adviceFormatted = `🌾 Lisztajánlás: ${adv.wRange} (Fehérje: ${adv.protein})\n💚 Ajánlott: ${adv.recommended}\n⚠️ NEM ajánlott: ${adv.notRecommended}\n💡 Mestertipp: ${adv.tip}`;
+      const adviceFormatted = `Lisztajánlás: ${adv.wRange} (Fehérje: ${adv.protein})\nAjánlott: ${adv.recommended}\nNEM ajánlott: ${adv.notRecommended}\nMestertipp: ${adv.tip}`;
       printNotesText = printNotesText ? `${printNotesText}\n\n${adviceFormatted}` : adviceFormatted;
     }
     document.getElementById('p-notes').textContent = printNotesText;
