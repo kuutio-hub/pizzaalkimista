@@ -96,8 +96,12 @@ const PizzaCalc = (() => {
   //     [3] 4h/25°C:  3.27g vs 3.44g  (−0.17g, −4.7%)
   //     [4] 16h/19°C: 1.43g vs 1.41g  (+0.02g, +1.9%)
 
-  // Alkimista-modell — 2D felületi másodfokú log-polinóm modell (100%-os hajszálpontos illeszkedés a tesztmátrixra):
-  // Képlet log-térben:
+  // Alkimista-modell (Pizzaalkímia — Preyer György):
+  // 20°C-on a friss élesztő % = 1.2 / óra (4h: 0.3%, 8h: 0.15%, 16h: 0.075%, 24h: 0.05%).
+  // Hőmérséklet-szorzó: ~9.6-10% gyorsulás/lassulás fokonként (f(T) = 1.096^(T-20)).
+  // Élesztőváltó arány: 3g friss = 1g száraz (3:1 arány).
+  //
+  // Gregory's formula — 2D felületi másodfokú log-polinóm modell (100%-os illeszkedés a 4 pontból álló tesztmátrixra):
   // ln(yeast_g) = c0 + c1*ln(t) + c2*(tempC - 14) + c3*(ln(t)^2) + c4*((tempC - 14)^2) + c5*ln(t)*(tempC - 14)
   // c0 = 5.198631, c1 = -1.390062, c2 = -0.181687, c3 = -0.009297, c4 = 0.000221, c5 = -0.002046
   const ALCHEMIST_C0 = 5.198631;
@@ -108,8 +112,11 @@ const PizzaCalc = (() => {
   const ALCHEMIST_C5 = -0.002046;
   const ALCHEMIST_REF_FLOUR_G = 844.3855;
 
-  function tempRateFactor(tempC, model = 'craig') {
+  function tempRateFactor(tempC, model = 'alchemist') {
     if (model === 'alchemist') {
+      return Math.pow(1.096, tempC - 20);
+    }
+    if (model === 'gregory') {
       return Math.exp(0.1699 * (tempC - 21));
     }
     return Math.pow(2, (tempC - YEAST_REF_TEMP_C) / YEAST_DOUBLING_C);
@@ -117,15 +124,30 @@ const PizzaCalc = (() => {
 
   /**
    * stages: [{hours, tempC}, ...] — pl. szobahőn + hűtőben töltött szakaszok
-   * Visszaadja az "ekvivalens 21°C-os órák" összegét.
+   * Visszaadja az "ekvivalens 21°C-os (vagy 20°C-os)" órák összegét.
    */
-  function effectiveHours21(stages, model = 'craig') {
+  function effectiveHours21(stages, model = 'alchemist') {
     return stages.reduce((sum, s) => sum + Math.max(0, s.hours) * tempRateFactor(s.tempC, model), 0);
   }
 
   function freshYeastPercentFromStages(stages, model = 'alchemist') {
     if (model === 'alchemist') {
-      // Többszakaszos fermentáció kezelése (RT + CT ekvivalens órák kiszámítása)
+      // Pizzaalkímia (Preyer György) modell:
+      let equivHours20 = 0;
+      stages.forEach(s => {
+        const tempC = (!s.tempC || isNaN(s.tempC)) ? 20 : s.tempC;
+        const hours = (!s.hours || isNaN(s.hours)) ? 0 : Math.max(0, s.hours);
+        const tempFactor = Math.pow(1.096, tempC - 20);
+        equivHours20 += hours * tempFactor;
+      });
+
+      if (equivHours20 <= 0) return 0.3;
+      const pct = 1.2 / equivHours20;
+      return clamp(pct, YEAST_MIN_PERCENT, YEAST_MAX_PERCENT);
+    }
+
+    if (model === 'gregory') {
+      // Gregory-féle 2D felületi modell:
       let equivHours = 0;
       let refTemp = 20;
       stages.forEach((s, idx) => {
@@ -149,7 +171,6 @@ const PizzaCalc = (() => {
       const lnYeastG = ALCHEMIST_C0 + ALCHEMIST_C1 * ln_t + ALCHEMIST_C2 * dt + ALCHEMIST_C3 * (ln_t * ln_t) + ALCHEMIST_C4 * (dt * dt) + ALCHEMIST_C5 * (ln_t * dt);
       let yeastFreshG = Math.exp(lnYeastG);
       
-      // Lisztszázalékra átszámítás a referencia liszttömeg alapján (844.3855g)
       let pct = (yeastFreshG / ALCHEMIST_REF_FLOUR_G) * 100;
       return clamp(pct, YEAST_MIN_PERCENT, YEAST_MAX_PERCENT);
     }
@@ -169,8 +190,16 @@ const PizzaCalc = (() => {
 
   function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
 
-  // Friss élesztő átváltás — széles körben idézett arányok
-  function yeastConversions(freshYeastG) {
+  // Friss élesztő átváltás — modellfüggő arányok
+  function yeastConversions(freshYeastG, model = 'alchemist') {
+    if (model === 'alchemist') {
+      // Pizzaalkímia (Preyer György) 3:1 váltószám: 3g friss = 1g száraz
+      return {
+        fresh: freshYeastG,
+        instantDry: freshYeastG / 3,
+        activeDry: freshYeastG / 3
+      };
+    }
     return {
       fresh: freshYeastG,
       instantDry: freshYeastG * 0.415,
@@ -285,7 +314,7 @@ const PizzaCalc = (() => {
     const yeastPct = freshYeastPercentFromStages(stages, model) * yeastFactor;
 
     const base = doughFromTotal(totalDoughG, hydration, salt, oil, yeastPct);
-    const yeast = yeastConversions(base.yeastFresh);
+    const yeast = yeastConversions(base.yeastFresh, model);
 
     // Öregtészta számítás
     let oldDoughFlour = 0;
@@ -415,3 +444,7 @@ const PizzaCalc = (() => {
     clamp
   };
 })();
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = PizzaCalc;
+}

@@ -1,58 +1,153 @@
 /*!
  * PizzaAlkimista — wiki-data.js
- * A Tudástár tartalma. Minden szöveg saját megfogalmazás, nyilvános
- * pékségi/pizzaiolo szakirodalom (AVPN, Pizzaalkímia, Stadler Made stb.)
- * alapján összefoglalva — nem szó szerinti átvétel.
+ * A Tudástár tartalma. Minden szöveg a Pizzaalkímia (Preyer György), AVPN
+ * és kapcsolódó pékségi/pizzaiolo szakirodalom alapján összefoglalva.
  */
 const WIKI_DATA = [
   {
-    id: 'lisztek',
-    title: 'Lisztek',
-    icon: 'wheat',
-    summary: 'Magyar és olasz jelölésrendszer, fehérjetartalom, W-érték',
+    id: 'pekszazalek',
+    title: 'Pékszázalék (Baker\'s percentage)',
+    icon: 'book',
+    summary: 'Anyaghányad-számítás a liszt tömegéhez viszonyítva',
     html: `
-      <p>A liszt kiválasztása a legtöbb pizzareceptnél nagyobb hatással van a végeredményre, mint bármelyik másik hozzávaló. Két dolog számít igazán: <strong>mennyi fehérje (sikér) van benne</strong>, és <strong>milyen finomra őrölték</strong>.</p>
-      <h3>Magyar jelölés (BL, BF, réteslejsz)</h3>
-      <p>A hazai lisztek betű-szám kombinációval vannak jelölve: a betű a gabonát és az őrlés típusát, a szám a hamutartalmat (nagyjából a korpa arányát) mutatja. A BL55 sima finomliszt alacsony, 9–11% körüli fehérjetartalommal — kalácshoz, palacsintához kiváló, pizzához önmagában gyakran gyenge, mert a tészta könnyen szakad, nem tartja a formáját. A BL80 kenyérliszt már erősebb sikérhálót képez, rugalmasabb, jobban bírja a nyújtást.</p>
-      <h3>Olasz jelölés (00, 0, 1) és a W-érték</h3>
-      <p>Az olasz rendszer a „00”, „0”, „1” jelöléssel az <em>őrlés finomságát</em> írja le (a „00” a legfinomabb, szinte korpamentes), nem a fehérjetartalmat. A liszt erősségét külön, a <strong>W-értékkel</strong> adják meg — ez azt mutatja meg, mennyi energiát bír el a tészta nyújtás közben, mielőtt elszakadna.</p>
-      <table>
-        <tr><th>W-érték</th><th>Jellemző fehérjetartalom</th><th>Ajánlott felhasználás</th></tr>
-        <tr><td>W180–220</td><td>~9–10,5%</td><td>Gyors, rövid kelesztésű tészták</td></tr>
-        <tr><td>W220–260</td><td>~10,5–12%</td><td>Nápolyi pizza, 8–24 órás kelesztés</td></tr>
-        <tr><td>W260–320</td><td>~12–13,5%</td><td>Hosszú (24–72 órás) hidegkelesztés, teglia</td></tr>
-        <tr><td>W320+</td><td>13,5%+</td><td>Manitoba jellegű, nagyon hosszú érlelésű vagy magas hidratációjú tészták</td></tr>
-      </table>
-      <p>Minél tovább kelesztesz (különösen hidegen), annál erősebb — magasabb W-értékű — lisztre van szükség, hogy a tészta ne essen szét a hosszú fermentáció alatt.</p>
-      <h3>Melyik stílushoz melyik liszt?</h3>
+      <p>A <strong>pékszázalék</strong> (az angol „baker's percentage” tükörfordítása) egy olyan arányosítási módszer, amely segítségével a liszt tömegéhez (mint 100%-os alapértékhez) viszonyítva határozzuk meg a többi összetevő (víz, só, élesztő, olaj) tömegét.</p>
+      <h3>Miért hasznos a pékszázalék?</h3>
       <ul>
-        <li><strong>Nápolyi:</strong> „00”-ás liszt, 11,5–13% fehérje, W260 körül.</li>
-        <li><strong>Római (tondo, ropogós):</strong> alacsonyabb fehérje (10–11,5%) is működik, mert nem a rugalmasság, hanem a ropogósság a cél.</li>
-        <li><strong>Teglia / tepsis:</strong> erős liszt kell (12–13%+), mert a magas hidratáció és a hosszú kelesztés komoly gluténhálót igényel.</li>
-        <li><strong>Otthoni sütő (max. 250–280°C):</strong> érdemes „00”-ás és BL80 vagy erős liszt keverékét használni, mert a hosszabb sütési idő jobban kiszárítja a tésztát, mint egy 450°C-os kemence.</li>
+        <li><strong>Skálázhatóság:</strong> Ránézésre megmondhatod a tészta jellegét és típusát, függetlenül a készítendő tésztagolyók számától.</li>
+        <li><strong>Pontos kiszámíthatóság:</strong> Bármelyik összetevő tömegéből visszaszámolható az összes többi elem tömege.</li>
+        <li><strong>Receptleírás:</strong> Mennyiségtől függetlenül, univerzálisan leírhatóak a receptek.</li>
+      </ul>
+      <h3>A pékszázalék képlete</h3>
+      <p><em>Összetevő súlya %-ban = (Összetevő súlya / Teljes lisztmennyiség) × 100</em></p>
+      <table>
+        <tr><th>Összetevő</th><th>Tömeg (g)</th><th>Pékszázalék (%)</th></tr>
+        <tr><td>Liszt (Összesen)</td><td>1000 g</td><td>100%</td></tr>
+        <tr><td>Víz (Hidratáció)</td><td>650 g (ml)</td><td>65%</td></tr>
+        <tr><td>Só</td><td>28 g</td><td>2.8%</td></tr>
+        <tr><td>Friss Élesztő</td><td>1.5 g</td><td>0.15%</td></tr>
+        <tr><td>Olívaolaj (opcionális)</td><td>10 g</td><td>1.0%</td></tr>
+      </table>
+      <p>Ha többféle lisztet használsz a receptben (pl. 00-s liszt + Semola vagy BL80), a lisztek együttes tömege képezi a 100%-os alapot!</p>
+    `
+  },
+  {
+    id: 'lisztek',
+    title: 'Lisztek, W-érték és Alveográf',
+    icon: 'wheat',
+    summary: 'Magyar és olasz jelölésrendszer, fehérjetartalom, Chopin-Alveográf, W-érték iránytű',
+    html: `
+      <p>A liszt kiválasztása határozza meg leginkább a pizzatészta szerkezetét, nyújthatóságát és sütési jellegét.</p>
+      
+      <h3>Mi nem a liszt W-értéke?</h3>
+      <ul>
+        <li>Nem csupán a fehérjetartalom!</li>
+        <li>Nem csupán a gluténtartalom!</li>
+        <li>Nem utal a szemcseméretre!</li>
+        <li>Nem utal a korpatartalomra!</li>
+      </ul>
+      
+      <h3>Mi a W-érték és az Alveográf?</h3>
+      <p>A liszt W-értékét a <strong>Chopin Alveográf</strong> nevű laboratóriumi műszerrel mérik (a tésztából fújt buborék ellenállását rögzítve):</p>
+      <ul>
+        <li><strong>P (Stabilitás):</strong> A tészta stabilitása és nyújtással szembeni ellenállása (szívósság).</li>
+        <li><strong>L (Nyújthatóság):</strong> A tésztabuborék szakadásáig mért görbehossz.</li>
+        <li><strong>P/L arány:</strong> A stabilitás és nyújthatóság aránya. <strong>Optimális tartomány: 0.4 – 0.7 között.</strong> (0.4 alatt a tészta terülős és elengedi a szén-dioxidot; 0.7 felett túlságosan szívós, gumis).</li>
+        <li><strong>W (Deformációs munka):</strong> A buborék felfújásához szükséges energia. A magasabb W-érték erősebb sikérhálót és magasabb vízfelvételt jelent.</li>
+      </ul>
+
+      <h3>Liszt W-érték Iránytű</h3>
+      <table>
+        <tr><th>Kategória</th><th>W-érték</th><th>Fehérje</th><th>Vízfelvétel</th><th>Direkt Szobahő</th><th>Direkt Hűtő</th><th>Indirekt Hűtő</th></tr>
+        <tr><td>Gyenge liszt</td><td>~W200</td><td>8 – 11 g</td><td>55 – 60%</td><td>2 – 6 óra</td><td>–</td><td>–</td></tr>
+        <tr><td>Közepesen erős</td><td>~W250</td><td>10 – 13 g</td><td>58 – 63%</td><td>10 – 16 óra</td><td>24 – 36 óra</td><td>–</td></tr>
+        <tr><td>Erős liszt</td><td>~W300</td><td>10 – 13 g</td><td>60 – 65%</td><td>12 – 18 óra</td><td>24 – 48 óra</td><td>24 – 48 óra</td></tr>
+        <tr><td>Igen erős liszt</td><td>~W350</td><td>12.5 – 15 g</td><td>65 – 75%</td><td>–</td><td>–</td><td>36 – 72 óra</td></tr>
+        <tr><td>Extra erős</td><td>W400+</td><td>13.5 – 17 g</td><td>70%+</td><td>–</td><td>–</td><td>48 – 120 óra</td></tr>
+      </table>
+
+      <h3>Olasz Liszttípusok (Grano tenero vs. Grano duro)</h3>
+      <ul>
+        <li><strong>Grano tenero (Puha búza):</strong> Fehér, hintőporszerű lisztek pizzához, kenyérhez.</li>
+        <li><strong>Grano duro (Kemény / Durumbúza):</strong> Sárgás színű, szemcsésebb őrlemény (Semola, Semola Rimacinata). Nyújthatósága kisebb, de aromagazdag.</li>
+        <li><strong>Tipo 00:</strong> Legfinomabb őrlésű, szinte korpamentes magbelső. Minimum 9% fehérje.</li>
+        <li><strong>Tipo 0:</strong> Közel 70%-os kinyerési ráta. Minimum 11% fehérje. Sokoldalú pizzaliszt.</li>
+        <li><strong>Tipo 1 és Tipo 2:</strong> Korpásabb, sötétebb, félbarna lisztek. Minimum 12% fehérje.</li>
+        <li><strong>Farina Manitoba:</strong> Észak-amerikai keménybúzából őrölt, extra erős (W300+) liszt más lisztek javításához.</li>
+      </ul>
+
+      <h3>Ismert Olasz Malmok Lisztjeinek W-értékei</h3>
+      <ul>
+        <li><strong>Mulino Caputo:</strong> Classica (W220-240), 100% Grani Italiani (W250-270), Pizzeria / Cuoco (W300-320), Aria (W300-320), A metro (W310-330), Americana (W360-380).</li>
+        <li><strong>Dallagiovanna:</strong> NobilGrano Blu (W290), LaNapoletana (W310), R Green (W340), Manitoba (W390).</li>
+        <li><strong>Le 5 Stagioni:</strong> Classica (W200), Verde (W280), Napoletana (W300), Superiore (W330), Oro (W390), Manitoba (W410).</li>
+        <li><strong>Molino Casillo:</strong> Tipo 00 (W200), La Pizza 00 (W260), Aroma Tipo 1 / La 8 (W280-300), Zero L / Manitoba (W340-350), Zero XL (W380).</li>
       </ul>
     `
   },
   {
     id: 'eleszto',
-    title: 'Élesztő',
+    title: 'Élesztő és Élesztő-modellek',
     icon: 'yeast',
-    summary: 'Friss, aktív szárított, instant — és a hőmérséklet hatása',
+    summary: 'Alkimista, Gregory\'s és Craig formula, élesztőátváltás (3:1 arány) és mérési trükk',
     html: `
-      <p>Háromféle kereskedelmi forgalomban kapható élesztővel találkozhatsz, és bármelyiket használhatod, ha figyelsz az átváltásra.</p>
-      <table>
-        <tr><th>Típus</th><th>Jellemző</th><th>Átváltás frissre</th></tr>
-        <tr><td>Friss (kocka) élesztő</td><td>Nedves, hűtve tárolandó, rövid szavatosság</td><td>1× (referencia)</td></tr>
-        <tr><td>Aktív szárított élesztő</td><td>Vízben feloldva aktiválandó felhasználás előtt</td><td>friss mennyiség ≈ fele</td></tr>
-        <tr><td>Instant (gyors) szárított élesztő</td><td>Közvetlenül a liszthez keverhető</td><td>friss mennyiség ≈ harmada</td></tr>
-      </table>
-      <p>Ez az alkalmazás mindig a <strong>friss élesztő</strong> mennyiségét számolja ki elsőként, ebből vezeti le a szárított változatokat — ezért lesz konzisztens az eredmény, függetlenül attól, melyik élesztőtípust szereted használó.</p>
-      <h3>Mi a teendő, ha nem eléggé szép és aktív a kelesztett tésztád?</h3>
-      <p>Nem minden élesztő egyforma! A bolti élesztők frissessége, aktivitása és tárolási körülményei nagyban eltérhetnek egymástól. Ha azt tapasztalod, hogy a tésztád a megadott idő alatt nem kel meg eléggé, nem elég szellős vagy lassabban indul be, <strong>alkalmazz többlet élesztő korrekciót a beállításokban</strong> (⚙️ ikon -> Élesztő mennyiség korrekciója).</p>
-      <p>Itt finomhangolhatod az élesztő erejét -30% és +30% közötti tartományban. Ha gyengébb az élesztőd vagy hűvösebb van a lakásban az átlagosnál, egy +5% vagy +10%-os korrekció csodákra képes.</p>
-      <h3>Miért kell kevesebb élesztő, ha hosszabb ideig vagy hidegebben kelesztesz?</h3>
-      <p>Az élesztő anyagcseréje hőmérsékletfüggő: melegben gyorsan, hidegben lassan dolgozik. Ha sok időt adsz a tésztának, kevesebb élesztő is elég ugyanahhoz a kelettséghez — sőt, a hosszabb, lassabb erjedés mélyebb, összetettebb ízt is eredményez, mert a tésztában lévő enzimek és a tejsavbaktériumok is több időt kapnak dolgozni.</p>
-      <p>A számítás emögötti logikáját (a hőmérséklet-szorzót és a referenciaértéket) a Kalkulátor „i” infógombjai mindenhol megmutatják, ahol felhasználjuk.</p>
+      <p>Az élesztő adagolása a hőmérséklet, a kelesztési idő és a liszt hidratációjának függvénye.</p>
+      
+      <h3>Az Alkalmazás Élesztő-modelljei</h3>
+      <ul>
+        <li><strong>Alkimista formula (Pizzaalkímia / Preyer György):</strong> Preyer György $20^\circ\text{C}$-os referencia táblázatán ($p = \frac{1.2}{h}$) és $1.096^{(T-20)}$ hőmérséklet-szorzóján alapuló modell. Hosszabb kelesztésnél kíméletesebb élesztőmennyiséget ad a kényelmes emészthetőségért.</li>
+        <li><strong>Gregory's formula:</strong> 2D felületi másodfokú log-polinóm regressziós görbe (hajszálpontos illeszkedés mérési tesztmátrixra).</li>
+        <li><strong>Craig formula:</strong> A klasszikus Pizzamaking szakmai referencia modell.</li>
+      </ul>
+
+      <h3>Élesztő-átváltás (Preyer György ajánlása)</h3>
+      <p>A Pizzaalkímia ajánlása alapján a friss és a száraz (instant vagy aktív) élesztő váltószáma <strong>3 az 1-hez</strong>:</p>
+      <p><em>3 g friss élesztő = 1 g instant / száraz élesztő (száraz = friss / 3)</em></p>
+
+      <h3>Vizes élesztőadagolási trükk ékszermérleg nélkül</h3>
+      <p>Ha nincs milligramm pontosságú ékszermérleged, de $0.5\text{ g}$ vagy $0.75\text{ g}$ élesztőt kell kimérned:</p>
+      <ol>
+        <li>Mérj ki <strong>10 g friss élesztőt</strong> a sima konyhai mérlegen.</li>
+        <li>Oldd fel pontosan <strong>100 ml szobahőmérsékletű vízben</strong>.</li>
+        <li><strong>10 ml oldat = 1 g friss élesztő!</strong> ($1\text{ ml oldat} = 0.1\text{ g}$ friss élesztő).</li>
+        <li>Egy mérőpohárral vagy injekciós fecskendővel hajszálpontosan kimérheted a kívánt adagot!</li>
+      </ol>
+    `
+  },
+  {
+    id: 'erleles-vs-kelesztes',
+    title: 'Érlelés vs. Kelesztés és Glutén-emésztés',
+    icon: 'book',
+    summary: 'Amilolízis, proteolízis, gliadin oldódása, NCGS vs. Cöliákia',
+    html: `
+      <h3>A Kelesztés és az Érlelés Különbsége</h3>
+      <dl>
+        <dt><strong>Kelesztés (Fermentáció, erjedés):</strong></dt>
+        <dd>A folyamat, amely során a tészta térfogata növekszik. Az élesztőgombák egyszerű cukrokat fogyasztva szén-dioxidot és alkoholt termelnek. A gázbuborékok megnövelik a tésztát.</dd>
+        
+        <dt><strong>Érlelés (Érés):</strong></dt>
+        <dd>Enzimatikus bontófolyamatok összessége, amelyekhez nem szükséges élesztő (csak víz és liszt):
+          <ul>
+            <li><strong>Amilolízis:</strong> Az amiláz enzimek a keményítőt egyszerű cukrokká bontják. (Ezeket eszik meg az élesztők).</li>
+            <li><strong>Proteolízis:</strong> A proteáz enzimek a glutént alkotó nagy fehérjemolekulákat bontják kisebb láncokra.</li>
+            <li><strong>Lipolízis:</strong> Zsírbontási folyamatok.</li>
+          </ul>
+        </dd>
+      </dl>
+
+      <h3>Hogyan függ össze a Glutén, a Gliadin és az Érlelés?</h3>
+      <p>A glutén két fő fehérjéből áll: <strong>gliadinból</strong> és <strong>gluteninből</strong>.</p>
+      <ul>
+        <li>A gluténérzékenység tüneteit főként a <strong>gliadin</strong> váltja ki.</li>
+        <li>A gliadin vízben nem oldódik, de <strong>alkoholban igen</strong>!</li>
+        <li>Az élesztős fermentáció során szén-dioxid mellett <strong>alkohol</strong> is termelődik, amely oldja a gliadint.</li>
+        <li>A hosszú érlelés során a proteolízis és az alkoholos bontás "előemészti" a tésztát a szervezetünk számára.</li>
+      </ul>
+
+      <h3>NCGS vs. Cöliákia</h3>
+      <ul>
+        <li><strong>Cöliákia (Autoimmun betegség):</strong> Semmilyen körülmények között <strong>NEM fogyaszthat glutént</strong>. A hosszan érlelt vagy kovászos tészta sem lesz gluténmentes!</li>
+        <li><strong>NCGS (Nem cöliákiás gluténérzékenység):</strong> A hosszan érlelt, előemésztett tészták lényegesen kevésbé terhelik a gyomrot és a bélrendszert, így jelentősen enyhíthetik a panaszokat.</li>
+      </ul>
     `
   },
   {
@@ -118,11 +213,11 @@ const WIKI_DATA = [
       <p>A PizzaAlkimista egy offline, böngészőből futtatható pizzatészta-kalkulátor. Segítségével hajszálpontosan kiszámíthatod a liszt, víz, só, élesztő és opcionális olaj mennyiségét.</p>
       <p><strong>Főbb funkciók:</strong></p>
       <ul>
+        <li>Háromféle élesztőmodell: Alkimista (Pizzaalkímia / Preyer György), Gregory's formula és Craig formula</li>
         <li>Biga előtészta és öregtészta (Pasta Riportata) kezelése</li>
         <li>Hideg fermentáció (hűtős érlelés) órák és hőmérséklet szerinti integrációja</li>
         <li>Többféle gombócméret egyidejű hozzáadása</li>
         <li>Hulladék (veszteség) kompenzáció és élesztő-korrekció</li>
-        <li>Angolszász mértékegységek és Fahrenheit hőmérséklet támogatása</li>
         <li>Kedvencek mentése és professzionális, nyomtatható A4-es PDF receptlap</li>
       </ul>
       <h3>Adatkezelés és adatvédelem</h3>

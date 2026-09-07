@@ -1227,7 +1227,7 @@
     cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.recommendedFlour.replace('{val}', recommendedW)}</div>`;
     
     // Kompenzációk és modellek
-    const modelLabel = inp.yeastModel === 'alchemist' ? 'Alkimista' : 'Craig';
+    const modelLabel = inp.yeastModel === 'alchemist' ? 'Alkimista' : (inp.yeastModel === 'gregory' ? "Gregory's" : 'Craig');
     cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.yeastModel.replace('{val}', modelLabel)}</div>`;
     if (inp.wastePct > 0) {
       cloudsHtml += `<div class="p-cloud-item">${pdfS.badges.wastePct.replace('{val}', inp.wastePct)}</div>`;
